@@ -7,6 +7,7 @@
 | 类别 | 词条 |
 |---|---|
 | 组件/项目 | ReShade、RenoDX、Luma、OptiScaler、OptiScaler DLSS-NR、DLSS Swapper、DXVK、dgVoodoo2、Special K、ENB、REFramework、ReLimiter、Display Commander、Lilium HDR、Ultra+、RHI |
+| 组件名（中文界面也用英文） | **DLSS Enabler、ASI Loader、Ultimate ASI Loader、DLSS5 Tool、DX11 Bridge、NR Cost Scaler、Cost Scaler、MFG Ada Unlock、20/30 FG Unlock、RTX 40 MFG Unlock、ShortFuse DLSS Tool、MFG Unlocks**、Neural Rendering、DLSS Super Resolution、Ray Reconstruction —— 主人 2026-11-01 看截图逐个圈定：组件名翻成中文（"ASI 加载器""DLSS5 工具""DLSS 启用工具"）反而对不上发布说明和日志。长句里的组件名也写英文（"安装 DLSS5 Tool"）。 |
 | 图形技术 | DLSS、DLSSD、DLSSG、FSR、XeSS、Streamline、Reflex、Frame Gen、MFG、HDR、scRGB、HDR10、NVAPI、DXR、VRAM |
 | 厂商/平台 | NVIDIA、AMD、Intel、Steam、Epic、GOG、Xbox、Game Pass、Nexus、PCGamingWiki、Discord |
 | 渠道/模式值 | Stable、Nightly、Development、Global、Custom、Select、Off、Auto |

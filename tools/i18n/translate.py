@@ -69,6 +69,11 @@ GLOSSARY: list[tuple[str, str]] = [
     # Feature names that stay English (user preference): the Chinese ones are harder to spot.
     ("Neural Rendering", "Neural Rendering"), ("DLSS Super Resolution", "DLSS Super Resolution"),
     ("Ray Reconstruction", "Ray Reconstruction"), ("DLSS Enabler", "DLSS Enabler"),
+    ("ASI Loader", "ASI Loader"), ("Ultimate ASI Loader", "Ultimate ASI Loader"),
+    ("DLSS5 Tool", "DLSS5 Tool"), ("DX11 Bridge", "DX11 Bridge"),
+    ("NR Cost Scaler", "NR Cost Scaler"), ("Cost Scaler", "Cost Scaler"),
+    ("MFG Ada Unlock", "MFG Ada Unlock"), ("20/30 FG Unlock", "20/30 FG Unlock"),
+    ("RTX 40 MFG Unlock", "RTX 40 MFG Unlock"), ("ShortFuse DLSS Tool", "ShortFuse DLSS Tool"),
 ]
 
 PLACEHOLDER_RE = re.compile(r"\{\d+(?::[^}]*)?\}")
