@@ -7,6 +7,21 @@ public class RemoteManifest
     [JsonPropertyName("version")]
     public int Version { get; set; }
 
+    /// <summary>
+    /// Mirror prefixes used to accelerate GitHub downloads, fastest first
+    /// (e.g. "https://gh.nxnow.top/"). Published remotely so the list can be replaced without
+    /// shipping a release; docs/mirror-eval.md holds the measurements behind the defaults.
+    /// </summary>
+    [JsonPropertyName("mirrorPrefixes")]
+    public List<string>? MirrorPrefixes { get; set; }
+
+    /// <summary>
+    /// Suggested download-source default for fresh installs (true = accelerated). Users who
+    /// already chose a source are never overridden; null keeps "Direct".
+    /// </summary>
+    [JsonPropertyName("mirrorEnabledDefault")]
+    public bool? MirrorEnabledDefault { get; set; }
+
     [JsonPropertyName("wikiNameOverrides")]
     public Dictionary<string, string>? WikiNameOverrides { get; set; }
 

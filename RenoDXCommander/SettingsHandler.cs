@@ -49,6 +49,8 @@ public partial class SettingsHandler
             _window.GameViewPanel.Visibility = Visibility.Collapsed;
             _window.SettingsPanel.Visibility = Visibility.Visible;
             _window.LoadingPanel.Visibility = Visibility.Collapsed;
+            // Build the C#-only "Downloads" section before the nav column scans for sections.
+            InitDownloadSection();
             // Nav column / search / update countdown (one-time setup) + scroll to the last section
             OnSettingsPageOpened(settingsWasOpen);
             // Sync toggle state with ViewModel

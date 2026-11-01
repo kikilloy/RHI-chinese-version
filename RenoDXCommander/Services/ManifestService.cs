@@ -1,6 +1,7 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using RenoDXCommander.Models;
+using RenoDXCommander.Services.Net;
 
 namespace RenoDXCommander.Services;
 
@@ -92,6 +93,9 @@ public class ManifestService : IManifestService
             CrashReporter.Log($"[ManifestService.FetchAsync] Fetched: v{manifest?.Version}, " +
                 $"{manifest?.WikiNameOverrides?.Count ?? 0} name overrides, " +
                 $"{manifest?.GameNotes?.Count ?? 0} game notes");
+            // Cross-layer on purpose: persisting the suggested default belongs to the settings
+            // layer, and there is no event for "manifest arrived" to hang it on.
+            RenoDXCommander.ViewModels.SettingsViewModel.ApplyManifestMirrorDefaults(manifest);
             return manifest;
         }
         catch (Exception ex)
@@ -137,6 +141,9 @@ public class ManifestService : IManifestService
             if (manifest != null)
                 Normalize(manifest);
             CrashReporter.Log($"[ManifestService.LoadCached] Loaded from cache: v{manifest?.Version}");
+            // Dual init path: the cached manifest must publish mirror prefixes too, or an offline
+            // launch would silently run without the feature.
+            RenoDXCommander.ViewModels.SettingsViewModel.ApplyManifestMirrorDefaults(manifest);
             return manifest;
         }
         catch (Exception ex)
@@ -152,6 +159,10 @@ public class ManifestService : IManifestService
     /// </summary>
     internal static void Normalize(RemoteManifest m)
     {
+        // Mirror prefixes are plain data (no case-insensitive lookups), but they must reach the
+        // HTTP pipeline whichever path loaded the manifest.
+        if (m.MirrorPrefixes is { Count: > 0 }) MirrorRuntime.SetManifestPrefixes(m.MirrorPrefixes);
+
         if (m.WikiNameOverrides != null)
             m.WikiNameOverrides = new Dictionary<string, string>(m.WikiNameOverrides, StringComparer.OrdinalIgnoreCase);
         if (m.LumaNameOverrides != null)

@@ -1,6 +1,12 @@
 {
   "version": 2,
   "_doc": "Full field reference: docs/manifest-field-reference.md",
+  "mirrorPrefixes": [
+    "https://gh.nxnow.top/",
+    "https://ghfile.geekertao.top/",
+    "https://gh-proxy.com/"
+  ],
+  "mirrorEnabledDefault": false,
   "featureFlags": {
     "dlssNr": true,
     "nexusMods": false,

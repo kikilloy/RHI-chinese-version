@@ -1,6 +1,8 @@
 using System.Text.Json;
 using CommunityToolkit.Mvvm.ComponentModel;
+using RenoDXCommander.Models;
 using RenoDXCommander.Services;
+using RenoDXCommander.Services.Net;
 
 namespace RenoDXCommander.ViewModels;
 
@@ -95,6 +97,40 @@ public partial class SettingsViewModel : ObservableObject
     [ObservableProperty] private string _gitHubOAuthToken = "";
     /// <summary>GitHub login name of the authenticated user.</summary>
     [ObservableProperty] private string _gitHubUsername = "";
+
+    // ── Download source (China mirror acceleration) ───────────────────────────
+    /// <summary>
+    /// "Direct" (default) or "Accelerated". When accelerated, GitHub downloads are tried through
+    /// mirror prefixes first and fall back to the direct connection. The manifest may publish a
+    /// different default for fresh installs (<c>mirrorEnabledDefault</c>).
+    /// </summary>
+    [ObservableProperty] private string _downloadSourceMode = DownloadSourceDirect;
+    /// <summary>User-supplied mirror prefix (e.g. https://gh.nxnow.top/). Empty = manifest/default list.</summary>
+    [ObservableProperty] private string _customMirrorPrefix = "";
+    /// <summary>Verifies mirrored downloads against GitHub's published digest (ADR-0002). Default on.</summary>
+    [ObservableProperty] private bool _verifyDownloads = true;
+    /// <summary>
+    /// jsDelivr as an extra raw fallback. Off by default: its edge cache (s-maxage 12 h) would
+    /// serve a stale manifest.json / motd.md (see docs/mirror-eval.md §6).
+    /// </summary>
+    [ObservableProperty] private bool _useJsDelivrFallback;
+
+    public const string DownloadSourceDirect = "Direct";
+    public const string DownloadSourceAccelerated = "Accelerated";
+
+    /// <summary>True when the user picked the accelerated download source.</summary>
+    public bool IsAcceleratedDownloads =>
+        string.Equals(DownloadSourceMode, DownloadSourceAccelerated, StringComparison.OrdinalIgnoreCase);
+
+    /// <summary>
+    /// Pushes the download-source settings into the HTTP pipeline. Call after loading settings and
+    /// after every change — the handler reads <see cref="MirrorRuntime"/> on each request.
+    /// </summary>
+    public void ApplyMirrorRuntime() => MirrorRuntime.Apply(
+        enabled: IsAcceleratedDownloads,
+        customPrefix: string.IsNullOrWhiteSpace(CustomMirrorPrefix) ? null : CustomMirrorPrefix.Trim(),
+        useJsDelivrFallback: UseJsDelivrFallback,
+        verifyDownloads: VerifyDownloads);
 
     // ── Digital Vibrance ──────────────────────────────────────────────────────
     /// <summary>Per-display DVC values. Key = display index (string), Value = 0-100.</summary>
@@ -314,6 +350,13 @@ public partial class SettingsViewModel : ObservableObject
         if (s.TryGetValue("SettingsLastSection", out var slsVal) && !string.IsNullOrWhiteSpace(slsVal)) SettingsLastSection = slsVal;
         if (s.TryGetValue("DxvkVariant", out var dvVal)) DxvkVariant = dvVal ?? "LiliumHdr";
         if (s.TryGetValue("ReShadeChannel", out var rscVal)) ReShadeChannel = rscVal ?? "Stable";
+        if (s.TryGetValue("DownloadSourceMode", out var dsmVal) && !string.IsNullOrWhiteSpace(dsmVal))
+            DownloadSourceMode = dsmVal;
+        else if (s.TryGetValue("MirrorEnabledDefault", out var medVal) && medVal == "true")
+            DownloadSourceMode = DownloadSourceAccelerated;   // manifest-published default for fresh installs
+        if (s.TryGetValue("CustomMirrorPrefix", out var cmpVal)) CustomMirrorPrefix = cmpVal ?? "";
+        if (s.TryGetValue("VerifyDownloads", out var vdVal)) VerifyDownloads = vdVal != "false"; // default true
+        if (s.TryGetValue("UseJsDelivrFallback", out var jdfVal)) UseJsDelivrFallback = jdfVal == "true";
         if (s.TryGetValue("PeakNits", out var pnVal) && int.TryParse(pnVal, out var pnInt)) PeakNits = pnInt;
         if (s.TryGetValue("PeakNitsEnabled", out var pneVal)) PeakNitsEnabled = pneVal != "false"; // default true
         if (s.TryGetValue("PeakNitsPresets", out var pnpVal))
@@ -441,6 +484,38 @@ public partial class SettingsViewModel : ObservableObject
             }
             catch { DetailSectionOrder = new(DefaultSectionOrder); }
         }
+
+        // Push the (possibly just loaded) download-source choice into the HTTP pipeline before
+        // anything can start downloading.
+        ApplyMirrorRuntime();
+    }
+
+    /// <summary>
+    /// Applies manifest-published mirror data. The prefix list goes straight into the HTTP
+    /// pipeline (it can change without a release); the suggested on/off default is only stored for
+    /// users who never chose a source themselves, and therefore takes effect on the next launch —
+    /// a running session never has its download source flipped underneath it.
+    /// </summary>
+    public static void ApplyManifestMirrorDefaults(RemoteManifest? manifest)
+    {
+        if (manifest is null) return;
+
+        MirrorRuntime.SetManifestPrefixes(manifest.MirrorPrefixes);
+
+        if (manifest.MirrorEnabledDefault is not bool wanted) return;
+
+        try
+        {
+            UpdateSettingsFile(s =>
+            {
+                if (s.ContainsKey("DownloadSourceMode")) return;   // user already chose — leave it
+                s["MirrorEnabledDefault"] = wanted ? "true" : "false";
+            }, "[SettingsViewModel.ApplyManifestMirrorDefaults]");
+        }
+        catch (Exception ex)
+        {
+            CrashReporter.Log($"[SettingsViewModel.ApplyManifestMirrorDefaults] Failed — {ex.Message}");
+        }
     }
 
     /// <summary>
@@ -491,6 +566,11 @@ public partial class SettingsViewModel : ObservableObject
         s["SettingsLastSection"] = SettingsLastSection;
         s["DxvkVariant"] = DxvkVariant;
         s["ReShadeChannel"] = ReShadeChannel;
+        s["DownloadSourceMode"] = IsAcceleratedDownloads ? DownloadSourceAccelerated : DownloadSourceDirect;
+        if (!string.IsNullOrWhiteSpace(CustomMirrorPrefix)) s["CustomMirrorPrefix"] = CustomMirrorPrefix.Trim();
+        else s.Remove("CustomMirrorPrefix");
+        s["VerifyDownloads"] = VerifyDownloads ? "true" : "false";
+        s["UseJsDelivrFallback"] = UseJsDelivrFallback ? "true" : "false";
         if (PeakNits > 0) s["PeakNits"] = PeakNits.ToString();
         s["PeakNitsEnabled"] = PeakNitsEnabled ? "true" : "false";
         if (PeakNitsPresets.Count < 3)

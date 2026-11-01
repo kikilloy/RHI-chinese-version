@@ -329,6 +329,25 @@ Manifest version integer. Logged on every `ApplyManifest` call for diagnostics.
 
 ### `gacSymlinkGames` — see [Install Behaviour Fields](#gacSymlinkGames)
 
+### `mirrorPrefixes` — `string[]`
+Mirror prefixes used by the optional "accelerated download source", **fastest first**. Each entry is
+prepended to the original URL (`https://gh.nxnow.top/https://github.com/...`). Only GitHub download
+URLs are rewritten: `github.com/{o}/{r}/releases/download/**`, `/archive/**`, `codeload.github.com/**`
+and `raw.githubusercontent.com/**`. `api.github.com`, presigned release-asset URLs, `nightly.link` and
+all non-GitHub hosts are never proxied.
+
+- Invalid entries (not HTTPS, not absolute, or a GitHub host) are dropped silently.
+- An empty/missing list falls back to `MirrorPolicy.DefaultPrefixes` in the app.
+- The user's custom prefix (settings page) always wins over this list.
+- Read by `ManifestService.Normalize()`, so both the network path and the cached-manifest path apply it.
+- Measurements behind the current list: `docs/mirror-eval.md`. Mirrors die often — verify before changing.
+
+### `mirrorEnabledDefault` — `bool`
+Suggested default for the download source on **fresh installs only**. `false` (or omitted) = direct
+connection. Users who already picked a source keep it: the value is only persisted as
+`MirrorEnabledDefault` in `settings.json` when no `DownloadSourceMode` key exists yet, and takes effect
+on the next launch.
+
 ---
 
 ## Key Architectural Notes

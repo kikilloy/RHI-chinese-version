@@ -1,5 +1,5 @@
 @echo off
-set OUT=C:\Users\Mark\OneDrive\Documents\RDXC\Publish\RHI
+set OUT=E:\coding\rhi\output
 set SRC=RenoDXCommander
 
 :: Force close RHI and helpers if running so the publish can replace the EXE

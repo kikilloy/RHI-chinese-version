@@ -1,6 +1,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.UI.Xaml;
 using RenoDXCommander.Services;
+using RenoDXCommander.Services.Net;
 using RenoDXCommander.ViewModels;
 
 namespace RenoDXCommander;
@@ -53,7 +54,15 @@ public partial class App : Application
             // for GitHub hosts only, by GitHubTokenHandler (never a default header: this client
             // also talks to non-GitHub hosts and manifest URLs).
             GitHubTokenHandler.SetToken(DevUnlockService.GitHubApiToken);
-            var client = new HttpClient(new GitHubTokenHandler(handler));
+
+            // Mirror pipeline order matters:
+            //   HttpClient → MirrorRewriteHandler → GitHubTokenHandler → SocketsHttpHandler
+            // The mirror handler rewrites the URL to a third-party prefix, so it must run before
+            // the token handler decides whether the host may see the token (it never may).
+            var mirrorHealth = sp.GetRequiredService<IMirrorHealthTracker>();
+            var integrityGuard = sp.GetRequiredService<IDownloadIntegrityGuard>();
+            var client = new HttpClient(new MirrorRewriteHandler(
+                new GitHubTokenHandler(handler), mirrorHealth, integrity: integrityGuard));
             client.DefaultRequestHeaders.Add("User-Agent", "RHI/2.0");
             // Per-request timeout — generous enough for large files on slow connections.
             // Individual services can set per-request timeouts via CancellationTokenSource
@@ -66,6 +75,12 @@ public partial class App : Application
 
         // Shared ETag cache for GitHub API conditional requests (304 Not Modified)
         services.AddSingleton<GitHubETagCache>();
+
+        // Session-scoped mirror circuit breaker — shared by the HTTP handler and the settings page.
+        services.AddSingleton<IMirrorHealthTracker, MirrorHealthTracker>();
+
+        // Digest lookup + 24 h cache for verifying mirrored downloads (ADR-0002).
+        services.AddSingleton<IDownloadIntegrityGuard, DownloadIntegrityGuard>();
 
         // Services — all singletons
         services.AddSingleton<IModInstallService, ModInstallService>();

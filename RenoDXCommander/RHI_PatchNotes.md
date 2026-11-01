@@ -14,6 +14,12 @@ If you use **Sign in with GitHub**, click **Sign out** in the same place, revoke
 
 ### New
 
+**Accelerated downloads**
+- Settings now has a **Downloads** section. With **Accelerated** selected, RHI fetches GitHub downloads through a mirror instead of connecting to GitHub directly: it tries the fastest mirror first, then the next one, and finally the direct connection, so a mirror that is down or slow can never block an install.
+- **Custom mirror prefix** accepts your own proxy — anything that answers `https://your-mirror/` + the full GitHub URL. Leave it empty to use the mirror list that ships with the manifest, which can be updated without a new RHI release.
+- **Test mirrors** downloads a small file through every mirror in the list and reports the time for each, so you can see which one is actually fast for you.
+- **Verify downloads** (on by default) compares mirrored files against the hash GitHub publishes. If a mirror returns a different file, RHI rejects it, marks that mirror as unreliable and falls back to the direct connection.
+
 **Per-game FPS limit**
 - Driver Settings on each game's page now has an FPS Limit option, so you can cap a single game without setting a limit for every game. Global follows the limit on the Settings page, Off turns the driver limit off for that game, and Custom... lets you enter any value from 20 to 1000. Restore Defaults has moved to the bottom row of Driver Settings to make room.
 
