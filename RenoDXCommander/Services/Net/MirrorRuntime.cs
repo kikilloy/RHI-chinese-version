@@ -32,6 +32,24 @@ public static class MirrorRuntime
     /// <summary>Raised once per fallback so the UI can show "mirror unavailable, using direct".</summary>
     public static event Action<string>? FellBackToDirect;
 
+    private static volatile string? _integritySkipReason;
+
+    /// <summary>
+    /// Why the last mirrored download could not be verified, or null when the last one was fine.
+    /// Shown on the settings page: "unverified" without a reason tells the user nothing.
+    /// </summary>
+    public static string? IntegritySkipReason => _integritySkipReason;
+
+    /// <summary>Records that verification had to be skipped, and why.</summary>
+    public static void ReportIntegritySkip(string reason)
+    {
+        if (string.IsNullOrWhiteSpace(reason)) return;
+        _integritySkipReason = reason.Trim();
+    }
+
+    /// <summary>Called after a verification actually happened, so stale warnings disappear.</summary>
+    public static void ClearIntegritySkip() => _integritySkipReason = null;
+
     /// <summary>Current options snapshot. Cheap, allocation-free, safe to read per request.</summary>
     public static MirrorOptions Options => _options;
 
@@ -148,5 +166,6 @@ public static class MirrorRuntime
             _state = MirrorRuntimeState.Default;
             _options = MirrorOptions.Direct;
         }
+        _integritySkipReason = null;
     }
 }

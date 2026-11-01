@@ -239,9 +239,13 @@ public sealed class MirrorRewriteHandler : DelegatingHandler
             using var timeoutCts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
             timeoutCts.CancelAfter(ApiLookupTimeout);
 
-            return await _integrity
+            var expectation = await _integrity
                 .GetExpectationAsync(original, mirrored.Content.Headers.ContentLength, FetchApiJsonAsync, timeoutCts.Token)
                 .ConfigureAwait(false);
+
+            // A verified download proves the lookup worked — drop any stale "couldn't verify" note.
+            if (expectation is not null) MirrorRuntime.ClearIntegritySkip();
+            return expectation;
         }
         catch (OperationCanceledException) when (!cancellationToken.IsCancellationRequested)
         {
@@ -268,11 +272,33 @@ public sealed class MirrorRewriteHandler : DelegatingHandler
         using var response = await SendAsync(request, cancellationToken).ConfigureAwait(false);
         if (!response.IsSuccessStatusCode)
         {
-            CrashReporter.Log($"[MirrorRewriteHandler.FetchApiJsonAsync] HTTP {(int)response.StatusCode} for {apiUri.Host}{apiUri.AbsolutePath}");
+            // Read the body here (we own this response) so the reason is actionable: a dead token
+            // and a rate limit both look like "403" otherwise, and neither explains itself.
+            var status = (int)response.StatusCode;
+            var body = await ReadBodyForDiagnosticsAsync(response, cancellationToken).ConfigureAwait(false);
+            var explanation = GitHubApiDiagnostics.Explain(status, body);
+
+            CrashReporter.Log($"[MirrorRewriteHandler.FetchApiJsonAsync] HTTP {status} for {apiUri.Host}{apiUri.AbsolutePath} — {explanation}");
+            MirrorRuntime.ReportIntegritySkip(explanation);
             return null;
         }
 
         return await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
+    }
+
+    private static async Task<string?> ReadBodyForDiagnosticsAsync(
+        HttpResponseMessage response,
+        CancellationToken cancellationToken)
+    {
+        try
+        {
+            var body = await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
+            return body.Length <= 400 ? body : body[..400];
+        }
+        catch (Exception ex) when (ex is HttpRequestException or IOException or OperationCanceledException)
+        {
+            return null;
+        }
     }
 
     /// <summary>2xx, or anything a caller might legitimately be waiting for (304 / unfollowed 3xx).</summary>

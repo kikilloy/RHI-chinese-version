@@ -54,11 +54,16 @@ public sealed class DownloadIntegrityGuard : IDownloadIntegrityGuard
 
             var json = await fetchApiJson(GitHubDigest.BuildReleaseApiUri(asset), cancellationToken)
                 .ConfigureAwait(false);
+
+            // null means the API call itself failed; the caller already reported why.
+            if (json is null) return null;
+
             var sha = GitHubDigest.ParseReleaseAssetSha256(json, asset.FileName);
 
             if (sha is null || !GitHubDigest.LooksLikeHex(sha, 64))
             {
                 CrashReporter.Log($"[DownloadIntegrityGuard] No digest for {asset.Owner}/{asset.Repo}@{asset.Tag}/{asset.FileName} — verification skipped");
+                MirrorRuntime.ReportIntegritySkip($"GitHub publishes no sha256 digest for {asset.FileName}");
                 return null;
             }
 
@@ -86,11 +91,14 @@ public sealed class DownloadIntegrityGuard : IDownloadIntegrityGuard
 
             var json = await fetchApiJson(GitHubDigest.BuildContentsApiUri(raw), cancellationToken)
                 .ConfigureAwait(false);
+            if (json is null) return null;   // API failure — already reported
+
             var sha = GitHubDigest.ParseContentsBlobSha(json);
 
             if (sha is null)
             {
                 CrashReporter.Log($"[DownloadIntegrityGuard] No blob sha for {raw.Owner}/{raw.Repo}@{raw.Reference}/{raw.Path} — verification skipped");
+                MirrorRuntime.ReportIntegritySkip($"GitHub publishes no blob sha for {raw.Path}");
                 return null;
             }
 

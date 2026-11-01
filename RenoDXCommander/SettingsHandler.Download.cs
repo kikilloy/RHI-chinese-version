@@ -260,27 +260,37 @@ public partial class SettingsHandler
         if (_downloadStatusText is null) return;
         var settings = _window.ViewModel.Settings;
 
+        string text;
+        var warn = false;
+
         if (!settings.IsAcceleratedDownloads)
         {
-            _downloadStatusText.Text = "Direct only — GitHub is contacted for every download.";
-            _downloadStatusText.Foreground = UIFactory.Brush(ResourceKeys.TextSecondaryBrush);
-            return;
+            text = "Direct only — GitHub is contacted for every download.";
+        }
+        else
+        {
+            var prefixes = MirrorRuntime.EffectivePrefixes;
+            var origin = string.IsNullOrWhiteSpace(settings.CustomMirrorPrefix) ? "manifest/default list" : "custom prefix";
+            text = settings.VerifyDownloads
+                ? $"Accelerated via {prefixes.Count} mirror(s) from the {origin} · integrity checks on."
+                : $"Accelerated via {prefixes.Count} mirror(s) from the {origin} · integrity checks OFF.  You will not be protected against a tampered mirror.";
+            warn = !settings.VerifyDownloads;
         }
 
-        var prefixes = MirrorRuntime.EffectivePrefixes;
-        var verify = settings.VerifyDownloads ? "integrity checks on" : "integrity checks OFF";
-        var origin = string.IsNullOrWhiteSpace(settings.CustomMirrorPrefix) ? "manifest/default list" : "custom prefix";
-        var text = $"Accelerated via {prefixes.Count} mirror(s) from the {origin} · {verify}.";
-
-        if (!settings.VerifyDownloads)
+        // Verification only happens when GitHub can tell us the expected hash. When it can't
+        // (dead token, rate limit, no published digest) say so instead of staying silent —
+        // "unverified" with no reason is the worst possible outcome.
+        var skipReason = MirrorRuntime.IntegritySkipReason;
+        if (settings.VerifyDownloads && !string.IsNullOrWhiteSpace(skipReason))
         {
-            _downloadStatusText.Text = text + "  You will not be protected against a tampered mirror.";
-            _downloadStatusText.Foreground = UIFactory.GetBrush("#E8C55A");
-            return;
+            text += $"\nLast mirrored download was NOT verified: {skipReason}";
+            warn = true;
         }
 
         _downloadStatusText.Text = text;
-        _downloadStatusText.Foreground = UIFactory.Brush(ResourceKeys.TextSecondaryBrush);
+        _downloadStatusText.Foreground = warn
+            ? UIFactory.GetBrush("#E8C55A")
+            : UIFactory.Brush(ResourceKeys.TextSecondaryBrush);
     }
 
     private async void RunMirrorProbe(Button button, TextBlock output)
