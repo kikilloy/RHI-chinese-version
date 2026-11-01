@@ -14,6 +14,7 @@ using Microsoft.UI.Xaml.Media;
 using RenoDXCommander.Models;
 using RenoDXCommander.Services;
 using RenoDXCommander.ViewModels;
+using RenoDXCommander.Localization;
 
 namespace RenoDXCommander;
 
@@ -202,7 +203,7 @@ public sealed partial class MainWindow
             // Auto button + paper white preset buttons
             var mgButtons = new List<Button>();
             var autoMgBtn = CogDialog.StyledButton("Auto", CogButtonKind.Secondary, compact: true);
-            ToolTipService.SetToolTip(autoMgBtn, "Calculate Middle Grey from Peak Brightness and Gamma using the ITU formula");
+            ToolTipService.SetToolTip(autoMgBtn, Loc.T("Calculate Middle Grey from Peak Brightness and Gamma using the ITU formula"));
             autoMgBtn.Click += (s, ev) =>
             {
                 mgSlider.Value = CalcAutoMiddleGrey((int)nitsSlider.Value, (int)contrastSlider.Value);
@@ -264,7 +265,7 @@ public sealed partial class MainWindow
             cog.AddNote("Save as Default stores these values as your RTX HDR preset. Set Default loads that preset into the sliders; click Apply to write it.");
 
             var saveDefaultBtn = CogDialog.StyledButton("Save as Default", CogButtonKind.Secondary);
-            ToolTipService.SetToolTip(saveDefaultBtn, "Save current slider values as your default RTX HDR preset");
+            ToolTipService.SetToolTip(saveDefaultBtn, Loc.T("Save current slider values as your default RTX HDR preset"));
             var setDefaultBtn = CogDialog.StyledButton("Set Default", CogButtonKind.Secondary);
             setDefaultBtn.IsEnabled = hasDefaults;
             ToolTipService.SetToolTip(setDefaultBtn, hasDefaults ? "Apply your saved default preset to the sliders" : "No default saved yet. Use Save as Default first.");
@@ -285,7 +286,7 @@ public sealed partial class MainWindow
                     File.WriteAllText(defaultsPath, JsonSerializer.Serialize(defaults,
                         new JsonSerializerOptions { WriteIndented = true }));
                     setDefaultBtn.IsEnabled = true;
-                    ToolTipService.SetToolTip(setDefaultBtn, "Apply your saved default preset to the sliders");
+                    ToolTipService.SetToolTip(setDefaultBtn, Loc.T("Apply your saved default preset to the sliders"));
                     cog.SetSuccess("Saved as your default RTX HDR preset.");
                 }
                 catch (Exception ex) when (ex is IOException or UnauthorizedAccessException or NotSupportedException)

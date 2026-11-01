@@ -67,7 +67,7 @@ public partial class DetailPanelBuilder
             IsEnabled = !card.UseNormalReShade,
         };
         ToolTipService.SetToolTip(addonModeCombo,
-            "Global = use global addon set. Select = pick per-game addons. Off = no addons for this game.");
+            Loc.T("Global = use global addon set. Select = pick per-game addons. Off = no addons for this game."));
 
         // Allow re-opening the Select picker when already on Select
         addonModeCombo.DropDownClosed += (s, ev) =>
@@ -192,7 +192,7 @@ public partial class DetailPanelBuilder
             Margin = new Thickness(0, 8, 0, 0),
         };
         ToolTipService.SetToolTip(presetBtn,
-            "Pick .ini preset files to copy to this game's folder. Place presets in the reshade-presets folder.");
+            Loc.T("Pick .ini preset files to copy to this game's folder. Place presets in the reshade-presets folder."));
         presetBtn.Click += async (s, ev) =>
         {
             var selected = await PresetPopupHelper.ShowAsync(_window.Content.XamlRoot);
@@ -329,7 +329,7 @@ public partial class DetailPanelBuilder
             HorizontalAlignment = HorizontalAlignment.Stretch,
         };
         ToolTipService.SetToolTip(launchExeBox,
-            "Override the executable used when launching this game. Leave blank for auto-detection (largest exe in install folder).");
+            Loc.T("Override the executable used when launching this game. Leave blank for auto-detection (largest exe in install folder)."));
         launchExeBox.LostFocus += (s, ev) =>
         {
             var newPath = launchExeBox.Text.Trim();

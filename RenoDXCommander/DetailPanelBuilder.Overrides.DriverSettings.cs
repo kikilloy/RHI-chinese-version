@@ -550,7 +550,7 @@ public partial class DetailPanelBuilder
                     IsEnabled = smoothMotionEnabled,
                     Opacity = smoothMotionEnabled ? 1.0 : 0.4,
                 };
-                ToolTipService.SetToolTip(combo, "Smooth Motion APIs — which graphics APIs Smooth Motion is allowed to hook. None = disabled for all APIs.");
+                ToolTipService.SetToolTip(combo, Loc.T("Smooth Motion APIs — which graphics APIs Smooth Motion is allowed to hook. None = disabled for all APIs."));
                 var init = true;
                 combo.SelectionChanged += (s, ev) =>
                 {
@@ -790,7 +790,7 @@ public partial class DetailPanelBuilder
                 IsEnabled = nvidiaPresetService.IsSupported,
             };
             ToolTipService.SetToolTip(restoreProfileBtn,
-                "Restore this game's NVIDIA driver profile to factory defaults. Removes all custom settings (presets, render scale, MFG, driver overrides). This action is irreversible.");
+                Loc.T("Restore this game's NVIDIA driver profile to factory defaults. Removes all custom settings (presets, render scale, MFG, driver overrides). This action is irreversible."));
             restoreProfileBtn.Click += async (s, ev) =>
             {
                 var xamlRoot = (s as FrameworkElement)?.XamlRoot ?? _window.Content.XamlRoot;
@@ -861,7 +861,7 @@ public partial class DetailPanelBuilder
                     CornerRadius = new CornerRadius(6),
                     MaxDropDownHeight = 300,
                 };
-                ToolTipService.SetToolTip(rebarEnableCombo, "Auto = driver decides. On = force-enable ReBAR. Off = force-disable ReBAR.");
+                ToolTipService.SetToolTip(rebarEnableCombo, Loc.T("Auto = driver decides. On = force-enable ReBAR. Off = force-disable ReBAR."));
                 var rebarComboInit = true;
                 rebarEnableCombo.SelectionChanged += (s, ev) =>
                 {
@@ -901,7 +901,7 @@ public partial class DetailPanelBuilder
                     IsEnabled = rebarEnabled,
                     Opacity = rebarEnabled ? 1.0 : 0.4,
                 };
-                ToolTipService.SetToolTip(rebarModeCombo, "Standard = conservative. Optimized = aggressive driver scheduling (used by NVIDIA-whitelisted titles).");
+                ToolTipService.SetToolTip(rebarModeCombo, Loc.T("Standard = conservative. Optimized = aggressive driver scheduling (used by NVIDIA-whitelisted titles)."));
                 var modeComboInit = true;
                 rebarModeCombo.SelectionChanged += (s, ev) =>
                 {

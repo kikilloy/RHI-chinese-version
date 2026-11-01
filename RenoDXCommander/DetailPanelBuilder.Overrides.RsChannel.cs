@@ -31,7 +31,7 @@ public partial class DetailPanelBuilder
             Foreground = UIFactory.Brush(ResourceKeys.TextPrimaryBrush),
         };
         ToolTipService.SetToolTip(channelLabel,
-            "Override the global ReShade build channel for this game.\nVulkan games: changing this affects ALL Vulkan games.");
+            Loc.T("Override the global ReShade build channel for this game.\nVulkan games: changing this affects ALL Vulkan games."));
 
         var channelItems = new[] { "Stable", "Nightly", "Custom", Loc.T("No Addons"), "Legacy..." };
         // For Vulkan games, show the effective Vulkan-wide override (any Vulkan game's override applies to all)
@@ -77,7 +77,7 @@ public partial class DetailPanelBuilder
             HorizontalAlignment = HorizontalAlignment.Stretch,
         };
         ToolTipService.SetToolTip(channelCombo,
-            "Override the ReShade build channel for this game.\nVulkan games: changing this affects ALL Vulkan games.");
+            Loc.T("Override the ReShade build channel for this game.\nVulkan games: changing this affects ALL Vulkan games."));
 
         bool channelComboInitializing = true;
         ctx.ChannelComboInitializing = true;

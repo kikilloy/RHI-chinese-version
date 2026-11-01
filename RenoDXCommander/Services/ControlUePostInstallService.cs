@@ -10,6 +10,7 @@
 //   4. Clear SR DLSS preset    → delete from NVIDIA driver profile (inherits global)
 
 using Microsoft.Extensions.DependencyInjection;
+using RenoDXCommander.Localization;
 
 namespace RenoDXCommander.Services;
 
@@ -160,7 +161,7 @@ public static class ControlUePostInstallService
                 MaxDropDownHeight = 300,
             };
             Microsoft.UI.Xaml.Controls.ToolTipService.SetToolTip(optiCombo,
-                "Installs OptiScaler Nightly with Frame Generation configured for Control UE.\nRenames OptiScaler to winmm.dll and ReShade to dxgi.dll.");
+                Loc.T("Installs OptiScaler Nightly with Frame Generation configured for Control UE.\nRenames OptiScaler to winmm.dll and ReShade to dxgi.dll."));
             optiStack.Children.Add(optiCombo);
             Microsoft.UI.Xaml.Controls.Grid.SetColumn(optiStack, 0);
             comboRow.Children.Add(optiStack);
@@ -184,7 +185,7 @@ public static class ControlUePostInstallService
                 Opacity = 0.45,
             };
             Microsoft.UI.Xaml.Controls.ToolTipService.SetToolTip(hdrCombo,
-                "If Yes, writes FgSlHdr10=1 to reshade.ini so the FG shader uses HDR10. Only available when installing OptiScaler FG.");
+                Loc.T("If Yes, writes FgSlHdr10=1 to reshade.ini so the FG shader uses HDR10. Only available when installing OptiScaler FG."));
             hdrStack.Children.Add(hdrCombo);
             Microsoft.UI.Xaml.Controls.Grid.SetColumn(hdrStack, 1);
             comboRow.Children.Add(hdrStack);

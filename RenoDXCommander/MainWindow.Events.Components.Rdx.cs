@@ -11,6 +11,7 @@ using Microsoft.UI.Xaml.Controls;
 using RenoDXCommander.Models;
 using RenoDXCommander.Services;
 using RenoDXCommander.ViewModels;
+using RenoDXCommander.Localization;
 
 namespace RenoDXCommander;
 
@@ -157,7 +158,7 @@ public sealed partial class MainWindow
         };
 
         var autoBtn = CogDialog.StyledButton("Auto", CogButtonKind.Primary, compact: true);
-        ToolTipService.SetToolTip(autoBtn, "Reads your monitor's peak brightness automatically.");
+        ToolTipService.SetToolTip(autoBtn, Loc.T("Reads your monitor's peak brightness automatically."));
         autoBtn.Click += async (s, ev) =>
         {
             try

@@ -127,9 +127,9 @@ public partial class DetailPanelBuilder
         if (driverOverrideActive)
             ToolTipService.SetToolTip(versionCombo, Loc.T("NVIDIA Override is active — the driver is injecting its own latest DLL for this game. Select any other version to disable the override and deploy that version instead."));
         else if (onDriverOverrideToggled != null)
-            ToolTipService.SetToolTip(versionCombo, "Selects which DLL version is copied into the game folder. Default restores the original game DLL. Custom uses your own file from %LocalAppData%\\RHI\\Custom\\DLSS\\. NVIDIA Override lets the driver inject its own latest version instead of a file on disk — equivalent to enabling DLSS Override in NVIDIA App or Profile Inspector.");
+            ToolTipService.SetToolTip(versionCombo, Loc.T("Selects which DLL version is copied into the game folder. Default restores the original game DLL. Custom uses your own file from %LocalAppData%\\RHI\\Custom\\DLSS\\. NVIDIA Override lets the driver inject its own latest version instead of a file on disk — equivalent to enabling DLSS Override in NVIDIA App or Profile Inspector."));
         else
-            ToolTipService.SetToolTip(versionCombo, "Selects which DLL version is copied into the game folder. Default restores the original game DLL. Custom uses your own file from %LocalAppData%\\RHI\\Custom\\DLSS\\.");
+            ToolTipService.SetToolTip(versionCombo, Loc.T("Selects which DLL version is copied into the game folder. Default restores the original game DLL. Custom uses your own file from %LocalAppData%\\RHI\\Custom\\DLSS\\."));
 
         col.Children.Add(versionCombo);
 
@@ -257,7 +257,7 @@ public partial class DetailPanelBuilder
                 MaxDropDownHeight = 300,
             };
             ToolTipService.SetToolTip(rsCombo,
-                "Override the DLSS render resolution scale. Off = game controls the scale.\nNamed presets set a fixed percentage. Custom lets you enter any value from 33-100%.");
+                Loc.T("Override the DLSS render resolution scale. Off = game controls the scale.\nNamed presets set a fixed percentage. Custom lets you enter any value from 33-100%."));
 
             bool rsInit = true;
             rsCombo.SelectionChanged += (s, ev) =>

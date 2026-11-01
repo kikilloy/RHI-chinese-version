@@ -147,7 +147,7 @@ public partial class DetailPanelBuilder
             HorizontalAlignment = HorizontalAlignment.Stretch,
         };
         ToolTipService.SetToolTip(detectedBox,
-            "The display name for this game. Edit and press Enter to rename. Reset reverts to the auto-detected store name.");
+            Loc.T("The display name for this game. Edit and press Enter to rename. Reset reverts to the auto-detected store name."));
         var wikiBox = new TextBox
         {
             Header = Loc.T("Wiki mod name"),
@@ -157,7 +157,7 @@ public partial class DetailPanelBuilder
             HorizontalAlignment = HorizontalAlignment.Stretch,
         };
         ToolTipService.SetToolTip(wikiBox,
-            "Override the name used to look up this game on the RenoDX/Luma wiki. Leave blank to use the game name. Press Enter to save.");
+            Loc.T("Override the name used to look up this game on the RenoDX/Luma wiki. Leave blank to use the game name. Press Enter to save."));
         var originalStoreName = _window.ViewModel.GetOriginalStoreName(gameName);
 
         // Mutable captured name so rename handler can update it for subsequent handlers
@@ -216,7 +216,7 @@ public partial class DetailPanelBuilder
             SelectedItem = DllDefaultSentinel, // default = no override
         };
         ToolTipService.SetToolTip(rsNameBox,
-            "Override the ReShade DLL filename. Select a name to rename the installed DLL immediately. Select -------- to revert to the default name.");
+            Loc.T("Override the ReShade DLL filename. Select a name to rename the installed DLL immediately. Select -------- to revert to the default name."));
         if (!string.IsNullOrEmpty(existingRsName))
         {
             if (rsNames.Contains(existingRsName, StringComparer.OrdinalIgnoreCase))
@@ -578,7 +578,7 @@ public partial class DetailPanelBuilder
             HorizontalAlignment = HorizontalAlignment.Stretch,
         };
         ToolTipService.SetToolTip(wikiExcludeCombo,
-            "Included = this game is looked up on the RenoDX and Luma wikis. Excluded = skip wiki lookups for this game.");
+            Loc.T("Included = this game is looked up on the RenoDX and Luma wikis. Excluded = skip wiki lookups for this game."));
         wikiExcludeCombo.SelectionChanged += (s, ev) =>
         {
             var selected = wikiExcludeCombo.SelectedItem as string;
@@ -663,7 +663,7 @@ public partial class DetailPanelBuilder
             CornerRadius = new CornerRadius(8),
         };
         ToolTipService.SetToolTip(resetDllBtn,
-            "Revert all DLL names back to defaults and clear saved overrides.");
+            Loc.T("Revert all DLL names back to defaults and clear saved overrides."));
         resetDllBtn.Click += async (s, e) =>
         {
             resetDllBtn.IsEnabled = false;
@@ -795,7 +795,7 @@ public partial class DetailPanelBuilder
             HorizontalAlignment = HorizontalAlignment.Stretch,
         };
         ToolTipService.SetToolTip(shaderModeCombo,
-            "Global = use global shader selection. Custom = use custom shader directories. Select = pick per-game packs. Off = no shaders.");
+            Loc.T("Global = use global shader selection. Custom = use custom shader directories. Select = pick per-game packs. Off = no shaders."));
 
         // Allow re-opening the Select picker when already on Select
         shaderModeCombo.DropDownClosed += (s, ev) =>
@@ -981,7 +981,7 @@ public partial class DetailPanelBuilder
             HorizontalAlignment = HorizontalAlignment.Stretch,
         };
         ToolTipService.SetToolTip(bitnessCombo,
-            "Override the auto-detected bitness for this game. Auto uses PE header detection. 32-bit or 64-bit forces the value.");
+            Loc.T("Override the auto-detected bitness for this game. Auto uses PE header detection. 32-bit or 64-bit forces the value."));
 
         bitnessCombo.SelectionChanged += (s, e) =>
         {
@@ -1106,7 +1106,7 @@ public partial class DetailPanelBuilder
             HorizontalAlignment = HorizontalAlignment.Stretch,
         };
         ToolTipService.SetToolTip(apiCombo,
-            "Override the detected graphics API for this game.\nAuto uses PE header scanning. Reset Overrides reverts to auto-detection.");
+            Loc.T("Override the detected graphics API for this game.\nAuto uses PE header scanning. Reset Overrides reverts to auto-detection."));
 
         apiCombo.SelectionChanged += (s, ev) =>
         {

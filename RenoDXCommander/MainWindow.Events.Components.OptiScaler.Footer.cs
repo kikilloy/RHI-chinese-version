@@ -11,6 +11,7 @@ using Microsoft.UI.Xaml.Controls;
 using RenoDXCommander.Models;
 using RenoDXCommander.Services;
 using RenoDXCommander.ViewModels;
+using RenoDXCommander.Localization;
 
 namespace RenoDXCommander;
 
@@ -137,7 +138,7 @@ public sealed partial class MainWindow
             nameBox.Padding = new Thickness(6, 4, 6, 4);
 
             var saveBtn = CogDialog.StyledButton("Save", CogButtonKind.Secondary, compact: true);
-            ToolTipService.SetToolTip(saveBtn, "Save the current settings into this slot");
+            ToolTipService.SetToolTip(saveBtn, Loc.T("Save the current settings into this slot"));
 
             var nameRow = CogDialog.Inline(nameBox, saveBtn);
             nameRow.ColumnSpacing = 4;
@@ -172,7 +173,7 @@ public sealed partial class MainWindow
                     applyBtn.IsEnabled = true;
                     applyBtn.Opacity = 1.0;
                     applyBtn.Content = p.Name ?? $"Slot {i + 1}";
-                    ToolTipService.SetToolTip(applyBtn, "Apply this preset to the current game");
+                    ToolTipService.SetToolTip(applyBtn, Loc.T("Apply this preset to the current game"));
                     showStatus($"Saved the current settings to {p.Name ?? $"Slot {i + 1}"}.", true);
                 }
                 catch (Exception ex)
