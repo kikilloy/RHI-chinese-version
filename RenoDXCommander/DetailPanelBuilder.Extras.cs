@@ -13,6 +13,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Windows.Foundation;
+using RenoDXCommander.Localization;
 
 namespace RenoDXCommander;
 
@@ -40,7 +41,7 @@ public partial class DetailPanelBuilder
         };
         var exTitle = new TextBlock
         {
-            Text       = "Extras",
+            Text       = Loc.T("Extras"),
             FontSize   = 13,
             FontWeight = Microsoft.UI.Text.FontWeights.SemiBold,
             Foreground = UIFactory.Brush(ResourceKeys.TextPrimaryBrush),
@@ -71,12 +72,12 @@ public partial class DetailPanelBuilder
         var dgSvc = App.Services.GetRequiredService<DgVoodooService>();
         bool dgvInstalled = !string.IsNullOrEmpty(installPath) && dgSvc.IsDeployed(installPath);
         var exSummaryEntries = new List<(string, string?)>();
-        if (!string.IsNullOrEmpty(vm.GetUalInstalledAs(gn, gs)))                           exSummaryEntries.Add(("ASI Loader", vm.GetUalInstalledAs(gn, gs)));
-        if (vm.GetRtx40MfgInstalled(gn, gs))                                               exSummaryEntries.Add(("RTX 40 MFG", "On"));
-        if (card.MfgAdaInstalled)                                                          exSummaryEntries.Add(("MFG Ada", "On"));
-        if (vm.GetDlssg2030Installed(gn, gs))                                              exSummaryEntries.Add(("20/30 FG", "On"));
+        if (!string.IsNullOrEmpty(vm.GetUalInstalledAs(gn, gs)))                           exSummaryEntries.Add((Loc.T("ASI Loader"), vm.GetUalInstalledAs(gn, gs)));
+        if (vm.GetRtx40MfgInstalled(gn, gs))                                               exSummaryEntries.Add((Loc.T("RTX 40 MFG"), "On"));
+        if (card.MfgAdaInstalled)                                                          exSummaryEntries.Add((Loc.T("MFG Ada"), "On"));
+        if (vm.GetDlssg2030Installed(gn, gs))                                              exSummaryEntries.Add((Loc.T("20/30 FG"), "On"));
         if (card.IsOsInstalled)                                                             exSummaryEntries.Add(("OptiScaler", card.OsInstalledVersion));
-        if (!string.IsNullOrEmpty(vm.GetDeInstalledAs(gn, gs)))                            exSummaryEntries.Add(("DLSS Enabler", "On"));
+        if (!string.IsNullOrEmpty(vm.GetDeInstalledAs(gn, gs)))                            exSummaryEntries.Add((Loc.T("DLSS Enabler"), "On"));
         if (card.IsDxvkInstalled)                                                           exSummaryEntries.Add(("DXVK", card.DxvkInstalledVersion ?? "On"));
         if (dgvInstalled)                                                                   exSummaryEntries.Add(("dgVoodoo2", vm.GetDgVoodooVersion(gn, gs) ?? _window.ViewModel.Manifest?.DgVoodooVersions?.Keys.FirstOrDefault()));
         var exSummary = DetailPanelBuilder.MakeSectionSummaryInlines(exSummaryEntries);
@@ -109,7 +110,7 @@ public partial class DetailPanelBuilder
         CrashReporter.Log($"[BuildExtrasSection] OsRow: {__exSw.ElapsedMilliseconds - __t0}ms '{card.GameName}'");
 
         // ── MFG Unlocks separator ─────────────────────────────────────────────
-        exBody.Children.Add(MakeExtrasSeparator("MFG Unlocks"));
+        exBody.Children.Add(MakeExtrasSeparator(Loc.T("MFG Unlocks")));
 
         // ── RTX Encore row ────────────────────────────────────────────────────
         __t0 = __exSw.ElapsedMilliseconds;
@@ -139,7 +140,7 @@ public partial class DetailPanelBuilder
         // ── API Upgrades sub-header + DXVK row ────────────────────────────────
         if (card.IsDxvkToggleVisible)
         {
-            exBody.Children.Add(MakeExtrasSeparator("API Upgrades"));
+            exBody.Children.Add(MakeExtrasSeparator(Loc.T("API Upgrades")));
             __t0 = __exSw.ElapsedMilliseconds;
             BuildDxvkRow(card, exBody);
             CrashReporter.Log($"[BuildExtrasSection] DxvkRow: {__exSw.ElapsedMilliseconds - __t0}ms '{card.GameName}'");
@@ -151,7 +152,7 @@ public partial class DetailPanelBuilder
         if (isDx9ForDgv || dgvInstalled)
         {
             if (!card.IsDxvkToggleVisible) // Show separator only if DXVK row wasn't shown
-                exBody.Children.Add(MakeExtrasSeparator("API Upgrades"));
+                exBody.Children.Add(MakeExtrasSeparator(Loc.T("API Upgrades")));
             __t0 = __exSw.ElapsedMilliseconds;
             BuildDgVoodooRow(card, exBody);
             CrashReporter.Log($"[BuildExtrasSection] DgVoodooRow: {__exSw.ElapsedMilliseconds - __t0}ms '{card.GameName}'");
@@ -279,7 +280,7 @@ public partial class DetailPanelBuilder
                 : osVariant == "Nightly"
                 ? "https://github.com/optiscaler/OptiScaler-nightly/releases"
                 : "https://github.com/optiscaler/OptiScaler/wiki";
-            ToolTipService.SetToolTip(statusBlock, "Click to open OptiScaler releases");
+            ToolTipService.SetToolTip(statusBlock, Loc.T("Click to open OptiScaler releases"));
             statusBlock.PointerPressed += async (s, e) =>
                 await Windows.System.Launcher.LaunchUriAsync(new Uri(osWikiUrl));
         }
@@ -307,8 +308,8 @@ public partial class DetailPanelBuilder
                 : osVariantForInfo == "DlssNr"
                 ? "https://github.com/wilsjo2/OptiScaler-DLSSNR-PreSR-Multipass"
                 : "https://github.com/optiscaler/OptiScaler-nightly";
-            var forkLabel = osVariantForInfo == "F5" ? "F5 DLSSNR" : osVariantForInfo == "DlssNr" ? "DLSS NR" : "OptiScaler Nightly";
-            ToolTipService.SetToolTip(infoBtn, $"Open {forkLabel} GitHub page");
+            var forkLabel = osVariantForInfo == "F5" ? Loc.T("F5 DLSSNR") : osVariantForInfo == "DlssNr" ? Loc.T("DLSS NR") : "OptiScaler Nightly";
+            ToolTipService.SetToolTip(infoBtn, Loc.T("Open {0} GitHub page", forkLabel));
             infoBtn.Click += (s, e) => _ = Windows.System.Launcher.LaunchUriAsync(new Uri(forkUrl));
         }
         else
@@ -341,7 +342,7 @@ public partial class DetailPanelBuilder
         row.Children.Add(installBtn);
 
         // Col 4 — Cog (⚙) button
-        var cogBtn = CogDialog.MakeCogButton("OptiScaler settings");
+        var cogBtn = CogDialog.MakeCogButton(Loc.T("OptiScaler settings"));
         cogBtn.Tag = card;
         cogBtn.IsEnabled = !osGreyed;
         cogBtn.Opacity = osGreyed ? 0.35 : 1.0;
@@ -366,7 +367,7 @@ public partial class DetailPanelBuilder
             Opacity = (osGreyed || !osShow) ? 0 : 1.0,
             IsHitTestVisible = osShow && !osGreyed,
         };
-        ToolTipService.SetToolTip(deleteBtn, "Remove OptiScaler");
+        ToolTipService.SetToolTip(deleteBtn, Loc.T("Remove OptiScaler"));
         deleteBtn.Click += (s, e) => _window.UninstallOsButton_Click(s, e);
         Grid.SetColumn(deleteBtn, 5);
         row.Children.Add(deleteBtn);

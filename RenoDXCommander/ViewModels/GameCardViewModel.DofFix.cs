@@ -1,6 +1,7 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using Microsoft.UI.Xaml;
 using RenoDXCommander.Models;
+using RenoDXCommander.Localization;
 
 namespace RenoDXCommander.ViewModels;
 
@@ -27,9 +28,9 @@ public partial class GameCardViewModel
         IsDofFixEligible ? Visibility.Visible : Visibility.Collapsed;
 
     public string DofFixActionLabel => DofFixIsInstalling ? "Installing..."
-        : DofFixStatus == GameStatus.UpdateAvailable ? "⬆  Update DOF Fix"
-        : DofFixStatus == GameStatus.Installed ? "↺  Reinstall DOF Fix"
-        : "⬇  Install DOF Fix";
+        : DofFixStatus == GameStatus.UpdateAvailable ? Loc.T("⬆  Update DOF Fix")
+        : DofFixStatus == GameStatus.Installed ? Loc.T("↺  Reinstall DOF Fix")
+        : Loc.T("⬇  Install DOF Fix");
 
     public string DofFixBtnBackground  => DofFixStatus == GameStatus.UpdateAvailable ? "#201838" : "#182840";
     public string DofFixBtnForeground  => DofFixStatus == GameStatus.UpdateAvailable ? "#B898E8" : "#7AACDD";

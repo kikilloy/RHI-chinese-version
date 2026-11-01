@@ -1,10 +1,11 @@
-﻿// DetailPanelBuilder.Overrides.Dlss.cs — DLSS/Streamline column builder helpers.
+// DetailPanelBuilder.Overrides.Dlss.cs — DLSS/Streamline column builder helpers.
 
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using RenoDXCommander.Models;
 using RenoDXCommander.Services;
 using RenoDXCommander.ViewModels;
+using RenoDXCommander.Localization;
 
 namespace RenoDXCommander;
 
@@ -32,7 +33,7 @@ public partial class DetailPanelBuilder
         });
 
         // Version ComboBox
-        var versionLabel = new TextBlock { Text = "Version", FontSize = 10, Foreground = UIFactory.Brush(ResourceKeys.TextTertiaryBrush), Margin = new Thickness(0, 2, 0, 0) };
+        var versionLabel = new TextBlock { Text = Loc.T("Version"), FontSize = 10, Foreground = UIFactory.Brush(ResourceKeys.TextTertiaryBrush), Margin = new Thickness(0, 2, 0, 0) };
         col.Children.Add(versionLabel);
 
         // Build items list with (Default) marker on the game's original/default version
@@ -56,7 +57,7 @@ public partial class DetailPanelBuilder
             // Add a "Default (x.x.x)" entry at the top so the user can restore the original
             if (formattedOriginal != null)
             {
-                var defaultLabel = $"Default ({formattedOriginal})";
+                var defaultLabel = Loc.T("Default ({0})", formattedOriginal);
                 items.Insert(0, defaultLabel);
             }
             else
@@ -91,7 +92,7 @@ public partial class DetailPanelBuilder
                     // Strip the "(Default)" suffix if present for comparison
                     var itemBase = items[i];
                     if (itemBase.StartsWith("Default (", StringComparison.OrdinalIgnoreCase))
-                        itemBase = itemBase.Substring("Default (".Length).TrimEnd(')');
+                        itemBase = itemBase.Substring(Loc.T("Default (").Length).TrimEnd(')');
 
                     if (installedVersion.Equals(itemBase, StringComparison.OrdinalIgnoreCase))
                     {
@@ -124,7 +125,7 @@ public partial class DetailPanelBuilder
         };
 
         if (driverOverrideActive)
-            ToolTipService.SetToolTip(versionCombo, "NVIDIA Override is active — the driver is injecting its own latest DLL for this game. Select any other version to disable the override and deploy that version instead.");
+            ToolTipService.SetToolTip(versionCombo, Loc.T("NVIDIA Override is active — the driver is injecting its own latest DLL for this game. Select any other version to disable the override and deploy that version instead."));
         else if (onDriverOverrideToggled != null)
             ToolTipService.SetToolTip(versionCombo, "Selects which DLL version is copied into the game folder. Default restores the original game DLL. Custom uses your own file from %LocalAppData%\\RHI\\Custom\\DLSS\\. NVIDIA Override lets the driver inject its own latest version instead of a file on disk — equivalent to enabling DLSS Override in NVIDIA App or Profile Inspector.");
         else
@@ -181,7 +182,7 @@ public partial class DetailPanelBuilder
         // Preset ComboBox (only for SR, RR, FG)
         if (presets != null && isPresent)
         {
-            col.Children.Add(new TextBlock { Text = "Preset", FontSize = 10, Foreground = UIFactory.Brush(ResourceKeys.TextTertiaryBrush), Margin = new Thickness(0, 2, 0, 0) });
+            col.Children.Add(new TextBlock { Text = Loc.T("Preset"), FontSize = 10, Foreground = UIFactory.Brush(ResourceKeys.TextTertiaryBrush), Margin = new Thickness(0, 2, 0, 0) });
 
             var presetItems = presets.Select(p => p.Name).ToList();
             int presetIdx = 0;
@@ -226,7 +227,7 @@ public partial class DetailPanelBuilder
         // Render Scale ComboBox (only for SR and RR)
         if (onRenderScaleSelected != null && isPresent)
         {
-            col.Children.Add(new TextBlock { Text = "Render Scale", FontSize = 10, Foreground = UIFactory.Brush(ResourceKeys.TextTertiaryBrush), Margin = new Thickness(0, 2, 0, 0) });
+            col.Children.Add(new TextBlock { Text = Loc.T("Render Scale"), FontSize = 10, Foreground = UIFactory.Brush(ResourceKeys.TextTertiaryBrush), Margin = new Thickness(0, 2, 0, 0) });
             var rsOptions = DlssPresetService.RenderScaleOptions;
             var rsItems = rsOptions.Select(o => o.Name).ToList();
 
@@ -244,7 +245,7 @@ public partial class DetailPanelBuilder
 
             // If Custom is selected, show the percentage in the item text
             if (rsIdx == rsItems.Count - 1 && currentRenderScale > 0)
-                rsItems[^1] = $"Custom ({currentRenderScale}%)";
+                rsItems[^1] = Loc.T("Custom ({0}%)", currentRenderScale);
 
             var rsCombo = new ComboBox
             {
@@ -349,7 +350,7 @@ public partial class DetailPanelBuilder
         if (xamlRoot == null) return;
         await DialogService.ShowSafeAsync(new ContentDialog
         {
-            Title = "Couldn't change DLSS files",
+            Title = Loc.T("Couldn't change DLSS files"),
             Content = new TextBlock { Text = message, TextWrapping = TextWrapping.Wrap },
             CloseButtonText = "OK",
             XamlRoot = xamlRoot,

@@ -9,6 +9,7 @@ using RenoDXCommander.Models;
 using RenoDXCommander.Services;
 using RenoDXCommander.ViewModels;
 using System.IO;
+using RenoDXCommander.Localization;
 
 namespace RenoDXCommander;
 
@@ -136,7 +137,7 @@ public partial class DetailPanelBuilder
             _window.DetailEngineText.TextDecorations = isClickable ? Windows.UI.Text.TextDecorations.Underline : Windows.UI.Text.TextDecorations.None;
             _window.DetailEngineBadge.Tag = isClickable ? card : null;
             if (isClickable)
-                ToolTipService.SetToolTip(_window.DetailEngineBadge, "Click to cycle engine version (affects DOF Fix eligibility)");
+                ToolTipService.SetToolTip(_window.DetailEngineBadge, Loc.T("Click to cycle engine version (affects DOF Fix eligibility)"));
             else
                 ToolTipService.SetToolTip(_window.DetailEngineBadge, null);
         }
@@ -188,11 +189,11 @@ public partial class DetailPanelBuilder
                     var cursorProp = DetailPanelBuilder.CursorProp;
                     badge.PointerEntered += (s, e) => cursorProp?.SetValue(badge, handCursor);
                     badge.PointerExited += (s, e) => cursorProp?.SetValue(badge, arrowCursor);
-                    ToolTipService.SetToolTip(badge, $"Mod author: {author} — click to open Ko-fi donation page");
+                    ToolTipService.SetToolTip(badge, Loc.T("Mod author: {0} — click to open Ko-fi donation page", author));
                 }
                 else
                 {
-                    ToolTipService.SetToolTip(badge, $"Mod author: {author}");
+                    ToolTipService.SetToolTip(badge, Loc.T("Mod author: {0}", author));
                 }
                 _window.DetailAuthorBadgePanel.Children.Add(badge);
             }
@@ -281,14 +282,14 @@ public partial class DetailPanelBuilder
             _window.DetailModStatusIcon.Text = "✓";
             _window.DetailModStatusIcon.Foreground = UIFactory.Brush(ResourceKeys.AccentGreenBrush);
             _window.DetailModStatusIcon.Visibility = Visibility.Visible;
-            ToolTipService.SetToolTip(_window.DetailModStatusIcon, "HDR mod complete");
+            ToolTipService.SetToolTip(_window.DetailModStatusIcon, Loc.T("HDR mod complete"));
         }
         else if (string.Equals(modStatusText, "WIP", StringComparison.OrdinalIgnoreCase))
         {
             _window.DetailModStatusIcon.Text = "🔨";
             _window.DetailModStatusIcon.Foreground = UIFactory.Brush(ResourceKeys.TextPrimaryBrush);
             _window.DetailModStatusIcon.Visibility = Visibility.Visible;
-            ToolTipService.SetToolTip(_window.DetailModStatusIcon, "HDR mod in progress");
+            ToolTipService.SetToolTip(_window.DetailModStatusIcon, Loc.T("HDR mod in progress"));
         }
         else
         {
@@ -307,7 +308,7 @@ public partial class DetailPanelBuilder
             : UIFactory.Brush(ResourceKeys.BorderSubtleBrush);
 
         _window.DetailHideBtn.Tag = card;
-        _window.DetailHideIcon.Text = card.IsHidden ? "Show" : "Hide";
+        _window.DetailHideIcon.Text = card.IsHidden ? Loc.T("Show") : Loc.T("Hide");
         _window.DetailHideBtn.Foreground = UIFactory.Brush(ResourceKeys.ChipTextBrush);
 
         // Folder management buttons
@@ -379,7 +380,7 @@ public partial class DetailPanelBuilder
         if (card.HasUwFixUrl)
         {
             var source = card.UwFixSource ?? "creator";
-            ToolTipService.SetToolTip(_window.DetailUwFixBtn, $"Open {source}'s ultrawide fix page");
+            ToolTipService.SetToolTip(_window.DetailUwFixBtn, Loc.T("Open {0}'s ultrawide fix page", source));
         }
 
         // Ultra+ link button
@@ -617,19 +618,19 @@ public partial class DetailPanelBuilder
     /// <summary>HDR button tooltip that states the current setting for this game.</summary>
     internal static string HdrToggleTooltip(bool active, bool isOverride)
     {
-        var source = isOverride ? "set for this game" : "following Settings › Display & HDR";
+        var source = isOverride ? Loc.T("set for this game") : Loc.T("following Settings › Display & HDR");
         return active
-            ? $"Windows HDR: On ({source}).\nWhen you launch the game from RHI, Windows HDR is turned on, then back off when the game closes.\nClick to turn off for this game."
-            : $"Windows HDR: Off ({source}).\nClick to turn Windows HDR on when you launch this game from RHI (and back off when it closes).";
+            ? Loc.T("Windows HDR: On ({0}).\nWhen you launch the game from RHI, Windows HDR is turned on, then back off when the game closes.\nClick to turn off for this game.", source)
+            : Loc.T("Windows HDR: Off ({0}).\nClick to turn Windows HDR on when you launch this game from RHI (and back off when it closes).", source);
     }
 
     /// <summary>RES button tooltip that states the current setting for this game.</summary>
     internal static string ResToggleTooltip(bool active, bool isOverride)
     {
-        var source = isOverride ? "set for this game" : "following Settings › Display & HDR";
+        var source = isOverride ? Loc.T("set for this game") : Loc.T("following Settings › Display & HDR");
         return active
-            ? $"Change resolution: On ({source}).\nWhen you launch the game from RHI, the display switches to your target resolution, then back when the game closes.\nClick to turn off for this game."
-            : $"Change resolution: Off ({source}).\nClick to switch to your target resolution when you launch this game from RHI (and back when it closes).";
+            ? Loc.T("Change resolution: On ({0}).\nWhen you launch the game from RHI, the display switches to your target resolution, then back when the game closes.\nClick to turn off for this game.", source)
+            : Loc.T("Change resolution: Off ({0}).\nClick to switch to your target resolution when you launch this game from RHI (and back when it closes).", source);
     }
 
     internal TextBlock MakeDragHandle(Border container)
@@ -776,8 +777,8 @@ public partial class DetailPanelBuilder
             else if (border == _window.NeuralRenderingContainer)    keyOrder.Add("NeuralRendering");
             else if (border == _window.NvidiaProfileDlssContainer)   keyOrder.Add("NvidiaProfileDlss");
             else if (border == _window.NvidiaProfileDriverContainer) keyOrder.Add("NvidiaProfileDriver");
-            else if (border == _window.ManagementContainer)         keyOrder.Add("Management");
-            else if (border == _window.ExtrasContainer)             keyOrder.Add("Extras");
+            else if (border == _window.ManagementContainer)         keyOrder.Add(Loc.T("Management"));
+            else if (border == _window.ExtrasContainer)             keyOrder.Add(Loc.T("Extras"));
         }
         if (keyOrder.Count > 0)
         {
@@ -944,7 +945,7 @@ public partial class DetailPanelBuilder
 
         var channel = _window.ViewModel.GetReShadeChannelOverride(card.GameName, card.Source ?? "");
         if (!string.IsNullOrEmpty(channel))
-            entries.Add(("RS Channel:", channel));
+            entries.Add((Loc.T("RS Channel:"), channel));
 
         var apis = _window.ViewModel.GetApiOverride(card.GameName, card.Source ?? "");
         if (apis is { Count: > 0 })
@@ -981,11 +982,11 @@ public partial class DetailPanelBuilder
             if (cfg != null)
             {
                 if (!string.IsNullOrEmpty(cfg.ReShadeFileName) && cfg.ReShadeFileName != "--------")
-                    entries.Add(("RS DLL:", cfg.ReShadeFileName));
+                    entries.Add((Loc.T("RS DLL:"), cfg.ReShadeFileName));
                 if (!string.IsNullOrEmpty(cfg.DcFileName) && cfg.DcFileName != "--------")
-                    entries.Add(("DC DLL:", cfg.DcFileName));
+                    entries.Add((Loc.T("DC DLL:"), cfg.DcFileName));
                 if (!string.IsNullOrEmpty(cfg.OsFileName) && cfg.OsFileName != "--------")
-                    entries.Add(("OS DLL:", cfg.OsFileName));
+                    entries.Add((Loc.T("OS DLL:"), cfg.OsFileName));
             }
         }
 

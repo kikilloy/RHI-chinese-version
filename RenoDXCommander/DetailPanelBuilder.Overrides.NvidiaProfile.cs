@@ -1,10 +1,11 @@
-﻿// DetailPanelBuilder.Overrides.NvidiaProfile.cs — DLSS / Streamline section (independent panel).
+// DetailPanelBuilder.Overrides.NvidiaProfile.cs — DLSS / Streamline section (independent panel).
 
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using RenoDXCommander.Models;
 using RenoDXCommander.Services;
 using RenoDXCommander.ViewModels;
+using RenoDXCommander.Localization;
 
 namespace RenoDXCommander;
 
@@ -229,7 +230,7 @@ public partial class DetailPanelBuilder
             // Disable for DLSS 1.x (not compatible with 2.x+ versions in manifest)
             bool srEnabled = hasDlss && !(card.DlssInstalledVersion?.StartsWith("1.") == true);
             bool srDriverOverride = dlssData?.SrDriverOverride == true;
-            var srCol = BuildDlssColumn("DLSS Super Resolution", srEnabled, dlssService.DlssVersions,
+            var srCol = BuildDlssColumn(Loc.T("DLSS Super Resolution"), srEnabled, dlssService.DlssVersions,
                 card.DlssInstalledVersion, DlssPresetService.SrPresets,
                 presetService.IsSupported && srEnabled ? (dlssData?.SrPreset ?? 0u) : 0u,
                 async (version) =>
@@ -252,11 +253,11 @@ public partial class DetailPanelBuilder
                     _ = Task.Run(() => presetService.SetSrDriverOverride(capturedGameName, capturedInstallPath, enable)); } : null);
             Grid.SetColumn(srCol, 0);
             dlssRowGrid.Children.Add(srCol);
-            _window.ViewModel.SetLastUiAction($"BuildNvidiaProfileBody:SR done({capturedGameName})");            dlssRowGrid.Children.Add(MakeDlssDivider(1));
+            _window.ViewModel.SetLastUiAction(Loc.T("BuildNvidiaProfileBody:SR done({0})", capturedGameName));            dlssRowGrid.Children.Add(MakeDlssDivider(1));
 
             // RR column
             bool rrDriverOverride = dlssData?.RrDriverOverride == true;
-            var rrCol = BuildDlssColumn("Ray Reconstruction", hasDlssd, dlssService.DlssdVersions,
+            var rrCol = BuildDlssColumn(Loc.T("Ray Reconstruction"), hasDlssd, dlssService.DlssdVersions,
                 card.DlssdInstalledVersion, DlssPresetService.RrPresets,
                 presetService.IsSupported && hasDlssd ? (dlssData?.RrPreset ?? 0u) : 0u,
                 async (version) =>
@@ -279,12 +280,12 @@ public partial class DetailPanelBuilder
                     _ = Task.Run(() => presetService.SetRrDriverOverride(capturedGameName, capturedInstallPath, enable)); } : null);
             Grid.SetColumn(rrCol, 2);
             dlssRowGrid.Children.Add(rrCol);
-            _window.ViewModel.SetLastUiAction($"BuildNvidiaProfileBody:RR done({capturedGameName})");            dlssRowGrid.Children.Add(MakeDlssDivider(3));
+            _window.ViewModel.SetLastUiAction(Loc.T("BuildNvidiaProfileBody:RR done({0})", capturedGameName));            dlssRowGrid.Children.Add(MakeDlssDivider(3));
 
             // FG column — no v1.x guard (FG can be updated from v1.0.0 to newer versions)
             bool fgEnabled = hasDlssg;
             bool fgDriverOverride = dlssData?.FgDriverOverride == true;
-            var fgCol = BuildDlssColumn("Frame Generation", fgEnabled, dlssService.DlssgVersions,
+            var fgCol = BuildDlssColumn(Loc.T("Frame Generation"), fgEnabled, dlssService.DlssgVersions,
                 card.DlssgInstalledVersion, DlssPresetService.FgPresets,
                 presetService.IsSupported && fgEnabled ? (dlssData?.FgPreset ?? 0u) : 0u,
                 async (version) =>
@@ -308,7 +309,7 @@ public partial class DetailPanelBuilder
             fgCol.Children.Add(new TextBlock { Text = " ", FontSize = 10, Margin = new Thickness(0, 2, 0, 0) });
             var mfgBtn = new Button
             {
-                Content = "Multi Frame Gen",
+                Content = Loc.T("Multi Frame Gen"),
                 FontSize = 11,
                 Height = 32,
                 HorizontalAlignment = HorizontalAlignment.Stretch,
@@ -320,7 +321,7 @@ public partial class DetailPanelBuilder
                 IsEnabled = fgEnabled && presetService.IsSupported,
                 Opacity = (fgEnabled && presetService.IsSupported) ? 1.0 : 0.4,
             };
-            ToolTipService.SetToolTip(mfgBtn, "Configure NVIDIA Multi Frame Generation: mode, frame count multiplier, and dynamic target frame rate. Requires 50 Series GPU.");
+            ToolTipService.SetToolTip(mfgBtn, Loc.T("Configure NVIDIA Multi Frame Generation: mode, frame count multiplier, and dynamic target frame rate. Requires 50 Series GPU."));
             mfgBtn.Click += async (s, ev) =>
             {
                 var xamlRoot = (s as FrameworkElement)?.XamlRoot ?? _window.Content.XamlRoot;
@@ -341,7 +342,7 @@ public partial class DetailPanelBuilder
 
             Grid.SetColumn(fgCol, 4);
             dlssRowGrid.Children.Add(fgCol);
-            _window.ViewModel.SetLastUiAction($"BuildNvidiaProfileBody:FG done({capturedGameName})");            dlssRowGrid.Children.Add(MakeDlssDivider(5));
+            _window.ViewModel.SetLastUiAction(Loc.T("BuildNvidiaProfileBody:FG done({0})", capturedGameName));            dlssRowGrid.Children.Add(MakeDlssDivider(5));
 
             // NR column — dev-only
             // hasDlssnr is a method parameter
@@ -378,7 +379,7 @@ public partial class DetailPanelBuilder
                 string nrSelectedVersion = nrInstalledVersion ?? "";
 
                 bool nrDriverOverride = dlssData?.NrDriverOverride == true;
-                var nrCol = BuildDlssColumn("Neural Rendering", hasDlssnr, dlssService.DlssnrVersions,
+                var nrCol = BuildDlssColumn(Loc.T("Neural Rendering"), hasDlssnr, dlssService.DlssnrVersions,
                     nrInstalledVersion, DlssPresetService.NrPresets,
                     presetService.IsSupported && hasDlssnr ? (dlssData?.NrPreset ?? 0u) : 0u,
                     async (version) =>
@@ -421,7 +422,7 @@ public partial class DetailPanelBuilder
                 // When NR is not installed the placeholder is invisible but still takes space.
                 if (!hasDlssnr)
                 {
-                    var presetPlaceholderLabel = new TextBlock { Text = "Preset", FontSize = 10, Foreground = UIFactory.Brush(ResourceKeys.TextTertiaryBrush), Margin = new Thickness(0, 2, 0, 0), Opacity = 0 };
+                    var presetPlaceholderLabel = new TextBlock { Text = Loc.T("Preset"), FontSize = 10, Foreground = UIFactory.Brush(ResourceKeys.TextTertiaryBrush), Margin = new Thickness(0, 2, 0, 0), Opacity = 0 };
                     var presetPlaceholderCombo = new ComboBox { ItemsSource = new[] { "Default" }, SelectedIndex = 0, FontSize = 11, HorizontalAlignment = HorizontalAlignment.Stretch, IsEnabled = false, Opacity = 0, MaxDropDownHeight = 300 };
                     nrCol.Children.Add(presetPlaceholderLabel);
                     nrCol.Children.Add(presetPlaceholderCombo);
@@ -433,7 +434,7 @@ public partial class DetailPanelBuilder
 
                 var deployNrBtn = new Button
                 {
-                    Content = "Deploy DLL",
+                    Content = Loc.T("Deploy DLL"),
                     FontSize = 11,
                     Height = 32,
                     HorizontalAlignment = HorizontalAlignment.Stretch,
@@ -443,7 +444,7 @@ public partial class DetailPanelBuilder
                     BorderThickness = new Thickness(1),
                     CornerRadius = new CornerRadius(8),
                 };
-                ToolTipService.SetToolTip(deployNrBtn, "Download and copy nvngx_dlssnr.dll to the game folder. Supports RTX 40 and 50 Series GPUs. Neural Rendering methods also deploy it automatically.");
+                ToolTipService.SetToolTip(deployNrBtn, Loc.T("Download and copy nvngx_dlssnr.dll to the game folder. Supports RTX 40 and 50 Series GPUs. Neural Rendering methods also deploy it automatically."));
 
                 var deleteNrBtn = new Button
                 {
@@ -460,7 +461,7 @@ public partial class DetailPanelBuilder
                     IsHitTestVisible = hasDlssnr,
                     Content = new TextBlock { Text = "✕", FontSize = 12, HorizontalAlignment = HorizontalAlignment.Center, Foreground = UIFactory.Brush(ResourceKeys.AccentRedBrush) },
                 };
-                ToolTipService.SetToolTip(deleteNrBtn, "Delete nvngx_dlssnr.dll from the game folder.");
+                ToolTipService.SetToolTip(deleteNrBtn, Loc.T("Delete nvngx_dlssnr.dll from the game folder."));
 
                 deployNrBtn.Click += async (s, ev) =>
                 {
@@ -493,7 +494,7 @@ public partial class DetailPanelBuilder
                                     "RHI", "Custom", "DLSS", "nvngx_dlssnr.dll");
                                 if (!File.Exists(customSrc))
                                 {
-                                    _window.DispatcherQueue?.TryEnqueue(() => { deployNrBtn.Content = "Not in Custom/DLSS"; deployNrBtn.IsEnabled = true; });
+                                    _window.DispatcherQueue?.TryEnqueue(() => { deployNrBtn.Content = Loc.T("Not in Custom/DLSS"); deployNrBtn.IsEnabled = true; });
                                     return;
                                 }
                                 File.Copy(customSrc, destPath, overwrite: true);
@@ -524,7 +525,7 @@ public partial class DetailPanelBuilder
                             }
                             else if (cachedPath == null)
                             {
-                                _window.DispatcherQueue?.TryEnqueue(() => { deployNrBtn.Content = "Not available"; deployNrBtn.IsEnabled = true; });
+                                _window.DispatcherQueue?.TryEnqueue(() => { deployNrBtn.Content = Loc.T("Not available"); deployNrBtn.IsEnabled = true; });
                                 return;
                             }
                             else if (isDefault)
@@ -575,7 +576,7 @@ public partial class DetailPanelBuilder
                     catch (Exception ex)
                     {
                         CrashReporter.Log($"[NrDeployBtn] Failed — {ex.Message}");
-                        _window.DispatcherQueue?.TryEnqueue(() => { deployNrBtn.Content = "Deploy DLL"; deployNrBtn.IsEnabled = true; });
+                        _window.DispatcherQueue?.TryEnqueue(() => { deployNrBtn.Content = Loc.T("Deploy DLL"); deployNrBtn.IsEnabled = true; });
                     }
                 };
 
@@ -628,7 +629,7 @@ public partial class DetailPanelBuilder
                 }
                 Grid.SetColumn(nrCol, 8);
                 dlssRowGrid.Children.Add(nrCol);
-                _window.ViewModel.SetLastUiAction($"BuildNvidiaProfileBody:NR done({capturedGameName})");                dlssRowGrid.Children.Add(MakeDlssDivider(7));
+                _window.ViewModel.SetLastUiAction(Loc.T("BuildNvidiaProfileBody:NR done({0})", capturedGameName));                dlssRowGrid.Children.Add(MakeDlssDivider(7));
             }
 
             // SL column (no preset)
@@ -671,7 +672,7 @@ public partial class DetailPanelBuilder
             bool restoreEnabled = card.HasAnyDlssBackup || hasNonDefaultPreset;
             var dlssRestoreBtn = new Button
             {
-                Content = "Restore DLSS/SL",
+                Content = Loc.T("Restore DLSS/SL"),
                 FontSize = 11,
                 Height = 32,
                 HorizontalAlignment = HorizontalAlignment.Stretch,
@@ -734,7 +735,7 @@ public partial class DetailPanelBuilder
 
             var applyBtn = new Button
             {
-                Content = "Quick Apply",
+                Content = Loc.T("Quick Apply"),
                 FontSize = 11,
                 Height = 32,
                 HorizontalAlignment = HorizontalAlignment.Stretch,
@@ -745,7 +746,7 @@ public partial class DetailPanelBuilder
                 CornerRadius = new CornerRadius(8),
                 IsEnabled = hasDefaults && card.HasAnyDlssStreamline,
             };
-            ToolTipService.SetToolTip(applyBtn, "Apply your configured DLSS/Streamline default versions, presets, and render scales to this game. Downloads versions on-demand if not cached.");
+            ToolTipService.SetToolTip(applyBtn, Loc.T("Apply your configured DLSS/Streamline default versions, presets, and render scales to this game. Downloads versions on-demand if not cached."));
             applyBtn.Click += async (s, ev) =>
             {
                 var targetCard = _window.ViewModel.AllCards.FirstOrDefault(c =>
@@ -876,11 +877,11 @@ public partial class DetailPanelBuilder
                         child.Opacity = 0.4;
                 }
             }
-            ToolTipService.SetToolTip(dlssRestoreBtn, "Restore all DLSS and Streamline DLLs to their original game versions and reset presets to Default.");
+            ToolTipService.SetToolTip(dlssRestoreBtn, Loc.T("Restore all DLSS and Streamline DLLs to their original game versions and reset presets to Default."));
 
             Grid.SetColumn(slCol, slColumn);
             dlssRowGrid.Children.Add(slCol);
-            _window.ViewModel.SetLastUiAction($"BuildNvidiaProfileBody:SL done({capturedGameName})");
+            _window.ViewModel.SetLastUiAction(Loc.T("BuildNvidiaProfileBody:SL done({0})", capturedGameName));
 
             nvBody.Children.Add(dlssRowGrid);
         }
@@ -917,25 +918,25 @@ public partial class DetailPanelBuilder
 
             if (card.HasDlss)
             {
-                var val = card.CachedSrDriverOverride ? "NV Override"
+                var val = card.CachedSrDriverOverride ? Loc.T("NV Override")
                     : FormatDlssEntry(card.DlssInstalledVersion, dlssData?.SrPreset ?? 0u, DlssPresetService.SrPresets, dlssData?.SrRenderScale ?? 0u);
                 nvSummaryEntries.Add(("SR", val));
             }
             if (card.HasDlssd)
             {
-                var val = card.CachedRrDriverOverride ? "NV Override"
+                var val = card.CachedRrDriverOverride ? Loc.T("NV Override")
                     : FormatDlssEntry(card.DlssdInstalledVersion, dlssData?.RrPreset ?? 0u, DlssPresetService.RrPresets, dlssData?.RrRenderScale ?? 0u);
                 nvSummaryEntries.Add(("RR", val));
             }
             if (card.HasDlssg)
             {
-                var val = card.CachedFgDriverOverride ? "NV Override"
+                var val = card.CachedFgDriverOverride ? Loc.T("NV Override")
                     : FormatDlssEntry(card.DlssgInstalledVersion, dlssData?.FgPreset ?? 0u, DlssPresetService.FgPresets, 0u);
                 nvSummaryEntries.Add(("FG", val));
             }
             if (FeatureFlags.DlssNr && card.HasDlssnr)
             {
-                var val = card.CachedNrDriverOverride ? "NV Override"
+                var val = card.CachedNrDriverOverride ? Loc.T("NV Override")
                     : FormatDlssEntry(card.DlssnrInstalledVersion, dlssData?.NrPreset ?? 0u, DlssPresetService.NrPresets, 0u);
                 nvSummaryEntries.Add(("NR", val));
             }

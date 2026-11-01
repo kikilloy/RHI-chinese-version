@@ -2,6 +2,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using Microsoft.UI.Xaml;
 using RenoDXCommander.Models;
 using RenoDXCommander.Services;
+using RenoDXCommander.Localization;
 
 namespace RenoDXCommander.ViewModels;
 
@@ -51,8 +52,8 @@ public partial class GameCardViewModel
                 bool layerInstalled = _vulkanLayerInstalled;
                 if (RsStatus == GameStatus.UpdateAvailable && layerInstalled && IsVulkanRsActive)
                     return "⬆  Update Vulkan ReShade";
-                if (layerInstalled && IsVulkanRsActive) return "↺  Reinstall Vulkan ReShade";
-                if (layerInstalled) return "⬇  Install Vulkan ReShade";
+                if (layerInstalled && IsVulkanRsActive) return Loc.T("↺  Reinstall Vulkan ReShade");
+                if (layerInstalled) return Loc.T("⬇  Install Vulkan ReShade");
                 return "⬇  Install Vulkan Layer";
             }
             return RsStatus == GameStatus.UpdateAvailable ? "⬆  Update ReShade"
@@ -95,7 +96,7 @@ public partial class GameCardViewModel
                 if (RsStatus == GameStatus.UpdateAvailable && layerInstalled && IsVulkanRsActive)
                     return "⬆ Update";
                 if (layerInstalled && IsVulkanRsActive) return "↺ Reinstall";
-                if (layerInstalled) return "⬇ Vulkan RS";
+                if (layerInstalled) return Loc.T("⬇ Vulkan RS");
                 return "⬇ Install";
             }
             return RsStatus == GameStatus.UpdateAvailable ? "⬆ Update"

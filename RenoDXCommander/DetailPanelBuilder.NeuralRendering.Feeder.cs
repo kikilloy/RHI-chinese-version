@@ -4,6 +4,7 @@ using Microsoft.UI.Xaml.Controls;
 using RenoDXCommander.Models;
 using RenoDXCommander.Services;
 using RenoDXCommander.ViewModels;
+using RenoDXCommander.Localization;
 
 namespace RenoDXCommander;
 
@@ -41,7 +42,7 @@ public partial class DetailPanelBuilder
         }
         bool useLatestConsumer = string.IsNullOrEmpty(requestedVersion) || requestedVersion.StartsWith("Latest");
 
-        _window.DispatcherQueue?.TryEnqueue(() => statusBtn.Content = "Downloading Feeder...");
+        _window.DispatcherQueue?.TryEnqueue(() => statusBtn.Content = Loc.T("Downloading Feeder..."));
 
         // Resolve Feeder staged path — versioned or latest via AddonPackService
         string? feederSourcePath = null;
@@ -78,7 +79,7 @@ public partial class DetailPanelBuilder
             _window.ViewModel.SetNrPackVersion(gameName, null, store); // clear version pin — using latest
         }
 
-        _window.DispatcherQueue?.TryEnqueue(() => statusBtn.Content = "Deploying Feeder...");
+        _window.DispatcherQueue?.TryEnqueue(() => statusBtn.Content = Loc.T("Deploying Feeder..."));
         await Task.Run(() =>
         {
             if (feederSourcePath == null || !File.Exists(feederSourcePath))
@@ -120,7 +121,7 @@ public partial class DetailPanelBuilder
                 else if (!File.Exists(nrDestPathFeeder) && !File.Exists(nrBackup))
                     File.WriteAllBytes(nrBackup, Array.Empty<byte>());
                 File.Copy(cachedNrFeeder, nrDestPathFeeder, overwrite: true);
-                RhiInstallManifest.AddSharedFileOwner(installPath, "nvngx_dlssnr.dll", "Feeder");
+                RhiInstallManifest.AddSharedFileOwner(installPath, "nvngx_dlssnr.dll", Loc.T("Feeder"));
                 CrashReporter.Log($"[NeuralRendering.Feeder] Deployed nvngx_dlssnr.dll v{(nrUseLatestFeeder ? "latest" : nrSelVer)} to '{installPath}'");
             }
         }
@@ -128,7 +129,7 @@ public partial class DetailPanelBuilder
         // Deploy DLSS5 Tool as neural consumer (Feeder needs renodx-dlss5.addon64 alongside it)
         // For 32-bit games the neural consumer runs in host64\ — it must NOT be in the game folder
         // (32-bit ReShade cannot load .addon64 files).
-        _window.DispatcherQueue?.TryEnqueue(() => statusBtn.Content = "Deploying DLSS5 Tool...");
+        _window.DispatcherQueue?.TryEnqueue(() => statusBtn.Content = Loc.T("Deploying DLSS5 Tool..."));
 
         // Resolve the source path for the neural consumer — versioned or latest
         string? consumerSourcePath = null;
@@ -168,7 +169,7 @@ public partial class DetailPanelBuilder
         }
 
         // Deploy newest nvngx_dlss.dll — required by Feeder beside the game exe (install root, not detected plugin path)
-        _window.DispatcherQueue?.TryEnqueue(() => statusBtn.Content = "Deploying DLSS SR...");
+        _window.DispatcherQueue?.TryEnqueue(() => statusBtn.Content = Loc.T("Deploying DLSS SR..."));
         var cachedDlss = await _dlssStreamlineService.EnsureNewestDlssCachedAsync().ConfigureAwait(false);
         if (cachedDlss != null && new FileInfo(cachedDlss).Length > 0)
         {
@@ -190,7 +191,7 @@ public partial class DetailPanelBuilder
         // DLSS5_Feed.fx is seeded from the Feeder addon zip into the DLSS5Feeder staging folder.
         // LumeniteFX is downloaded via the pack system.
         // We do NOT call EnsurePacksAsync for DLSS5Feeder — its URL is a dead fallback that 404s.
-        _window.DispatcherQueue?.TryEnqueue(() => statusBtn.Content = "Deploying shaders...");
+        _window.DispatcherQueue?.TryEnqueue(() => statusBtn.Content = Loc.T("Deploying shaders..."));
         try
         {
             // Ensure LumeniteFX is staged (DLSS5Feeder is self-contained — no download needed)
@@ -242,7 +243,7 @@ public partial class DetailPanelBuilder
                     // No zip available locally — force re-download the Feeder addon so the zip
                     // is fetched fresh and DLSS5_Feed.fx is extracted from it.
                     CrashReporter.Log("[NeuralRendering] DLSS5_Feed.fx missing and no zip found — re-downloading Feeder addon to seed it");
-                    _window.DispatcherQueue?.TryEnqueue(() => statusBtn.Content = "Downloading Feed.fx...");
+                    _window.DispatcherQueue?.TryEnqueue(() => statusBtn.Content = Loc.T("Downloading Feed.fx..."));
                     var feederEntry = addonSvc.AvailablePacks.FirstOrDefault(p =>
                         p.PackageName.Equals(FeederPackageName, StringComparison.OrdinalIgnoreCase));
                     if (feederEntry != null)
@@ -337,7 +338,7 @@ public partial class DetailPanelBuilder
                             // Point reshade.ini at this preset
                             var rIni = AuxInstallService.ParseIni(File.ReadAllLines(iniPath));
                             if (!rIni.TryGetValue("GENERAL", out var rg))
-                            { rg = new AuxInstallService.OrderedDict(); rIni["GENERAL"] = rg; }
+                            { rg = new AuxInstallService.OrderedDict(); rIni["GENERAL"] = rg; }   // ini section name, never translated
                             rg["PresetPath"] = ".\\ReShadePreset.ini";
                             AuxInstallService.WriteIni(iniPath, rIni);
                             CrashReporter.Log($"[NeuralRendering] Created ReShadePreset.ini for '{installPath}'");
@@ -438,7 +439,7 @@ public partial class DetailPanelBuilder
             var manifest = _window.ViewModel.Manifest;
             if (manifest?.DgVoodooVersions?.Count > 0)
             {
-                _window.DispatcherQueue?.TryEnqueue(() => statusBtn.Content = "Deploying dgVoodoo2...");
+                _window.DispatcherQueue?.TryEnqueue(() => statusBtn.Content = Loc.T("Deploying dgVoodoo2..."));
                 try
                 {
                     var dgSvc = App.Services.GetRequiredService<DgVoodooService>();
@@ -450,7 +451,7 @@ public partial class DetailPanelBuilder
                     else
                     {
                         CrashReporter.Log($"[NeuralRendering] dgVoodoo2 deploy returned no files for '{card.GameName}' — Windows Defender may be blocking the zip. Add %LocalAppData%\\RHI\\dgvoodoo\\ to Defender exclusions.");
-                        _window.DispatcherQueue?.TryEnqueue(() => statusBtn.Content = "⚠ dgVoodoo2 blocked by Defender");
+                        _window.DispatcherQueue?.TryEnqueue(() => statusBtn.Content = Loc.T("⚠ dgVoodoo2 blocked by Defender"));
                     }
                 }
                 catch (Exception dgEx)
@@ -466,7 +467,7 @@ public partial class DetailPanelBuilder
         // Note: NOT gated on isDx9 — host64 is needed for all 32-bit Feeder installs
         if (card.Is32Bit)
         {
-                _window.DispatcherQueue?.TryEnqueue(() => statusBtn.Content = "Setting up host64\\...");
+                _window.DispatcherQueue?.TryEnqueue(() => statusBtn.Content = Loc.T("Setting up host64\\..."));
                 await Task.Run(async () =>
                 {
                     try
@@ -569,7 +570,7 @@ public partial class DetailPanelBuilder
                 feederFiles.Add("D3D9.dll");
                 feederFiles.Add("dgVoodoo.conf");
             }
-            Models.RhiInstallManifest.SetComponent(installPath, "Feeder", feederFiles);
+            Models.RhiInstallManifest.SetComponent(installPath, Loc.T("Feeder"), feederFiles);
         }
 
         // Re-detect DLSS so the Nvidia Profile section shows the newly deployed DLLs.

@@ -2472,7 +2472,7 @@ public sealed partial class MainWindow
             {
                 var tick = new TextBlock
                 {
-                    Text                = status == Loc.T("Done") ? "✓" : status == Loc.T("WIP") ? "🔨" : "✗",
+                    Text                = status == "Done" ? "✓" : status == "WIP" ? "🔨" : "✗",
                     FontSize            = 13,
                     Foreground          = status == "Done" ? UIFactory.GetBrush(doneColor)
                                         : status == "WIP"  ? UIFactory.GetBrush("#D4A856")

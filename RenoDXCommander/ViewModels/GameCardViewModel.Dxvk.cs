@@ -1,6 +1,7 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using Microsoft.UI.Xaml;
 using RenoDXCommander.Models;
+using RenoDXCommander.Localization;
 
 namespace RenoDXCommander.ViewModels;
 
@@ -71,11 +72,11 @@ public partial class GameCardViewModel
     /// </summary>
     public string? DxvkToggleTooltip =>
         IsDxvkToggleEnabled ? null
-        : IsDxvkBlacklisted ? "DXVK is blocked for this game due to anti-cheat software."
+        : IsDxvkBlacklisted ? Loc.T("DXVK is blocked for this game due to anti-cheat software.")
         : GraphicsApi == GraphicsApiType.Unknown && !HasDxvkApiOverride
-            ? "DXVK cannot be enabled because the game's DirectX version could not be determined."
+            ? Loc.T("DXVK cannot be enabled because the game's DirectX version could not be determined.")
         : GraphicsApi is GraphicsApiType.DirectX12 or GraphicsApiType.Vulkan or GraphicsApiType.OpenGL
-            ? $"DXVK does not support {GraphicsApi}. It only translates DirectX 8/9/10/11 to Vulkan."
+            ? Loc.T("DXVK does not support {0}. It only translates DirectX 8/9/10/11 to Vulkan.", GraphicsApi)
         : null;
 
     // ── DXVK computed properties ──────────────────────────────────────────────────
@@ -85,9 +86,9 @@ public partial class GameCardViewModel
         : DxvkStatus == GameStatus.Installed ? "🟢" : "⚪";
 
     public string DxvkActionLabel => DxvkIsInstalling ? "Installing..."
-        : DxvkStatus == GameStatus.UpdateAvailable ? "⬆  Update DXVK"
-        : DxvkStatus == GameStatus.Installed ? "↺  Reinstall DXVK"
-        : "⬇  Install DXVK";
+        : DxvkStatus == GameStatus.UpdateAvailable ? Loc.T("⬆  Update DXVK")
+        : DxvkStatus == GameStatus.Installed ? Loc.T("↺  Reinstall DXVK")
+        : Loc.T("⬇  Install DXVK");
 
     public string DxvkBtnBackground  => DxvkStatus == GameStatus.UpdateAvailable ? "#201838" : "#182840";
     public string DxvkBtnForeground  => DxvkStatus == GameStatus.UpdateAvailable ? "#B898E8" : "#7AACDD";

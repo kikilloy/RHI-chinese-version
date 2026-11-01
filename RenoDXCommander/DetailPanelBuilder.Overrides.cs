@@ -5,6 +5,7 @@ using Microsoft.UI.Xaml.Controls;
 using RenoDXCommander.Models;
 using RenoDXCommander.Services;
 using RenoDXCommander.ViewModels;
+using RenoDXCommander.Localization;
 
 namespace RenoDXCommander;
 
@@ -68,7 +69,7 @@ public partial class DetailPanelBuilder
         };
         var ovTitle = new TextBlock
         {
-            Text       = "Game Overrides",
+            Text       = Loc.T("Game Overrides"),
             FontSize   = 13,
             FontWeight = Microsoft.UI.Text.FontWeights.SemiBold,
             Foreground = UIFactory.Brush(ResourceKeys.TextPrimaryBrush),
@@ -140,7 +141,7 @@ public partial class DetailPanelBuilder
         // ── Game name + Wiki name ────────────────────────────────────────────────
         var detectedBox = new TextBox
         {
-            Header = "Game name (editable)",
+            Header = Loc.T("Game name (editable)"),
             Text = gameName,
             FontSize = 12,
             HorizontalAlignment = HorizontalAlignment.Stretch,
@@ -149,8 +150,8 @@ public partial class DetailPanelBuilder
             "The display name for this game. Edit and press Enter to rename. Reset reverts to the auto-detected store name.");
         var wikiBox = new TextBox
         {
-            Header = "Wiki mod name",
-            PlaceholderText = "Exact wiki name",
+            Header = Loc.T("Wiki mod name"),
+            PlaceholderText = Loc.T("Exact wiki name"),
             Text = _window.ViewModel.GetUserNameMapping(gameName) ?? "",
             FontSize = 12,
             HorizontalAlignment = HorizontalAlignment.Stretch,
@@ -172,7 +173,7 @@ public partial class DetailPanelBuilder
             Foreground = UIFactory.Brush(ResourceKeys.TextSecondaryBrush),
             BorderBrush = UIFactory.Brush(ResourceKeys.BorderDefaultBrush),
         };
-        ToolTipService.SetToolTip(resetBtn, "Reset game name back to auto-detected and clear wiki name mapping.");
+        ToolTipService.SetToolTip(resetBtn, Loc.T("Reset game name back to auto-detected and clear wiki name mapping."));
         resetBtn.Click += (s, ev) =>
         {
             var resetName = (originalStoreName ?? gameName).Trim();
@@ -267,7 +268,7 @@ public partial class DetailPanelBuilder
 
         var osNameBox = new ComboBox
         {
-            PlaceholderText = "Select OptiScaler DLL name",
+            PlaceholderText = Loc.T("Select OptiScaler DLL name"),
             FontSize = 12,
             IsEnabled = true,
             HorizontalAlignment = HorizontalAlignment.Stretch,
@@ -568,11 +569,11 @@ public partial class DetailPanelBuilder
         resetWikiRow.Children.Add(resetBtn);
 
         // Wiki lookup ComboBox (replaces ToggleSwitch)
-        var wikiExcludeItems = new[] { "Included", "Excluded" };
+        var wikiExcludeItems = new[] { Loc.T("Included"), Loc.T("Excluded") };
         var wikiExcludeCombo = new ComboBox
         {
             ItemsSource = wikiExcludeItems,
-            SelectedItem = _window.ViewModel.IsWikiExcluded(gameName) ? "Excluded" : "Included",
+            SelectedItem = _window.ViewModel.IsWikiExcluded(gameName) ? Loc.T("Excluded") : Loc.T("Included"),
             FontSize = 12,
             HorizontalAlignment = HorizontalAlignment.Stretch,
         };
@@ -613,7 +614,7 @@ public partial class DetailPanelBuilder
 
         var dllOverrideLabel = new TextBlock
         {
-            Text = "DLL naming overrides",
+            Text = Loc.T("DLL naming overrides"),
             FontSize = 12,
             Foreground = UIFactory.Brush(ResourceKeys.TextSecondaryBrush),
         };
@@ -649,7 +650,7 @@ public partial class DetailPanelBuilder
         // Reset DLL Names button — reverts all three DLLs to defaults and clears the config
         resetDllBtn = new Button
         {
-            Content = "Reset DLL Names",
+            Content = Loc.T("Reset DLL Names"),
             FontSize = 12,
             Height = 28,
             HorizontalAlignment = HorizontalAlignment.Right,
@@ -957,7 +958,7 @@ public partial class DetailPanelBuilder
         // ── Bitness Override ComboBox (left column of Bitness & API Row) ─────────
         var bitnessLabel = new TextBlock
         {
-            Text = "Bitness",
+            Text = Loc.T("Bitness"),
             FontSize = 12,
             Foreground = UIFactory.Brush(ResourceKeys.TextPrimaryBrush),
             Margin = new Thickness(0, 0, 0, 8),
@@ -1063,7 +1064,7 @@ public partial class DetailPanelBuilder
         // ── API Override ComboBox (single selection, placed in left panel below bitness) ──────
         var apiLabel = new TextBlock
         {
-            Text = "Graphics API",
+            Text = Loc.T("Graphics API"),
             FontSize = 12,
             Foreground = UIFactory.Brush(ResourceKeys.TextPrimaryBrush),
         };
@@ -1073,7 +1074,7 @@ public partial class DetailPanelBuilder
             "User overrides set here take precedence over manifest and auto-detected values.\n" +
             "Reset Overrides reverts to auto-detection.");
 
-        var apiDropdownItems = new[] { "Auto", "DirectX8", "DirectX9", "DirectX10", "DirectX11", "DirectX12", "Vulkan", "OpenGL" };
+        var apiDropdownItems = new[] { "Auto", "DirectX8", "DirectX9", "DirectX10", "DirectX11", "DirectX12", Loc.T("Vulkan"), "OpenGL" };
         var existingApiOverride = _window.ViewModel.GetApiOverride(gameName, card.Source);
 
         // Determine current selection
@@ -1086,7 +1087,7 @@ public partial class DetailPanelBuilder
             else if (existingApiOverride.Contains("DirectX11", StringComparer.OrdinalIgnoreCase))
                 defaultApiSelection = "DirectX11";
             else if (existingApiOverride.Contains("Vulkan", StringComparer.OrdinalIgnoreCase))
-                defaultApiSelection = "Vulkan";
+                defaultApiSelection = Loc.T("Vulkan");
             else if (existingApiOverride.Contains("OpenGL", StringComparer.OrdinalIgnoreCase))
                 defaultApiSelection = "OpenGL";
             else if (existingApiOverride.Contains("DirectX10", StringComparer.OrdinalIgnoreCase))

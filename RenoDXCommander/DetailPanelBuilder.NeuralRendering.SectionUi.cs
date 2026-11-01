@@ -4,6 +4,7 @@ using Microsoft.UI.Xaml.Controls;
 using RenoDXCommander.Models;
 using RenoDXCommander.Services;
 using RenoDXCommander.ViewModels;
+using RenoDXCommander.Localization;
 
 namespace RenoDXCommander;
 
@@ -72,10 +73,10 @@ public partial class DetailPanelBuilder
         // ── Build method combo items (show all, disable inapplicable) ─────────
         var methodItems = new[]
         {
-            new { Name = "ShortFuse DLSS Tool",          Key = NrMethodShortFuse,       Enabled = !is32Bit && card.GraphicsApi != GraphicsApiType.OpenGL },
-            new { Name = "DLSS5 Tool",                 Key = NrMethodDlss5Tool,       Enabled = hasDlss && !is32Bit },
-            new { Name = "DLSS5 Tool + DX11 Bridge",   Key = NrMethodDlss5ToolBridge, Enabled = hasDlss && (isDx11 || isVulkan) && !is32Bit },
-            new { Name = "DLSS5 Feeder",               Key = NrMethodFeeder,          Enabled = true },
+            new { Name = Loc.T("ShortFuse DLSS Tool"),          Key = NrMethodShortFuse,       Enabled = !is32Bit && card.GraphicsApi != GraphicsApiType.OpenGL },
+            new { Name = Loc.T("DLSS5 Tool"),                 Key = NrMethodDlss5Tool,       Enabled = hasDlss && !is32Bit },
+            new { Name = Loc.T("DLSS5 Tool + DX11 Bridge"),   Key = NrMethodDlss5ToolBridge, Enabled = hasDlss && (isDx11 || isVulkan) && !is32Bit },
+            new { Name = Loc.T("DLSS5 Feeder"),               Key = NrMethodFeeder,          Enabled = true },
         };
 
         // ── Header ────────────────────────────────────────────────────────────
@@ -93,7 +94,7 @@ public partial class DetailPanelBuilder
         };
         var nrTitle = new TextBlock
         {
-            Text       = "Neural Rendering",
+            Text       = Loc.T("Neural Rendering"),
             FontSize   = 13,
             FontWeight = Microsoft.UI.Text.FontWeights.SemiBold,
             Foreground = UIFactory.Brush(ResourceKeys.TextPrimaryBrush),
@@ -125,16 +126,16 @@ public partial class DetailPanelBuilder
             var nrSummaryEntries = new List<(string, string?)>();
             string methodLabel = effectiveMethod switch
             {
-                NrMethodShortFuse       => "DLSS Tool (SF)",
-                NrMethodDlss5Tool       => "DLSS5 Tool",
-                NrMethodDlss5ToolBridge => "DLSS5 Tool + Bridge",
-                NrMethodFeeder          => "Feeder",
+                NrMethodShortFuse       => Loc.T("DLSS Tool (SF)"),
+                NrMethodDlss5Tool       => Loc.T("DLSS5 Tool"),
+                NrMethodDlss5ToolBridge => Loc.T("DLSS5 Tool + Bridge"),
+                NrMethodFeeder          => Loc.T("Feeder"),
                 _                       => effectiveMethod,
             };
             if (nrAnyInstalled)
-                nrSummaryEntries.Add(("NR Method", methodLabel));
+                nrSummaryEntries.Add((Loc.T("NR Method"), methodLabel));
             if (nrDllPresent)
-                nrSummaryEntries.Add(("NR DLL", nrDllVersion));
+                nrSummaryEntries.Add((Loc.T("NR DLL"), nrDllVersion));
             nrSummary = DetailPanelBuilder.MakeSectionSummaryInlines(nrSummaryEntries);
             if (nrSummary != null)
             {
@@ -174,7 +175,7 @@ public partial class DetailPanelBuilder
 
         // Method combo (col 0)
         var methodStack = new StackPanel { Spacing = 2 };
-        methodStack.Children.Add(new TextBlock { Text = "Method", FontSize = 10, Foreground = UIFactory.Brush(ResourceKeys.TextTertiaryBrush) });
+        methodStack.Children.Add(new TextBlock { Text = Loc.T("Method"), FontSize = 10, Foreground = UIFactory.Brush(ResourceKeys.TextTertiaryBrush) });
 
         var methodCombo = new ComboBox
         {
@@ -203,7 +204,7 @@ public partial class DetailPanelBuilder
 
         // Pack version combo (col 1) — Feeder version or Bridge version, always "Latest" (managed by AddonPackService)
         var packVersionLabel = new TextBlock { FontSize = 10, Foreground = UIFactory.Brush(ResourceKeys.TextTertiaryBrush) };
-        packVersionLabel.Text = effectiveMethod == NrMethodFeeder ? "Feeder Version" : "Bridge Version";
+        packVersionLabel.Text = effectiveMethod == NrMethodFeeder ? Loc.T("Feeder Version") : Loc.T("Bridge Version");
         var packVersionStack = new StackPanel { Spacing = 2, Visibility = isFeederOrBridge ? Visibility.Visible : Visibility.Collapsed };
         packVersionStack.Children.Add(packVersionLabel);
         var packVersionCombo = new ComboBox
@@ -235,7 +236,7 @@ public partial class DetailPanelBuilder
             packVersionCombo.Items.Clear();
             var packAddonType = methodKey == NrMethodFeeder ? Renodx5AddonService.FeederSubDir : Renodx5AddonService.BridgeSubDir;
             var latestPackVer = rdx5Svc.GetLatestAvailableVersion(packAddonType);
-            packVersionCombo.Items.Add(string.IsNullOrEmpty(latestPackVer) ? "Latest" : $"Latest ({latestPackVer})");
+            packVersionCombo.Items.Add(string.IsNullOrEmpty(latestPackVer) ? "Latest" : Loc.T("Latest ({0})", latestPackVer));
             var versions = rdx5Svc.GetAvailableVersions(packAddonType);
             foreach (var v in versions)
                 packVersionCombo.Items.Add(v);
@@ -292,7 +293,7 @@ public partial class DetailPanelBuilder
                 _window.DispatcherQueue?.TryEnqueue(() =>
                 {
                     installBtn.IsEnabled = false;
-                    installBtn.Content   = "Swapping addon...";
+                    installBtn.Content   = Loc.T("Swapping addon...");
                 });
 
                 try
@@ -373,17 +374,17 @@ public partial class DetailPanelBuilder
 
         ToolTipService.SetToolTip(packVersionStack,
             effectiveMethod == NrMethodFeeder
-                ? "Version of dlss5-feed.addon64 to install."
-                : "Version of dlss5-bridge.addon64 to install.");
+                ? Loc.T("Version of dlss5-feed.addon64 to install.")
+                : Loc.T("Version of dlss5-bridge.addon64 to install."));
         packVersionStack.Children.Add(packVersionCombo);        Grid.SetColumn(packVersionStack, 1);
         row1.Children.Add(packVersionStack);
 
         // DLSS5 Tool / SF version combo (col 2)
         var addonVersionLabel = new TextBlock { FontSize = 10, Foreground = UIFactory.Brush(ResourceKeys.TextTertiaryBrush) };
-        addonVersionLabel.Text = effectiveMethod == NrMethodShortFuse ? "SF Version"
-                                : effectiveMethod == NrMethodFeeder    ? "DLSS5 Tool Version"
-                                : effectiveMethod == NrMethodDlss5ToolBridge ? "DLSS5 Tool Version"
-                                : "DLSS5 Tool Version";
+        addonVersionLabel.Text = effectiveMethod == NrMethodShortFuse ? Loc.T("SF Version")
+                                : effectiveMethod == NrMethodFeeder    ? Loc.T("DLSS5 Tool Version")
+                                : effectiveMethod == NrMethodDlss5ToolBridge ? Loc.T("DLSS5 Tool Version")
+                                : Loc.T("DLSS5 Tool Version");
         var addonVersionStack = new StackPanel { Spacing = 2 };
         addonVersionStack.Children.Add(addonVersionLabel);
 
@@ -403,7 +404,7 @@ public partial class DetailPanelBuilder
             bool addonComboInit = true;
             addonVersionCombo.Items.Clear();
             var latestAddonVer = rdx5Svc.GetLatestAvailableVersion(addonType);
-            addonVersionCombo.Items.Add(string.IsNullOrEmpty(latestAddonVer) ? "Latest" : $"Latest ({latestAddonVer})");
+            addonVersionCombo.Items.Add(string.IsNullOrEmpty(latestAddonVer) ? "Latest" : Loc.T("Latest ({0})", latestAddonVer));
             foreach (var v in rdx5Svc.GetAvailableVersions(addonType))
                 addonVersionCombo.Items.Add(v);
 
@@ -453,7 +454,7 @@ public partial class DetailPanelBuilder
                     _window.DispatcherQueue?.TryEnqueue(() =>
                     {
                         installBtn.IsEnabled = false;
-                        installBtn.Content   = "Swapping addon...";
+                        installBtn.Content   = Loc.T("Swapping addon...");
                     });
 
                     try
@@ -545,15 +546,15 @@ public partial class DetailPanelBuilder
 
         ToolTipService.SetToolTip(addonVersionCombo,
             effectiveMethod == NrMethodFeeder
-                ? "Version of renodx-dlss5.addon64 deployed as the neural consumer. The Feeder addon itself always uses the latest version."
-                : "Addon version to install. 'Latest' always installs the newest available and auto-updates.");
+                ? Loc.T("Version of renodx-dlss5.addon64 deployed as the neural consumer. The Feeder addon itself always uses the latest version.")
+                : Loc.T("Addon version to install. 'Latest' always installs the newest available and auto-updates."));
         addonVersionStack.Children.Add(addonVersionCombo);
         Grid.SetColumn(addonVersionStack, 2);
         row1.Children.Add(addonVersionStack);
 
         // NR version combo (col 3)
         var nrVersionStack = new StackPanel { Spacing = 2 };
-        nrVersionStack.Children.Add(new TextBlock { Text = "NR DLL Version", FontSize = 10, Foreground = UIFactory.Brush(ResourceKeys.TextTertiaryBrush) });
+        nrVersionStack.Children.Add(new TextBlock { Text = Loc.T("NR DLL Version"), FontSize = 10, Foreground = UIFactory.Brush(ResourceKeys.TextTertiaryBrush) });
 
         var nrVersionCombo = new ComboBox
         {
@@ -562,7 +563,7 @@ public partial class DetailPanelBuilder
             CornerRadius = new CornerRadius(6),
             MaxDropDownHeight = 300,
         };
-        ToolTipService.SetToolTip(nrVersionCombo, "NR DLL version to deploy. 'Latest' always uses the newest available. Change while installed to swap the NR DLL in-place.");
+        ToolTipService.SetToolTip(nrVersionCombo, Loc.T("NR DLL version to deploy. 'Latest' always uses the newest available. Change while installed to swap the NR DLL in-place."));
         nrVersionStack.Children.Add(nrVersionCombo);
         Grid.SetColumn(nrVersionStack, 3);
         row1.Children.Add(nrVersionStack);
@@ -575,7 +576,7 @@ public partial class DetailPanelBuilder
             nrVersionCombo.Items.Clear();
             var versions = dlssSvc.DlssnrVersions.ToList();
             var latestVer = versions.FirstOrDefault();
-            nrVersionCombo.Items.Add(string.IsNullOrEmpty(latestVer) ? "Latest" : $"Latest ({latestVer})");
+            nrVersionCombo.Items.Add(string.IsNullOrEmpty(latestVer) ? Loc.T("Latest") : $"Latest ({latestVer})");
             foreach (var v in versions)
                 nrVersionCombo.Items.Add(v);
 
@@ -619,7 +620,7 @@ public partial class DetailPanelBuilder
                 _window.DispatcherQueue?.TryEnqueue(() =>
                 {
                     installBtn.IsEnabled = false;
-                    installBtn.Content   = "Swapping NR DLL...";
+                    installBtn.Content   = Loc.T("Swapping NR DLL...");
                 });
 
                 try
@@ -812,60 +813,60 @@ public partial class DetailPanelBuilder
                            ?? methodItems.ElementAtOrDefault(methodCombo.SelectedIndex)?.Key
                            ?? effectiveMethod;
 
-            Tag(rsi ? "✓ ReShade" : "✗ ReShade", rsi);
+            Tag(rsi ? Loc.T("✓ ReShade") : Loc.T("✗ ReShade"), rsi);
 
             switch (selectedKey)
             {
                 case NrMethodDlss5Tool:
-                    Tag(d5i ? "✓ DLSS5 Tool" : "✗ DLSS5 Tool", d5i);
+                    Tag(d5i ? Loc.T("✓ DLSS5 Tool") : Loc.T("✗ DLSS5 Tool"), d5i);
                     if (card.HasDlss)
                     {
-                        Tag(srOk ? $"✓ DLSS SR {srv}" : "✗ DLSS SR", srOk);
-                        Tag(rrOk ? $"✓ DLSS RR {rrv}" : "✗ DLSS RR", rrOk);
-                        Tag(fgOk ? $"✓ DLSS FG {fgv}" : "✗ DLSS FG", fgOk);
+                        Tag(srOk ? Loc.T("✓ DLSS SR {0}", srv) : Loc.T("✗ DLSS SR"), srOk);
+                        Tag(rrOk ? Loc.T("✓ DLSS RR {0}", rrv) : Loc.T("✗ DLSS RR"), rrOk);
+                        Tag(fgOk ? Loc.T("✓ DLSS FG {0}", fgv) : Loc.T("✗ DLSS FG"), fgOk);
                     }
-                    Tag(nrOk ? $"✓ NR DLL {nrv2}" : "✗ NR DLL", nrOk);
+                    Tag(nrOk ? Loc.T("✓ NR DLL {0}", nrv2) : Loc.T("✗ NR DLL"), nrOk);
                     break;
                 case NrMethodDlss5ToolBridge:
-                    Tag(d5i ? "✓ DLSS5 Tool" : "✗ DLSS5 Tool", d5i);
-                    Tag(bri ? "✓ DX11 Bridge" : "✗ DX11 Bridge", bri);
+                    Tag(d5i ? Loc.T("✓ DLSS5 Tool") : Loc.T("✗ DLSS5 Tool"), d5i);
+                    Tag(bri ? Loc.T("✓ DX11 Bridge") : Loc.T("✗ DX11 Bridge"), bri);
                     if (card.HasDlss)
                     {
-                        Tag(srOk ? $"✓ DLSS SR {srv}" : "✗ DLSS SR", srOk);
-                        Tag(rrOk ? $"✓ DLSS RR {rrv}" : "✗ DLSS RR", rrOk);
-                        Tag(fgOk ? $"✓ DLSS FG {fgv}" : "✗ DLSS FG", fgOk);
+                        Tag(srOk ? Loc.T("✓ DLSS SR {0}", srv) : Loc.T("✗ DLSS SR"), srOk);
+                        Tag(rrOk ? Loc.T("✓ DLSS RR {0}", rrv) : Loc.T("✗ DLSS RR"), rrOk);
+                        Tag(fgOk ? Loc.T("✓ DLSS FG {0}", fgv) : Loc.T("✗ DLSS FG"), fgOk);
                     }
-                    Tag(nrOk ? $"✓ NR DLL {nrv2}" : "✗ NR DLL", nrOk);
+                    Tag(nrOk ? Loc.T("✓ NR DLL {0}", nrv2) : Loc.T("✗ NR DLL"), nrOk);
                     break;
                 case NrMethodShortFuse:
-                    Tag(sfi    ? "✓ ShortFuse DLSS Tool"  : "✗ ShortFuse DLSS Tool", sfi);
-                    Tag(srOk   ? $"✓ DLSS SR {srv}"   : "✗ DLSS SR",  srOk);
-                    Tag(rrOk   ? $"✓ DLSS RR {rrv}"   : "✗ DLSS RR", rrOk);
-                    Tag(fgOk   ? $"✓ DLSS FG {fgv}"   : "✗ DLSS FG", fgOk);
-                    Tag(nrOk   ? $"✓ NR DLL {nrv2}"   : "✗ NR DLL",  nrOk);
-                    Tag(ualOk  ? $"✓ ASI Loader ({ualName})" : "✗ ASI Loader", ualOk);
+                    Tag(sfi    ? Loc.T("✓ ShortFuse DLSS Tool")  : Loc.T("✗ ShortFuse DLSS Tool"), sfi);
+                    Tag(srOk   ? $"✓ DLSS SR {srv}"   : Loc.T("✗ DLSS SR"),  srOk);
+                    Tag(rrOk   ? $"✓ DLSS RR {rrv}"   : Loc.T("✗ DLSS RR"), rrOk);
+                    Tag(fgOk   ? $"✓ DLSS FG {fgv}"   : Loc.T("✗ DLSS FG"), fgOk);
+                    Tag(nrOk   ? $"✓ NR DLL {nrv2}"   : Loc.T("✗ NR DLL"),  nrOk);
+                    Tag(ualOk  ? Loc.T("✓ ASI Loader ({0})", ualName) : Loc.T("✗ ASI Loader"), ualOk);
                     break;
                 case NrMethodFeeder:
-                    Tag(fei   ? "✓ Feeder Addon"            : "✗ Feeder Addon",  fei);
+                    Tag(fei   ? Loc.T("✓ Feeder Addon")            : Loc.T("✗ Feeder Addon"),  fei);
                     // For 32-bit games DLSS5 Tool lives in host64\ — label accordingly
                     if (card.Is32Bit)
                     {
-                        Tag(d5i   ? "✓ DLSS5 Tool (host64)"   : "✗ DLSS5 Tool (host64)", d5i);
+                        Tag(d5i   ? Loc.T("✓ DLSS5 Tool (host64)")   : Loc.T("✗ DLSS5 Tool (host64)"), d5i);
                         Tag(hostExeOk ? "✓ host64.exe"         : "✗ host64.exe",           hostExeOk);
                     }
                     else
                     {
-                        Tag(d5i   ? "✓ DLSS5 Tool"             : "✗ DLSS5 Tool",    d5i);
+                        Tag(d5i   ? Loc.T("✓ DLSS5 Tool")             : Loc.T("✗ DLSS5 Tool"),    d5i);
                     }
-                    Tag(dlssi ? $"✓ DLSS SR {dlssv}"        : "✗ DLSS SR",       dlssi);
-                    Tag(nri   ? $"✓ NR DLL {nrv}"           : "✗ NR DLL",        nri);
-                    Tag(feedFxPresent    ? "✓ Feed.fx"    : "✗ Feed.fx",    feedFxPresent);
-                    Tag(lumeniteFxPresent ? "✓ LumeniteFX" : "✗ LumeniteFX", lumeniteFxPresent);
+                    Tag(dlssi ? $"✓ DLSS SR {dlssv}"        : Loc.T("✗ DLSS SR"),       dlssi);
+                    Tag(nri   ? $"✓ NR DLL {nrv}"           : Loc.T("✗ NR DLL"),        nri);
+                    Tag(feedFxPresent    ? Loc.T("✓ Feed.fx")    : Loc.T("✗ Feed.fx"),    feedFxPresent);
+                    Tag(lumeniteFxPresent ? Loc.T("✓ LumeniteFX") : Loc.T("✗ LumeniteFX"), lumeniteFxPresent);
                     if (isDx9Feeder)
-                        Tag(dgVoodooOk ? "✓ dgVoodoo2" : "✗ dgVoodoo2", dgVoodooOk);
+                        Tag(dgVoodooOk ? Loc.T("✓ dgVoodoo2") : Loc.T("✗ dgVoodoo2"), dgVoodooOk);
                     break;
                 default:
-                    Tag("Not installed", false);
+                    Tag(Loc.T("Not installed"), false);
                     break;
             }
         }
@@ -905,26 +906,26 @@ public partial class DetailPanelBuilder
             {
                 case NrMethodDlss5Tool:
                     descText.Text = hasDlss
-                        ? "For DX12 games with native DLSS. Deploys the DLSS5 Tool ReShade addon and nvngx_dlssnr.dll. Lighter alternative to ShortFuse DLSS Tool when you don't need the full Streamline stack."
-                        : "For DX12 games with native DLSS. This game has no detected DLSS — consider ShortFuse DLSS Tool instead.";
-                    descLink.Content = "DLSS5 Tool info →";
+                        ? Loc.T("For DX12 games with native DLSS. Deploys the DLSS5 Tool ReShade addon and nvngx_dlssnr.dll. Lighter alternative to ShortFuse DLSS Tool when you don't need the full Streamline stack.")
+                        : Loc.T("For DX12 games with native DLSS. This game has no detected DLSS — consider ShortFuse DLSS Tool instead.");
+                    descLink.Content = Loc.T("DLSS5 Tool info →");
                     descLink.NavigateUri = new Uri("https://discord.com/channels/1408098019194310818/1543802634991968366");
                     break;
                 case NrMethodDlss5ToolBridge:
-                    descText.Text = "For DX11 and Vulkan games with native DLSS. The bridge mirrors the game's DLSS onto a private DX12 session so the NR addon can hook it.";
-                    descLink.Content = "DX11 Bridge info →";
+                    descText.Text = Loc.T("For DX11 and Vulkan games with native DLSS. The bridge mirrors the game's DLSS onto a private DX12 session so the NR addon can hook it.");
+                    descLink.Content = Loc.T("DX11 Bridge info →");
                     descLink.NavigateUri = new Uri("https://github.com/NIGos/dlss5-bridge");
                     break;
                 case NrMethodShortFuse:
-                    descText.Text = "Recommended for most games with native DLSS. Deploys the full DLSS SR/RR/FG/NR stack and Streamline alongside the ReShade addon. Supports DX12, DX11, DX9, and Vulkan.";
-                    descLink.Content = "ShortFuse DLSS Tool info →";
+                    descText.Text = Loc.T("Recommended for most games with native DLSS. Deploys the full DLSS SR/RR/FG/NR stack and Streamline alongside the ReShade addon. Supports DX12, DX11, DX9, and Vulkan.");
+                    descLink.Content = Loc.T("ShortFuse DLSS Tool info →");
                     descLink.NavigateUri = new Uri("https://discord.com/channels/1408098019194310818/1543975158937821315");
                     break;
                 case NrMethodFeeder:
                     descText.Text = is32Bit
-                        ? "For 32-bit games. Feeds a synthetic DLSS contract from ReShade depth and motion vectors. Deploys the Feeder addon, DLSS5 Tool (neural consumer), NR DLL, DLSS SR DLL, and the required shaders (DLSS5_Feed.fx + LumeniteFX)."
-                        : "For games with no native DLSS (DX11, DX12, Vulkan, OpenGL). Feeds a synthetic DLSS contract from ReShade depth and motion vectors. Deploys the Feeder addon, DLSS5 Tool (neural consumer), NR DLL, DLSS SR DLL, and required shaders.";
-                    descLink.Content = "Feeder setup guide →";
+                        ? Loc.T("For 32-bit games. Feeds a synthetic DLSS contract from ReShade depth and motion vectors. Deploys the Feeder addon, DLSS5 Tool (neural consumer), NR DLL, DLSS SR DLL, and the required shaders (DLSS5_Feed.fx + LumeniteFX).")
+                        : Loc.T("For games with no native DLSS (DX11, DX12, Vulkan, OpenGL). Feeds a synthetic DLSS contract from ReShade depth and motion vectors. Deploys the Feeder addon, DLSS5 Tool (neural consumer), NR DLL, DLSS SR DLL, and required shaders.");
+                    descLink.Content = Loc.T("Feeder setup guide →");
                     descLink.NavigateUri = new Uri("https://github.com/jlrouzies-fr/DLSS5-Feeder");
                     break;
             }
@@ -966,7 +967,7 @@ public partial class DetailPanelBuilder
         };
 
         // Cog button — always shown, opens method-specific settings
-        var sfCogBtn = CogDialog.MakeCogButton("ShortFuse DLSS Tool settings");
+        var sfCogBtn = CogDialog.MakeCogButton(Loc.T("ShortFuse DLSS Tool settings"));
         sfCogBtn.Height = 34; // matches the 34 px install and remove buttons in this row
         sfCogBtn.Visibility = effectiveMethod == NrMethodShortFuse ? Visibility.Visible : Visibility.Collapsed;
         sfCogBtn.Click += async (s, e) =>
@@ -975,8 +976,8 @@ public partial class DetailPanelBuilder
             {
                 bool currentEnabled = _window.ViewModel.GetSfAutoConfigEnabled(gameName, store);
 
-                var cog = new CogDialog("ShortFuse DLSS Tool", _window.Content.XamlRoot);
-                cog.AddCombo("Auto-configure ReShade for FrameGen",
+                var cog = new CogDialog(Loc.T("ShortFuse DLSS Tool"), _window.Content.XamlRoot);
+                cog.AddCombo(Loc.T("Auto-configure ReShade for FrameGen"),
                     "When On, installing ShortFuse DLSS Tool also sets ReShade up so FrameGen works correctly after ReShade. " +
                     "Not needed on ShortFuse DLSS Tool v0.54 and above.",
                     new[] { "Off", "On" }, currentEnabled ? 1 : 0, i =>
@@ -985,12 +986,12 @@ public partial class DetailPanelBuilder
                         _window.ViewModel.SetSfAutoConfigEnabled(gameName, enabled, store);
                         CrashReporter.Log($"[DetailPanelBuilder.SfCog] Auto-configure ReShade for FrameGen = {enabled} for '{gameName}'");
                         cog.SetSuccess(enabled
-                            ? "Saved. Applies the next time ShortFuse DLSS Tool is installed or updated."
+                            ? Loc.T("Saved. Applies the next time ShortFuse DLSS Tool is installed or updated.")
                             : "Saved.");
                     });
-                cog.AddNote("When On, installing ShortFuse DLSS Tool will:");
+                cog.AddNote(Loc.T("When On, installing ShortFuse DLSS Tool will:"));
                 cog.AddNote("• Rename ReShade to Reshade64.asi");
-                cog.AddNote("• Install ASI Loader (winmm, then version, then dinput8)");
+                cog.AddNote(Loc.T("• Install ASI Loader (winmm, then version, then dinput8)"));
                 cog.AddNote("• Write HookStreamline=1 and HookDirectX=1 to reshade.ini");
                 await cog.ShowAsync();
             }
@@ -1020,21 +1021,21 @@ public partial class DetailPanelBuilder
             // Install button appearance
             if (isFeeder)
             {
-                installBtn.Content = "Install Feeder Addon";
+                installBtn.Content = Loc.T("Install Feeder Addon");
                 installBtn.Background  = UIFactory.Brush(ResourceKeys.AccentBlueBgBrush);
                 installBtn.Foreground  = UIFactory.Brush(ResourceKeys.AccentBlueBrush);
                 installBtn.BorderBrush = UIFactory.Brush(ResourceKeys.AccentBlueBorderBrush);
             }
             else if (anyInstalled)
             {
-                installBtn.Content = "Reinstall";
+                installBtn.Content = Loc.T("Reinstall");
                 installBtn.Background  = UIFactory.Brush(ResourceKeys.SurfaceOverlayBrush);
                 installBtn.Foreground  = UIFactory.Brush(ResourceKeys.TextSecondaryBrush);
                 installBtn.BorderBrush = UIFactory.Brush(ResourceKeys.BorderDefaultBrush);
             }
             else
             {
-                installBtn.Content = "Install Neural Rendering";
+                installBtn.Content = Loc.T("Install Neural Rendering");
                 installBtn.Background  = UIFactory.Brush(ResourceKeys.AccentBlueBgBrush);
                 installBtn.Foreground  = UIFactory.Brush(ResourceKeys.AccentBlueBrush);
                 installBtn.BorderBrush = UIFactory.Brush(ResourceKeys.AccentBlueBorderBrush);
@@ -1049,25 +1050,25 @@ public partial class DetailPanelBuilder
             // Pack version column (Feeder/Bridge only)
             bool showPackVersion = selKey == NrMethodFeeder || selKey == NrMethodDlss5ToolBridge;
             packVersionStack.Visibility = showPackVersion ? Visibility.Visible : Visibility.Collapsed;
-            packVersionLabel.Text = selKey == NrMethodFeeder ? "Feeder Version" : "Bridge Version";
+            packVersionLabel.Text = selKey == NrMethodFeeder ? Loc.T("Feeder Version") : Loc.T("Bridge Version");
             if (showPackVersion)
             {
                 PopulatePackVersionCombo(selKey);
                 ToolTipService.SetToolTip(packVersionStack,
                     selKey == NrMethodFeeder
-                        ? "Version of dlss5-feed.addon64 to install."
-                        : "Version of dlss5-bridge.addon64 to install.");
+                        ? Loc.T("Version of dlss5-feed.addon64 to install.")
+                        : Loc.T("Version of dlss5-bridge.addon64 to install."));
             }
 
             // DLSS5 Tool / SF version label
-            addonVersionLabel.Text = selKey == NrMethodShortFuse ? "SF Version" : "DLSS5 Tool Version";
+            addonVersionLabel.Text = selKey == NrMethodShortFuse ? Loc.T("SF Version") : "DLSS5 Tool Version";
 
             // Addon version combo — enabled always (swap-in-place supported while installed)
             addonVersionStack.Opacity   = 1.0;
             addonVersionCombo.IsEnabled = true;
             ToolTipService.SetToolTip(addonVersionStack, selKey == NrMethodFeeder
-                ? "Version of renodx-dlss5.addon64 deployed as the neural consumer. Changing while installed swaps the file in-place."
-                : "Addon version to install. Changing while installed swaps the file in-place without a full reinstall.");
+                ? Loc.T("Version of renodx-dlss5.addon64 deployed as the neural consumer. Changing while installed swaps the file in-place.")
+                : Loc.T("Addon version to install. Changing while installed swaps the file in-place without a full reinstall."));
 
             // Pack version combo — enabled always when visible (swap-in-place supported while installed)
             packVersionStack.Opacity   = showPackVersion ? 1.0 : 0.4;
@@ -1174,7 +1175,7 @@ public partial class DetailPanelBuilder
                                 if (info.Length == 0) { try { File.Delete(dlssDest); File.Delete(dlssSentinel); } catch (Exception ex) { CrashReporter.Log($"[DetailPanelBuilder.BuildNeuralRenderingSectionWithData] Failed to remove RHI-placed nvngx_dlss.dll on method switch — {ex.Message}"); } }
                                 else { try { File.Copy(dlssSentinel, dlssDest, overwrite: true); File.Delete(dlssSentinel); } catch (Exception ex) { CrashReporter.Log($"[DetailPanelBuilder.BuildNeuralRenderingSectionWithData] Failed to restore original nvngx_dlss.dll on method switch — {ex.Message}"); } }
                             }
-                            rdx5Svc.RemoveNrDll(installPath, "Feeder");
+                            rdx5Svc.RemoveNrDll(installPath, Loc.T("Feeder"));
                             RemoveFeederShaders(installPath, gameName, store, card);
                             // Remove host64\ and dgVoodoo2 on method switch too
                             var h64 = Path.Combine(installPath, "host64");
@@ -1186,7 +1187,7 @@ public partial class DetailPanelBuilder
                                 App.Services.GetRequiredService<DgVoodooService>().RemoveFromGame(installPath);
                             else
                                 CrashReporter.Log($"[NeuralRendering] {(card.LumaStatus == GameStatus.Installed ? "Luma" : "Standalone")} still installed — preserving dgVoodoo2 for '{gameName}'");
-                            Models.RhiInstallManifest.RemoveComponent(installPath, "Feeder");
+                            Models.RhiInstallManifest.RemoveComponent(installPath, Loc.T("Feeder"));
                             break;
                         }
                     }
@@ -1245,7 +1246,7 @@ public partial class DetailPanelBuilder
                 // Ensure ReShade is installed first — all NR methods require it
                 if (!card.IsRsInstalled)
                 {
-                    _window.DispatcherQueue?.TryEnqueue(() => installBtn.Content = "Installing ReShade...");
+                    _window.DispatcherQueue?.TryEnqueue(() => installBtn.Content = Loc.T("Installing ReShade..."));
 
                     // For DX9 Feeder: dgVoodoo2 will own d3d9.dll, so ReShade must be dxgi.dll.
                     // Call InstallReShadeInternalAsync directly with the forced filename instead of
@@ -1266,7 +1267,7 @@ public partial class DetailPanelBuilder
                     && card.RsRecord?.InstalledAs?.Equals("d3d9.dll", StringComparison.OrdinalIgnoreCase) == true)
                 {
                     // ReShade already installed as d3d9.dll (wrong for dgVoodoo) — reinstall as dxgi.dll
-                    _window.DispatcherQueue?.TryEnqueue(() => installBtn.Content = "Fixing ReShade filename...");
+                    _window.DispatcherQueue?.TryEnqueue(() => installBtn.Content = Loc.T("Fixing ReShade filename..."));
                     await _window.ViewModel.InstallReShadeInternalAsync(card, "dxgi.dll").ConfigureAwait(false);
                     await Task.Delay(300).ConfigureAwait(false);
                 }
@@ -1317,7 +1318,7 @@ public partial class DetailPanelBuilder
                 // that conflict with the NR section. Remove them from the global set so they don't
                 // get re-deployed on every refresh.
                 var globalAddons = _window.ViewModel.Settings.EnabledGlobalAddons;
-                var conflicting  = new[] { "DLSS5 Tool", "ShortFuse DLSS Tool" };
+                var conflicting  = new[] { Loc.T("DLSS5 Tool"), Loc.T("ShortFuse DLSS Tool") };
                 bool removedAny  = false;
                 foreach (var c in conflicting)
                     if (globalAddons.RemoveAll(a => a.Equals(c, StringComparison.OrdinalIgnoreCase)) > 0)
@@ -1337,7 +1338,7 @@ public partial class DetailPanelBuilder
             catch (Exception ex)
             {
                 CrashReporter.Log($"[NeuralRendering.Install] Failed for '{gameName}' — {ex.Message}");
-                _window.DispatcherQueue?.TryEnqueue(() => installBtn.Content = "Install failed");
+                _window.DispatcherQueue?.TryEnqueue(() => installBtn.Content = Loc.T("Install failed"));
             }
             finally
             {
@@ -1425,7 +1426,7 @@ public partial class DetailPanelBuilder
                             }
 
                             // Remove NR dll
-                            rdx5Svc.RemoveNrDll(installPath, "Feeder");
+                            rdx5Svc.RemoveNrDll(installPath, Loc.T("Feeder"));
 
                             // Remove only DLSS5Feeder + LumeniteFX shader files — never wipe the whole folder
                             RemoveFeederShaders(installPath, gameName, store, card);
@@ -1445,7 +1446,7 @@ public partial class DetailPanelBuilder
                             else
                                 CrashReporter.Log($"[NeuralRendering] Luma still installed — preserving dgVoodoo2 for '{gameName}'");
 
-                            Models.RhiInstallManifest.RemoveComponent(installPath, "Feeder");
+                            Models.RhiInstallManifest.RemoveComponent(installPath, Loc.T("Feeder"));
                             break;
                         }
                     }
@@ -1456,7 +1457,7 @@ public partial class DetailPanelBuilder
                     Models.RhiInstallManifest.SetNrMethod(installPath, null);
 
                     // Remove conflicting addons from global and per-game selections
-                    var conflictingRemove = new[] { "DLSS5 Tool", "ShortFuse DLSS Tool" };
+                    var conflictingRemove = new[] { Loc.T("DLSS5 Tool"), Loc.T("ShortFuse DLSS Tool") };
                     var globalAddonsRemove = _window.ViewModel.Settings.EnabledGlobalAddons;
                     bool removedGlobal = false;
                     foreach (var c in conflictingRemove)
@@ -1520,7 +1521,7 @@ public partial class DetailPanelBuilder
             Margin = new Thickness(0, 4, 0, 0) };
         var costScalerLabel = new TextBlock
         {
-            Text = "NR Cost Scaler",
+            Text = Loc.T("NR Cost Scaler"),
             FontSize = 12,
             Foreground = UIFactory.Brush(ResourceKeys.TextSecondaryBrush),
             VerticalAlignment = VerticalAlignment.Center,
@@ -1538,9 +1539,9 @@ public partial class DetailPanelBuilder
             Opacity = costScalerToggleEnabled ? 1.0 : 0.45,
         };
         if (!costScalerSvc.IsStagingReady)
-            ToolTipService.SetToolTip(costScalerToggle, "Cost Scaler not yet staged — will be available after first launch");
+            ToolTipService.SetToolTip(costScalerToggle, Loc.T("Cost Scaler not yet staged — will be available after first launch"));
         else if (nrMethodInstalled)
-            ToolTipService.SetToolTip(costScalerToggle, "Remove the installed NR method first, then toggle Cost Scaler On before reinstalling");
+            ToolTipService.SetToolTip(costScalerToggle, Loc.T("Remove the installed NR method first, then toggle Cost Scaler On before reinstalling"));
 
         // Installed indicator
         bool costScalerInstalled = DlssNrCostScalerService.IsInstalled(installPath);
@@ -1570,7 +1571,7 @@ public partial class DetailPanelBuilder
             costScalerRow.Children.Add(new Border { Width = 1, Background = UIFactory.Brush(ResourceKeys.BorderDefaultBrush), VerticalAlignment = VerticalAlignment.Stretch, Margin = new Thickness(4, 0, 4, 0) });
             costScalerRow.Children.Add(new TextBlock
             {
-                Text = "ZZZ Load Order",
+                Text = Loc.T("ZZZ Load Order"),
                 FontSize = 12,
                 Foreground = UIFactory.Brush(ResourceKeys.TextSecondaryBrush),
                 VerticalAlignment = VerticalAlignment.Center,
@@ -1613,7 +1614,7 @@ public partial class DetailPanelBuilder
 
             nrBody.Children.Add(new TextBlock
             {
-                Text = "Cost Scaler is built into the ShortFuse addon — this toggle is no longer required but remains available if you prefer the standalone version.",
+                Text = Loc.T("Cost Scaler is built into the ShortFuse addon — this toggle is no longer required but remains available if you prefer the standalone version."),
                 FontSize = 10,
                 Foreground = UIFactory.Brush(ResourceKeys.TextTertiaryBrush),
                 TextWrapping = TextWrapping.Wrap,
@@ -1632,10 +1633,10 @@ public partial class DetailPanelBuilder
             Foreground = UIFactory.Brush(ResourceKeys.TextTertiaryBrush),
             Padding = new Thickness(0),
         };
-        linksRow.Children.Add(MakeLink("DLSS5 Tool →",  "https://discord.com/channels/1408098019194310818/1543802634991968366"));
-        linksRow.Children.Add(MakeLink("DX11 Bridge →", "https://github.com/NIGos/dlss5-bridge"));
-        linksRow.Children.Add(MakeLink("ShortFuse →",   "https://discord.com/channels/1408098019194310818/1543975158937821315"));
-        linksRow.Children.Add(MakeLink("Feeder →",      "https://github.com/jlrouzies-fr/DLSS5-Feeder"));
+        linksRow.Children.Add(MakeLink(Loc.T("DLSS5 Tool →"),  "https://discord.com/channels/1408098019194310818/1543802634991968366"));
+        linksRow.Children.Add(MakeLink(Loc.T("DX11 Bridge →"), "https://github.com/NIGos/dlss5-bridge"));
+        linksRow.Children.Add(MakeLink(Loc.T("ShortFuse →"),   "https://discord.com/channels/1408098019194310818/1543975158937821315"));
+        linksRow.Children.Add(MakeLink(Loc.T("Feeder →"),      "https://github.com/jlrouzies-fr/DLSS5-Feeder"));
         nrBody.Children.Add(linksRow);
         _window.ViewModel.SetLastUiAction($"NeuralRenderingSectionWithData:Done({card.GameName})");
     }

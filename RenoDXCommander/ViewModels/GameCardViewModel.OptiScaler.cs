@@ -1,6 +1,7 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using Microsoft.UI.Xaml;
 using RenoDXCommander.Models;
+using RenoDXCommander.Localization;
 
 namespace RenoDXCommander.ViewModels;
 
@@ -25,9 +26,9 @@ public partial class GameCardViewModel
         : OsStatus == GameStatus.Installed ? "🟢" : "⚪";
 
     public string OsActionLabel => OsIsInstalling ? "Installing..."
-        : OsStatus == GameStatus.UpdateAvailable ? "⬆  Update OptiScaler"
-        : OsStatus == GameStatus.Installed ? "↺  Reinstall OptiScaler"
-        : "⬇  Install OptiScaler";
+        : OsStatus == GameStatus.UpdateAvailable ? Loc.T("⬆  Update OptiScaler")
+        : OsStatus == GameStatus.Installed ? Loc.T("↺  Reinstall OptiScaler")
+        : Loc.T("⬇  Install OptiScaler");
 
     public string OsBtnBackground  => OsStatus == GameStatus.UpdateAvailable ? "#201838" : "#182840";
     public string OsBtnForeground  => OsStatus == GameStatus.UpdateAvailable ? "#B898E8" : "#7AACDD";

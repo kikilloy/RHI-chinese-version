@@ -1,6 +1,7 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using Microsoft.UI.Xaml;
 using RenoDXCommander.Models;
+using RenoDXCommander.Localization;
 
 namespace RenoDXCommander.ViewModels;
 
@@ -42,16 +43,16 @@ public partial class GameCardViewModel
     public Visibility LumaMessageVisibility => string.IsNullOrEmpty(LumaActionMessage) ? Visibility.Collapsed : Visibility.Visible;
     public string LumaActionLabel => IsLumaInstalling ? "Installing..."
         : (!IsRsInstalled && !ExcludeFromUpdateAllReShade && LumaStatus == GameStatus.NotInstalled) ? "⚠  ReShade required"
-        : LumaStatus == GameStatus.UpdateAvailable ? "⬆  Update Luma"
-        : LumaStatus == GameStatus.Installed ? "↺  Reinstall Luma"
-        : LumaIsExternalOnly ? "Get on Nexus Mods"
-        : "⬇  Install Luma";
+        : LumaStatus == GameStatus.UpdateAvailable ? Loc.T("⬆  Update Luma")
+        : LumaStatus == GameStatus.Installed ? Loc.T("↺  Reinstall Luma")
+        : LumaIsExternalOnly ? Loc.T("Get on Nexus Mods")
+        : Loc.T("⬇  Install Luma");
 
     // Component table: Luma short status/action (consistent with RS/DC/RDX)
     public string LumaStatusText => IsLumaInstalling ? "Installing…"
         : LumaStatus == GameStatus.UpdateAvailable ? "Update"
         : LumaStatus == GameStatus.Installed
-            ? (LumaRecord?.InstalledBuildNumber > 0 ? $"Build {LumaRecord.InstalledBuildNumber}" : "Installed")
+            ? (LumaRecord?.InstalledBuildNumber > 0 ? Loc.T("Build {0}", LumaRecord.InstalledBuildNumber) : "Installed")
         : "Ready";
     public string LumaStatusColor => IsLumaInstalling ? "#D4A856"
         : LumaStatus == GameStatus.UpdateAvailable ? "#B898E8"

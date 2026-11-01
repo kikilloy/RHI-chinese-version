@@ -13,6 +13,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Windows.Foundation;
+using RenoDXCommander.Localization;
 
 namespace RenoDXCommander;
 
@@ -35,10 +36,10 @@ public partial class DetailPanelBuilder
         bool rsInstalled   = card.IsRsInstalled;
         bool rtx40Conflict = card.Rtx40MfgInstalled;
         // Use AddonPackService.IsDownloaded instead of File.Exists
-        bool staged        = _window.ViewModel.AddonPackServiceInstance.IsDownloaded("MFG Ada Unlock");
+        bool staged        = _window.ViewModel.AddonPackServiceInstance.IsDownloaded(Loc.T("MFG Ada Unlock"));
 
-        var   addonVersion = AddonPackService.LoadAddonVersion("MFG Ada Unlock");
-        string statusText  = isInstalled ? (string.IsNullOrEmpty(addonVersion) ? "Installed" : $"v{addonVersion}") : "Ready";
+        var   addonVersion = AddonPackService.LoadAddonVersion(Loc.T("MFG Ada Unlock"));
+        string statusText  = isInstalled ? (string.IsNullOrEmpty(addonVersion) ? "Installed" : $"v{addonVersion}") : Loc.T("Ready");
         string statusColor = isInstalled ? "#5ECB7D" : "#A0AABB";
 
         var row = new Grid { ColumnSpacing = 8 };
@@ -52,12 +53,12 @@ public partial class DetailPanelBuilder
         // Col 0 — label
         var label = new TextBlock
         {
-            Text = "MFG Ada Unlock",
+            Text = Loc.T("MFG Ada Unlock"),
             FontSize = 12,
             Foreground = UIFactory.Brush(ResourceKeys.TextSecondaryBrush),
             VerticalAlignment = VerticalAlignment.Center,
         };
-        ToolTipService.SetToolTip(label, "MFG Ada Unlock — unlocks DLSS Multi Frame Generation (3x/4x+) on RTX 40-series GPUs. Requires ReShade. In-memory only, no files modified.");
+        ToolTipService.SetToolTip(label, Loc.T("MFG Ada Unlock — unlocks DLSS Multi Frame Generation (3x/4x+) on RTX 40-series GPUs. Requires ReShade. In-memory only, no files modified."));
         Grid.SetColumn(label, 0);
         row.Children.Add(label);
 
@@ -73,7 +74,7 @@ public partial class DetailPanelBuilder
         };
         if (isInstalled)
         {
-            ToolTipService.SetToolTip(statusBlock, "Click to open GitHub releases");
+            ToolTipService.SetToolTip(statusBlock, Loc.T("Click to open GitHub releases"));
             statusBlock.PointerPressed += (s, e) =>
                 _ = Windows.System.Launcher.LaunchUriAsync(new Uri("https://github.com/mavismmg/MFGAdaUnlock-RenoDx/releases"));
         }
@@ -94,7 +95,7 @@ public partial class DetailPanelBuilder
             BorderThickness = new Thickness(1),
             CornerRadius = new CornerRadius(8),
         };
-        ToolTipService.SetToolTip(infoBtn, "Open MFG Ada Unlock GitHub page");
+        ToolTipService.SetToolTip(infoBtn, Loc.T("Open MFG Ada Unlock GitHub page"));
         infoBtn.Click += (s, e) =>
             _ = Windows.System.Launcher.LaunchUriAsync(new Uri("https://github.com/mavismmg/MFGAdaUnlock-RenoDx"));
         Grid.SetColumn(infoBtn, 2);
@@ -105,22 +106,22 @@ public partial class DetailPanelBuilder
         bool btnEnabled = true;
         if (!rsInstalled)
         {
-            btnLabel   = "⚠  ReShade required";
+            btnLabel   = Loc.T("⚠  ReShade required");
             btnEnabled = false;
         }
         else if (rtx40Conflict)
         {
-            btnLabel   = "⚠  RTX 40 MFG installed";
+            btnLabel   = Loc.T("⚠  RTX 40 MFG installed");
             btnEnabled = false;
         }
         else if (!staged)
         {
-            btnLabel   = "⬇  Install MFG Ada Unlock";
+            btnLabel   = Loc.T("⬇  Install MFG Ada Unlock");
             btnEnabled = true; // will download on demand when clicked
         }
         else
         {
-            btnLabel = isInstalled ? "↺  Reinstall MFG Ada Unlock" : "⬇  Install MFG Ada Unlock";
+            btnLabel = isInstalled ? Loc.T("↺  Reinstall MFG Ada Unlock") : "⬇  Install MFG Ada Unlock";
         }
 
         var installBtn = new Button
@@ -139,9 +140,9 @@ public partial class DetailPanelBuilder
         };
 
         if (!rsInstalled)
-            ToolTipService.SetToolTip(installBtn, "Install ReShade first — MFG Ada Unlock requires it");
+            ToolTipService.SetToolTip(installBtn, Loc.T("Install ReShade first — MFG Ada Unlock requires it"));
         else if (rtx40Conflict)
-            ToolTipService.SetToolTip(installBtn, "RTX 40 MFG Unlock (ASI version) is already installed and conflicts. Remove it first.");
+            ToolTipService.SetToolTip(installBtn, Loc.T("RTX 40 MFG Unlock (ASI version) is already installed and conflicts. Remove it first."));
 
         installBtn.Click += async (s, e) =>
         {
@@ -163,7 +164,7 @@ public partial class DetailPanelBuilder
                 if (!File.Exists(stagedPath))
                 {
                     CrashReporter.Log("[BuildMfgAdaUnlockRow] Staged file still not found after download attempt");
-                    _window.DispatcherQueue?.TryEnqueue(() => installBtn.Content = "Download failed");
+                    _window.DispatcherQueue?.TryEnqueue(() => installBtn.Content = Loc.T("Download failed"));
                     return;
                 }
 
@@ -191,15 +192,15 @@ public partial class DetailPanelBuilder
         row.Children.Add(installBtn);
 
         // Col 4 — Cog
-        var cogBtn = CogDialog.MakeCogButton("MFG Ada Unlock settings");
+        var cogBtn = CogDialog.MakeCogButton(Loc.T("MFG Ada Unlock settings"));
         cogBtn.Click += async (s, e) =>
         {
             try
             {
-                var cog = new CogDialog("MFG Ada Unlock", _window.Content.XamlRoot);
-                cog.AddIntro("MFG Ada Unlock unlocks DLSS Multi Frame Generation (3x/4x and above) on RTX 40-series GPUs.");
-                cog.AddNote("Configure it in the ReShade overlay in-game.");
-                cog.AddButtons(cog.MakeButton("Open GitHub page", CogButtonKind.Secondary,
+                var cog = new CogDialog(Loc.T("MFG Ada Unlock"), _window.Content.XamlRoot);
+                cog.AddIntro(Loc.T("MFG Ada Unlock unlocks DLSS Multi Frame Generation (3x/4x and above) on RTX 40-series GPUs."));
+                cog.AddNote(Loc.T("Configure it in the ReShade overlay in-game."));
+                cog.AddButtons(cog.MakeButton(Loc.T("Open GitHub page"), CogButtonKind.Secondary,
                     async () => { await Windows.System.Launcher.LaunchUriAsync(new Uri("https://github.com/mavismmg/MFGAdaUnlock-RenoDx")); }));
                 await cog.ShowAsync();
             }
@@ -226,7 +227,7 @@ public partial class DetailPanelBuilder
             Opacity = isInstalled ? 1.0 : 0,
             IsHitTestVisible = isInstalled,
         };
-        ToolTipService.SetToolTip(removeBtn, "Remove MFG Ada Unlock from this game");
+        ToolTipService.SetToolTip(removeBtn, Loc.T("Remove MFG Ada Unlock from this game"));
         removeBtn.Click += (s, e) =>
         {
             if (string.IsNullOrEmpty(installPath)) return;
@@ -329,7 +330,7 @@ public partial class DetailPanelBuilder
 
         _window.ViewModel.SetLastUiAction($"BuildDlssEnablerRow:StagedVersion({card.GameName})");
         // Status text
-        string statusText  = isInstalled ? (deSvc.StagedVersion ?? "Installed") : "Ready";
+        string statusText  = isInstalled ? (deSvc.StagedVersion ?? "Installed") : Loc.T("Ready");
         string statusColor = isInstalled ? "#5ECB7D" : "#A0AABB";
 
         _window.ViewModel.SetLastUiAction($"BuildDlssEnablerRow:BuildGrid({card.GameName})");
@@ -347,12 +348,12 @@ public partial class DetailPanelBuilder
         // Col 0 — label
         var label = new TextBlock
         {
-            Text = "DLSS Enabler",
+            Text = Loc.T("DLSS Enabler"),
             FontSize = 12,
             Foreground = UIFactory.Brush(ResourceKeys.TextSecondaryBrush),
             VerticalAlignment = VerticalAlignment.Center,
         };
-        ToolTipService.SetToolTip(label, "DLSS Enabler — standalone proxy DLL that enables DLSS in games that don't natively support it.");
+        ToolTipService.SetToolTip(label, Loc.T("DLSS Enabler — standalone proxy DLL that enables DLSS in games that don't natively support it."));
         Grid.SetColumn(label, 0);
         row.Children.Add(label);
 
@@ -389,7 +390,7 @@ public partial class DetailPanelBuilder
             BorderThickness = new Thickness(1),
             CornerRadius = new CornerRadius(8),
         };
-        ToolTipService.SetToolTip(infoBtn, "Open DLSS Enabler Nexus page");
+        ToolTipService.SetToolTip(infoBtn, Loc.T("Open DLSS Enabler Nexus page"));
         infoBtn.Click += (s, e) =>
             _ = Windows.System.Launcher.LaunchUriAsync(new Uri("https://www.nexusmods.com/site/mods/757"));
         Grid.SetColumn(infoBtn, 2);
@@ -398,9 +399,9 @@ public partial class DetailPanelBuilder
         // Col 3 — Install button
         string installBtnLabel;
         if (osConflict)
-            installBtnLabel = "Installed via OptiScaler";
+            installBtnLabel = Loc.T("Installed via OptiScaler");
         else
-            installBtnLabel = isInstalled ? "↺  Reinstall DLSS Enabler" : "⬇  Install DLSS Enabler";
+            installBtnLabel = isInstalled ? Loc.T("↺  Reinstall DLSS Enabler") : Loc.T("⬇  Install DLSS Enabler");
 
         var installBtn = new Button
         {
@@ -426,13 +427,13 @@ public partial class DetailPanelBuilder
             installBtn.IsEnabled = false;
             installBtn.IsHitTestVisible = false;
             installBtn.Opacity = 0.35;
-            ToolTipService.SetToolTip(installBtn, "Cannot install alongside OptiScaler — DLSS Enabler is already included within OptiScaler");
+            ToolTipService.SetToolTip(installBtn, Loc.T("Cannot install alongside OptiScaler — DLSS Enabler is already included within OptiScaler"));
         }
         else
         {
             ToolTipService.SetToolTip(installBtn, isInstalled
-                ? $"Reinstall DLSS Enabler (currently '{currentDllName}')"
-                : "Install DLSS Enabler — choose which DLL name to use");
+                ? Loc.T("Reinstall DLSS Enabler (currently '{0}')", currentDllName)
+                : Loc.T("Install DLSS Enabler — choose which DLL name to use"));
 
             installBtn.Click += async (s, e) =>
             {
@@ -452,14 +453,14 @@ public partial class DetailPanelBuilder
                     }
                     else
                     {
-                        installBtn.Content   = "Install failed";
+                        installBtn.Content   = Loc.T("Install failed");
                         installBtn.IsEnabled = true;
                     }
                 }
                 catch (Exception ex)
                 {
                     CrashReporter.Log($"[BuildDlssEnablerRow] Install failed — {ex.Message}");
-                    installBtn.Content   = "Install failed";
+                    installBtn.Content   = Loc.T("Install failed");
                     installBtn.IsEnabled = true;
                 }
             };
@@ -468,7 +469,7 @@ public partial class DetailPanelBuilder
         row.Children.Add(installBtn);
 
         // Col 4 — Cog button
-        var cogBtn = CogDialog.MakeCogButton(osConflict ? "Cannot install alongside OptiScaler" : "DLSS Enabler settings");
+        var cogBtn = CogDialog.MakeCogButton(osConflict ? Loc.T("Cannot install alongside OptiScaler") : Loc.T("DLSS Enabler settings"));
         cogBtn.IsEnabled = !osConflict;
         cogBtn.IsHitTestVisible = !osConflict;
         cogBtn.Opacity = osConflict ? 0.35 : 1.0;
@@ -476,7 +477,7 @@ public partial class DetailPanelBuilder
         {
             try
             {
-                var cog = new CogDialog("DLSS Enabler", _window.Content.XamlRoot);
+                var cog = new CogDialog(Loc.T("DLSS Enabler"), _window.Content.XamlRoot);
                 cog.AddEmpty();
                 await cog.ShowAsync();
             }
@@ -503,7 +504,7 @@ public partial class DetailPanelBuilder
             Opacity = isInstalled ? 1.0 : 0,
             IsHitTestVisible = isInstalled,
         };
-        ToolTipService.SetToolTip(removeBtn, "Remove standalone DLSS Enabler from this game");
+        ToolTipService.SetToolTip(removeBtn, Loc.T("Remove standalone DLSS Enabler from this game"));
         removeBtn.Click += (s, e) =>
         {
             if (string.IsNullOrEmpty(installPath) || string.IsNullOrEmpty(currentDllName)) return;
@@ -580,20 +581,20 @@ public partial class DetailPanelBuilder
             });
 
             if (isRecommended)
-                contentRow.Children.Add(MakeBadge("Recommended", "#1A3A20", "#6AE87A", "#2A5A30"));
+                contentRow.Children.Add(MakeBadge(Loc.T("Recommended"), "#1A3A20", "#6AE87A", "#2A5A30"));
             if (isRhiOwned)
-                contentRow.Children.Add(MakeBadge("Used by RHI", "#2A1818", "#CC6666", "#5A2828"));
+                contentRow.Children.Add(MakeBadge(Loc.T("Used by RHI"), "#2A1818", "#CC6666", "#5A2828"));
             else if (isDxgiConflict)
-                contentRow.Children.Add(MakeBadge("May conflict with ReShade/OS", "#2A1A10", "#CC9955", "#5A3A18"));
+                contentRow.Children.Add(MakeBadge(Loc.T("May conflict with ReShade/OS"), "#2A1A10", "#CC9955", "#5A3A18"));
             if (isCurrent)
-                contentRow.Children.Add(MakeBadge("Current", "#182840", "#7AACDD", "#2A4468"));
+                contentRow.Children.Add(MakeBadge(Loc.T("Current"), "#182840", "#7AACDD", "#2A4468"));
 
             btn.Content = contentRow;
 
             if (isRhiOwned)
-                ToolTipService.SetToolTip(btn, "This filename is already used by an RHI-managed component (ReShade, OptiScaler, or DC). Choose a different name.");
+                ToolTipService.SetToolTip(btn, Loc.T("This filename is already used by an RHI-managed component (ReShade, OptiScaler, or DC). Choose a different name."));
             else if (isDxgiConflict)
-                ToolTipService.SetToolTip(btn, "dxgi.dll may conflict with ReShade or OS components if they also use this name.");
+                ToolTipService.SetToolTip(btn, Loc.T("dxgi.dll may conflict with ReShade or OS components if they also use this name."));
 
             btn.Tag    = name;
             btn.Click += (s, ev) =>
@@ -611,7 +612,7 @@ public partial class DetailPanelBuilder
 
         var pickerDialog = new ContentDialog
         {
-            Title = "Choose DLSS Enabler DLL name",
+            Title = Loc.T("Choose DLSS Enabler DLL name"),
             Content = new StackPanel
             {
                 Spacing = 8,
@@ -619,7 +620,7 @@ public partial class DetailPanelBuilder
                 {
                     new TextBlock
                     {
-                        Text = "Select the filename for the standalone DLSS Enabler DLL. Most games work with version.dll.",
+                        Text = Loc.T("Select the filename for the standalone DLSS Enabler DLL. Most games work with version.dll."),
                         FontSize = 11,
                         Foreground = UIFactory.Brush(ResourceKeys.TextTertiaryBrush),
                         TextWrapping = TextWrapping.Wrap,

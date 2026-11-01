@@ -5,6 +5,7 @@ using Microsoft.UI.Xaml.Controls;
 using RenoDXCommander.Models;
 using RenoDXCommander.Services;
 using RenoDXCommander.ViewModels;
+using RenoDXCommander.Localization;
 
 namespace RenoDXCommander;
 
@@ -52,14 +53,14 @@ public partial class DetailPanelBuilder
         if (!string.IsNullOrEmpty(driverVer))
             tb.Inlines.Add(new Microsoft.UI.Xaml.Documents.Run
             {
-                Text       = $"Driver {driverVer}  ·  ",
+                Text       = Loc.T("Driver {0}  ·  ", driverVer),
                 Foreground = UIFactory.Brush(ResourceKeys.TextTertiaryBrush),
             });
         tb.Inlines.Add(new Microsoft.UI.Xaml.Documents.Run
         {
             Text = elevated
-                ? "✓ Running as admin — all driver profile settings are writable."
-                : "⚠ Admin rights required to write driver profile settings. Enable Admin Mode in Settings or restart as admin.",
+                ? Loc.T("✓ Running as admin — all driver profile settings are writable.")
+                : Loc.T("⚠ Admin rights required to write driver profile settings. Enable Admin Mode in Settings or restart as admin."),
             Foreground = UIFactory.Brush(elevated ? ResourceKeys.TextTertiaryBrush : ResourceKeys.AccentAmberDimBrush),
         });
         return tb;
@@ -137,7 +138,7 @@ public partial class DetailPanelBuilder
         {
             // No profile data to read: the summary is just the driver version
             if (!string.IsNullOrEmpty(driverVer)
-                && DetailPanelBuilder.MakeSectionSummaryInlines(new[] { ("Driver", (string?)driverVer) }) is { } verTb)
+                && DetailPanelBuilder.MakeSectionSummaryInlines(new[] { (Loc.T("Driver"), (string?)driverVer) }) is { } verTb)
             {
                 verTb.Tag = DriverSummaryTag;
                 verTb.Visibility = driverCollapsed ? Visibility.Visible : Visibility.Collapsed;
@@ -257,14 +258,14 @@ public partial class DetailPanelBuilder
 
                     var summaryEntries = new System.Collections.Generic.List<(string, string?)>();
                     if (!string.IsNullOrEmpty(driverVer))
-                        summaryEntries.Add(("Driver", driverVer));
+                        summaryEntries.Add((Loc.T("Driver"), driverVer));
                     summaryEntries.Add(("VSync", vsyncName));
                     if (smoothName != null)
-                        summaryEntries.Add(("Smooth", smoothName));
+                        summaryEntries.Add((Loc.T("Smooth"), smoothName));
                     if (rebarName != null)
                         summaryEntries.Add(("ReBAR", rebarName));
                     if (data.PerGameFpsLimit is uint capFps)
-                        summaryEntries.Add(("FPS Limit", capFps == 0 ? "Off" : $"{capFps}"));
+                        summaryEntries.Add((Loc.T("FPS Limit"), capFps == 0 ? "Off" : $"{capFps}"));
                     var summaryTb = DetailPanelBuilder.MakeSectionSummaryInlines(summaryEntries);
                     if (summaryTb != null)
                     {
@@ -316,12 +317,12 @@ public partial class DetailPanelBuilder
             // ── Column 0: VSync ──
             var vsyncCol = new StackPanel { Spacing = 4 };
             var vsyncLabel = new TextBlock { Text = "VSync", FontSize = 11, Foreground = UIFactory.Brush(ResourceKeys.TextPrimaryBrush) };
-            ToolTipService.SetToolTip(vsyncLabel, "Vertical Sync settings — controls how the driver synchronizes frame rendering with your display's refresh rate.");
+            ToolTipService.SetToolTip(vsyncLabel, Loc.T("Vertical Sync settings — controls how the driver synchronizes frame rendering with your display's refresh rate."));
             vsyncCol.Children.Add(vsyncLabel);
 
             // VSync Mode
             {
-                vsyncCol.Children.Add(new TextBlock { Text = "Mode", FontSize = 10, Foreground = UIFactory.Brush(ResourceKeys.TextTertiaryBrush), Margin = new Thickness(0, 2, 0, 0) });
+                vsyncCol.Children.Add(new TextBlock { Text = Loc.T("Mode"), FontSize = 10, Foreground = UIFactory.Brush(ResourceKeys.TextTertiaryBrush), Margin = new Thickness(0, 2, 0, 0) });
                 var options = DlssPresetService.VSyncModeOptions;
                 uint current = d.VSyncMode;
                 var globalVSync = d.GlobalVSyncMode;
@@ -329,8 +330,8 @@ public partial class DetailPanelBuilder
                 var itemsList = new List<string>();
                 if (globalVSync.HasValue)
                 {
-                    var globalName = options.FirstOrDefault(o => o.Value == globalVSync.Value).Name ?? "App Controlled";
-                    itemsList.Add($"Global ({globalName})");
+                    var globalName = options.FirstOrDefault(o => o.Value == globalVSync.Value).Name ?? Loc.T("App Controlled");
+                    itemsList.Add(Loc.T("Global ({0})", globalName));
                 }
                 itemsList.AddRange(options.Select(o => o.Name));
                 var items = itemsList.ToArray();
@@ -360,7 +361,7 @@ public partial class DetailPanelBuilder
                 };
                 ToolTipService.SetToolTip(combo, globalVSync.HasValue
                     ? "Global = inherit from global setting. App Controlled: let the game decide. Force Off: disables VSync. Force On: locks to refresh rate. Fast Sync: renders freely, displays latest complete frame."
-                    : "VSync Mode — App Controlled: let the game decide. Force Off: disables VSync entirely. Force On: locks to refresh rate. Fast Sync: renders freely, displays latest complete frame.");
+                    : Loc.T("VSync Mode — App Controlled: let the game decide. Force Off: disables VSync entirely. Force On: locks to refresh rate. Fast Sync: renders freely, displays latest complete frame."));
                 var init = true;
                 combo.SelectionChanged += (s, ev) =>
                 {
@@ -390,7 +391,7 @@ public partial class DetailPanelBuilder
 
             // VSync Tear Control
             {
-                vsyncCol.Children.Add(new TextBlock { Text = "Tear Control", FontSize = 10, Foreground = UIFactory.Brush(ResourceKeys.TextTertiaryBrush), Margin = new Thickness(0, 2, 0, 0) });
+                vsyncCol.Children.Add(new TextBlock { Text = Loc.T("Tear Control"), FontSize = 10, Foreground = UIFactory.Brush(ResourceKeys.TextTertiaryBrush), Margin = new Thickness(0, 2, 0, 0) });
                 var options = DlssPresetService.VSyncTearControlOptions;
                 uint current = d.VSyncTearControl;
                 var items = options.Select(o => o.Name).ToArray();
@@ -405,7 +406,7 @@ public partial class DetailPanelBuilder
                     CornerRadius = new CornerRadius(6),
                     MaxDropDownHeight = 300,
                 };
-                ToolTipService.SetToolTip(combo, "VSync Tear Control — Standard: normal VSync behavior. Adaptive: VSync on when FPS ≥ refresh rate, off when below (reduces stuttering at low FPS).");
+                ToolTipService.SetToolTip(combo, Loc.T("VSync Tear Control — Standard: normal VSync behavior. Adaptive: VSync on when FPS ≥ refresh rate, off when below (reduces stuttering at low FPS)."));
                 var init = true;
                 combo.SelectionChanged += (s, ev) =>
                 {
@@ -421,7 +422,7 @@ public partial class DetailPanelBuilder
 
             // Low Latency Mode (in VSync column)
             {
-                vsyncCol.Children.Add(new TextBlock { Text = "Low Latency", FontSize = 10, Foreground = UIFactory.Brush(ResourceKeys.TextTertiaryBrush), Margin = new Thickness(0, 2, 0, 0) });
+                vsyncCol.Children.Add(new TextBlock { Text = Loc.T("Low Latency"), FontSize = 10, Foreground = UIFactory.Brush(ResourceKeys.TextTertiaryBrush), Margin = new Thickness(0, 2, 0, 0) });
                 var options = DlssPresetService.LowLatencyModeOptions;
                 uint current = d.LowLatencyMode;
                 var items = options.Select(o => o.Name).ToArray();
@@ -442,8 +443,8 @@ public partial class DetailPanelBuilder
                     Opacity = latencyLocked ? 0.4 : 1.0,
                 };
                 ToolTipService.SetToolTip(combo2, latencyLocked
-                    ? "Low Latency is locked to Ultra while Smooth Motion is enabled. Turn off Smooth Motion to change this setting."
-                    : "Low Latency Mode — Off: game controls frame queue. On: limits pre-rendered frames to 1 (lower latency). Ultra: just-in-time frame submission (lowest latency, may reduce FPS slightly).");
+                    ? Loc.T("Low Latency is locked to Ultra while Smooth Motion is enabled. Turn off Smooth Motion to change this setting.")
+                    : Loc.T("Low Latency Mode — Off: game controls frame queue. On: limits pre-rendered frames to 1 (lower latency). Ultra: just-in-time frame submission (lowest latency, may reduce FPS slightly)."));
                 var init2 = true;
                 combo2.SelectionChanged += (s, ev) =>
                 {
@@ -460,18 +461,18 @@ public partial class DetailPanelBuilder
             Grid.SetColumn(vsyncCol, 0);
             nvidiaGrid.Children.Add(vsyncCol);
             nvidiaGrid.Children.Add(MakeDlssDivider(1));
-            _window.ViewModel.SetLastUiAction($"BuildDriverProfileSectionWithData:VSync done({capturedName})");
+            _window.ViewModel.SetLastUiAction(Loc.T("BuildDriverProfileSectionWithData:VSync done({0})", capturedName));
 
             // ── Column 4: Smooth Motion ──
             var smoothCol = new StackPanel { Spacing = 4 };
-            var smoothLabel = new TextBlock { Text = "Smooth Motion", FontSize = 11, Foreground = UIFactory.Brush(ResourceKeys.TextPrimaryBrush) };
-            ToolTipService.SetToolTip(smoothLabel, "NVIDIA Smooth Motion — driver-level frame generation. Adds interpolated frames for smoother visuals. RTX 40 Series+ required.");
+            var smoothLabel = new TextBlock { Text = Loc.T("Smooth Motion"), FontSize = 11, Foreground = UIFactory.Brush(ResourceKeys.TextPrimaryBrush) };
+            ToolTipService.SetToolTip(smoothLabel, Loc.T("NVIDIA Smooth Motion — driver-level frame generation. Adds interpolated frames for smoother visuals. RTX 40 Series+ required."));
             smoothCol.Children.Add(smoothLabel);
 
             // Enable
             bool smoothMotionEnabled;
             {
-                smoothCol.Children.Add(new TextBlock { Text = "Enable", FontSize = 10, Foreground = UIFactory.Brush(ResourceKeys.TextTertiaryBrush), Margin = new Thickness(0, 2, 0, 0) });
+                smoothCol.Children.Add(new TextBlock { Text = Loc.T("Enable"), FontSize = 10, Foreground = UIFactory.Brush(ResourceKeys.TextTertiaryBrush), Margin = new Thickness(0, 2, 0, 0) });
                 var options = DlssPresetService.SmoothMotionEnableOptions;
                 uint current = d.SmoothMotionEnable;
                 smoothMotionEnabled = current != 0;
@@ -487,7 +488,7 @@ public partial class DetailPanelBuilder
                     CornerRadius = new CornerRadius(6),
                     MaxDropDownHeight = 300,
                 };
-                ToolTipService.SetToolTip(combo, "Smooth Motion Enable — Off: disabled. On: enables driver-level frame generation (RTX 40 Series+ only).");
+                ToolTipService.SetToolTip(combo, Loc.T("Smooth Motion Enable — Off: disabled. On: enables driver-level frame generation (RTX 40 Series+ only)."));
                 var init = true;
                 combo.SelectionChanged += (s, ev) =>
                 {
@@ -532,7 +533,7 @@ public partial class DetailPanelBuilder
 
             // APIs
             {
-                smoothCol.Children.Add(new TextBlock { Text = "Allowed APIs", FontSize = 10, Foreground = UIFactory.Brush(ResourceKeys.TextTertiaryBrush), Margin = new Thickness(0, 2, 0, 0) });
+                smoothCol.Children.Add(new TextBlock { Text = Loc.T("Allowed APIs"), FontSize = 10, Foreground = UIFactory.Brush(ResourceKeys.TextTertiaryBrush), Margin = new Thickness(0, 2, 0, 0) });
                 var options = DlssPresetService.SmoothMotionApisOptions;
                 uint current = d.SmoothMotionApis;
                 var items = options.Select(o => o.Name).ToArray();
@@ -565,7 +566,7 @@ public partial class DetailPanelBuilder
 
             // Flip Pacing (combined — sets both Fullscreen and Windowed together)
             {
-                smoothCol.Children.Add(new TextBlock { Text = "Flip Pacing", FontSize = 10, Foreground = UIFactory.Brush(ResourceKeys.TextTertiaryBrush), Margin = new Thickness(0, 2, 0, 0) });
+                smoothCol.Children.Add(new TextBlock { Text = Loc.T("Flip Pacing"), FontSize = 10, Foreground = UIFactory.Brush(ResourceKeys.TextTertiaryBrush), Margin = new Thickness(0, 2, 0, 0) });
                 var options = DlssPresetService.SmoothMotionFlipPacingFsOptions;
                 uint current = d.SmoothMotionFlipPacingFs;
                 var items = options.Select(o => o.Name).ToArray();
@@ -582,7 +583,7 @@ public partial class DetailPanelBuilder
                     IsEnabled = smoothMotionEnabled,
                     Opacity = smoothMotionEnabled ? 1.0 : 0.4,
                 };
-                ToolTipService.SetToolTip(combo, "Flip Pacing — Off: prioritize lower latency. On: prioritize smoother frame pacing. Sets both fullscreen and windowed modes together.");
+                ToolTipService.SetToolTip(combo, Loc.T("Flip Pacing — Off: prioritize lower latency. On: prioritize smoother frame pacing. Sets both fullscreen and windowed modes together."));
                 var init = true;
                 combo.SelectionChanged += (s, ev) =>
                 {
@@ -605,17 +606,17 @@ public partial class DetailPanelBuilder
             Grid.SetColumn(smoothCol, 4);
             nvidiaGrid.Children.Add(smoothCol);
             nvidiaGrid.Children.Add(MakeDlssDivider(5));
-            _window.ViewModel.SetLastUiAction($"BuildDriverProfileSectionWithData:SmoothMotion done({capturedName})");
+            _window.ViewModel.SetLastUiAction(Loc.T("BuildDriverProfileSectionWithData:SmoothMotion done({0})", capturedName));
 
             // ── Column 6: Other (Power, G-Sync, FPS Limit) ──
             var powerCol = new StackPanel { Spacing = 4 };
             var powerLabel = new TextBlock { Text = "Other", FontSize = 11, Foreground = UIFactory.Brush(ResourceKeys.TextPrimaryBrush) };
-            ToolTipService.SetToolTip(powerLabel, "Power management, G-Sync control and the driver frame rate limit for this game.");
+            ToolTipService.SetToolTip(powerLabel, Loc.T("Power management, G-Sync control and the driver frame rate limit for this game."));
             powerCol.Children.Add(powerLabel);
 
             // Power Management Mode
             {
-                powerCol.Children.Add(new TextBlock { Text = "Power Mode", FontSize = 10, Foreground = UIFactory.Brush(ResourceKeys.TextTertiaryBrush), Margin = new Thickness(0, 2, 0, 0) });
+                powerCol.Children.Add(new TextBlock { Text = Loc.T("Power Mode"), FontSize = 10, Foreground = UIFactory.Brush(ResourceKeys.TextTertiaryBrush), Margin = new Thickness(0, 2, 0, 0) });
                 var options = DlssPresetService.PowerManagementOptions;
                 uint current = d.PowerManagementMode;
                 var items = options.Select(o => o.Name).ToArray();
@@ -630,7 +631,7 @@ public partial class DetailPanelBuilder
                     CornerRadius = new CornerRadius(6),
                     MaxDropDownHeight = 300,
                 };
-                ToolTipService.SetToolTip(combo, "Power Management — Adaptive: GPU clocks down at idle. Maximum: locks GPU to highest clocks. Optimal: balanced (NVIDIA recommended).");
+                ToolTipService.SetToolTip(combo, Loc.T("Power Management — Adaptive: GPU clocks down at idle. Maximum: locks GPU to highest clocks. Optimal: balanced (NVIDIA recommended)."));
                 var init = true;
                 combo.SelectionChanged += (s, ev) =>
                 {
@@ -650,14 +651,14 @@ public partial class DetailPanelBuilder
                 bool gsyncEnabled = d.PerGameGSyncEnabled;
                 var gsyncCombo = new ComboBox
                 {
-                    ItemsSource = new[] { "Enabled", "Disabled" },
+                    ItemsSource = new[] { "Enabled", Loc.T("Disabled") },
                     SelectedIndex = gsyncEnabled ? 0 : 1,
                     FontSize = 11,
                     HorizontalAlignment = HorizontalAlignment.Stretch,
                     CornerRadius = new CornerRadius(6),
                     MaxDropDownHeight = 300,
                 };
-                ToolTipService.SetToolTip(gsyncCombo, "Per-game G-Sync control. Disabled forces G-Sync off for this game regardless of global setting.");
+                ToolTipService.SetToolTip(gsyncCombo, Loc.T("Per-game G-Sync control. Disabled forces G-Sync off for this game regardless of global setting."));
                 var gsyncInit = true;
                 gsyncCombo.SelectionChanged += (s, ev) =>
                 {
@@ -671,10 +672,10 @@ public partial class DetailPanelBuilder
 
             // Per-game FPS limit (FPS Limiter V3). "Global" removes the game's own value so it follows the Settings page limit.
             {
-                powerCol.Children.Add(new TextBlock { Text = "FPS Limit", FontSize = 10, Foreground = UIFactory.Brush(ResourceKeys.TextTertiaryBrush), Margin = new Thickness(0, 2, 0, 0) });
+                powerCol.Children.Add(new TextBlock { Text = Loc.T("FPS Limit"), FontSize = 10, Foreground = UIFactory.Brush(ResourceKeys.TextTertiaryBrush), Margin = new Thickness(0, 2, 0, 0) });
                 var presets = DlssPresetService.FpsLimiterPresets;
                 var globalFps = d.GlobalFpsLimit;
-                var globalItem = globalFps == 0 ? "Global (Off)" : $"Global ({globalFps} FPS)";
+                var globalItem = globalFps == 0 ? Loc.T("Global (Off)") : Loc.T("Global ({0} FPS)", globalFps);
 
                 // Builds the item list; a custom per-game value gets its own entry just above "Custom..."
                 (string[] Items, int Index) BuildFpsItems(uint? perGame)
@@ -701,9 +702,9 @@ public partial class DetailPanelBuilder
                 };
                 bool hasFrameLimiter = card.UlStatus is GameStatus.Installed or GameStatus.UpdateAvailable
                                     || card.DcStatus is GameStatus.Installed or GameStatus.UpdateAvailable;
-                var fpsTip = "NVIDIA driver frame rate limit for this game only. Global follows the limit set on the Settings page. Off turns the driver limit off for this game even when a global limit is set.";
+                var fpsTip = Loc.T("NVIDIA driver frame rate limit for this game only. Global follows the limit set on the Settings page. Off turns the driver limit off for this game even when a global limit is set.");
                 if (hasFrameLimiter)
-                    fpsTip += "\n\nReLimiter or Display Commander is installed for this game, so RHI set the driver limit to Off. Using both limiters at once can cause stutter.";
+                    fpsTip += Loc.T("\n\nReLimiter or Display Commander is installed for this game, so RHI set the driver limit to Off. Using both limiters at once can cause stutter.");
                 ToolTipService.SetToolTip(fpsCombo, fpsTip);
 
                 var fpsInit = true;
@@ -740,7 +741,7 @@ public partial class DetailPanelBuilder
                         var textBox = new TextBox { PlaceholderText = "20-1000", FontSize = 13 };
                         var dialog = new ContentDialog
                         {
-                            Title = "Custom FPS Limit",
+                            Title = Loc.T("Custom FPS Limit"),
                             Content = textBox,
                             PrimaryButtonText = "Set",
                             CloseButtonText = "Cancel",
@@ -777,7 +778,7 @@ public partial class DetailPanelBuilder
             // Restore Profile Defaults button — sits in the footer row under this column
             var restoreProfileBtn = new Button
             {
-                Content = "Restore Defaults",
+                Content = Loc.T("Restore Defaults"),
                 FontSize = 11,
                 Height = 32,
                 HorizontalAlignment = HorizontalAlignment.Stretch,
@@ -795,14 +796,14 @@ public partial class DetailPanelBuilder
                 var xamlRoot = (s as FrameworkElement)?.XamlRoot ?? _window.Content.XamlRoot;
                 var warningDialog = new ContentDialog
                 {
-                    Title = "Restore driver settings?",
+                    Title = Loc.T("Restore driver settings?"),
                     Content = new TextBlock
                     {
-                        Text = $"This will restore driver settings for {capturedName} back to the factory default and restore DLSS/Streamline DLLs to their original versions. This action is irreversible.",
+                        Text = Loc.T("This will restore driver settings for {0} back to the factory default and restore DLSS/Streamline DLLs to their original versions. This action is irreversible.", capturedName),
                         TextWrapping = TextWrapping.Wrap,
                         FontSize = 13,
                     },
-                    PrimaryButtonText = "Restore",
+                    PrimaryButtonText = Loc.T("Restore"),
                     CloseButtonText = "Cancel",
                     XamlRoot = xamlRoot,
                     RequestedTheme = ElementTheme.Dark,
@@ -832,12 +833,12 @@ public partial class DetailPanelBuilder
 
             Grid.SetColumn(powerCol, 6);
             nvidiaGrid.Children.Add(powerCol);
-            _window.ViewModel.SetLastUiAction($"BuildDriverProfileSectionWithData:Power done({capturedName})");
+            _window.ViewModel.SetLastUiAction(Loc.T("BuildDriverProfileSectionWithData:Power done({0})", capturedName));
 
             // ── Column 8: ReBAR ──
             var rebarCol = new StackPanel { Spacing = 4 };
             var rebarLabel = new TextBlock { Text = "ReBAR", FontSize = 11, Foreground = UIFactory.Brush(ResourceKeys.TextPrimaryBrush) };
-            ToolTipService.SetToolTip(rebarLabel, "Resizable BAR — allows the CPU to access full GPU VRAM at once. Can improve performance by 5-10% in some titles. RTX 30+ and BIOS support required.");
+            ToolTipService.SetToolTip(rebarLabel, Loc.T("Resizable BAR — allows the CPU to access full GPU VRAM at once. Can improve performance by 5-10% in some titles. RTX 30+ and BIOS support required."));
             rebarCol.Children.Add(rebarLabel);
 
             bool rebarEnabled = false; // set inside Enable block below
@@ -845,7 +846,7 @@ public partial class DetailPanelBuilder
 
             // Enable — Auto (Default) / Off / On using new 0x000BFA21 setting
             {
-                rebarCol.Children.Add(new TextBlock { Text = "Enable", FontSize = 10, Foreground = UIFactory.Brush(ResourceKeys.TextTertiaryBrush), Margin = new Thickness(0, 2, 0, 0) });
+                rebarCol.Children.Add(new TextBlock { Text = Loc.T("Enable"), FontSize = 10, Foreground = UIFactory.Brush(ResourceKeys.TextTertiaryBrush), Margin = new Thickness(0, 2, 0, 0) });
 
                 uint rebarEnableMode = d.ReBarEnableMode;
                 // 0=Off→index 1, 1=Auto→index 0, 2=On→index 2
@@ -853,7 +854,7 @@ public partial class DetailPanelBuilder
 
                 var rebarEnableCombo = new ComboBox
                 {
-                    ItemsSource = new[] { "Auto (Default)", "Off", "On" },
+                    ItemsSource = new[] { Loc.T("Auto (Default)"), "Off", "On" },
                     SelectedIndex = enableIdx,
                     FontSize = 11,
                     HorizontalAlignment = HorizontalAlignment.Stretch,
@@ -881,7 +882,7 @@ public partial class DetailPanelBuilder
 
             // Mode
             {
-                rebarCol.Children.Add(new TextBlock { Text = "Mode", FontSize = 10, Foreground = UIFactory.Brush(ResourceKeys.TextTertiaryBrush), Margin = new Thickness(0, 2, 0, 0) });
+                rebarCol.Children.Add(new TextBlock { Text = Loc.T("Mode"), FontSize = 10, Foreground = UIFactory.Brush(ResourceKeys.TextTertiaryBrush), Margin = new Thickness(0, 2, 0, 0) });
                 uint rebarMode = d.ReBarMode;
                 var modeItems = DlssPresetService.ReBarModes.Select(m => m.Name).ToList();
 
@@ -916,7 +917,7 @@ public partial class DetailPanelBuilder
 
             // Size Limit — always shows actual size values (no Global option)
             {
-                rebarCol.Children.Add(new TextBlock { Text = "Size Limit", FontSize = 10, Foreground = UIFactory.Brush(ResourceKeys.TextTertiaryBrush), Margin = new Thickness(0, 2, 0, 0) });
+                rebarCol.Children.Add(new TextBlock { Text = Loc.T("Size Limit"), FontSize = 10, Foreground = UIFactory.Brush(ResourceKeys.TextTertiaryBrush), Margin = new Thickness(0, 2, 0, 0) });
 
                 var sizeItems = new List<string>();
                 var sizeValues = new List<ulong>();
@@ -944,7 +945,7 @@ public partial class DetailPanelBuilder
                     IsEnabled = rebarEnabled,
                     Opacity = rebarEnabled ? 1.0 : 0.4,
                 };
-                ToolTipService.SetToolTip(rebarSizeCombo, "1GB is optimal for most games. Decrease to 512MB if experiencing ReBAR-related stutters.");
+                ToolTipService.SetToolTip(rebarSizeCombo, Loc.T("1GB is optimal for most games. Decrease to 512MB if experiencing ReBAR-related stutters."));
                 var sizeComboInit = true;
                 rebarSizeCombo.SelectionChanged += (s, ev) =>
                 {
@@ -961,7 +962,7 @@ public partial class DetailPanelBuilder
             Grid.SetColumn(rebarCol, 2);
             nvidiaGrid.Children.Add(rebarCol);
             nvidiaGrid.Children.Add(MakeDlssDivider(3));
-            _window.ViewModel.SetLastUiAction($"BuildDriverProfileSectionWithData:ReBAR done({capturedName})");
+            _window.ViewModel.SetLastUiAction(Loc.T("BuildDriverProfileSectionWithData:ReBAR done({0})", capturedName));
 
             // Defer adding the fully-built driver grid to the visual tree so WinUI can
             // finish any queued layout work from the DLSS columns above before committing

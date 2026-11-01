@@ -75,6 +75,9 @@ WAVE_RULES: list[tuple[str, str]] = [
     ("MassDlssDeployDialog", "W2"),
     ("UpdateLogWindow", "W2"),
     ("DetailPanelBuilder", "W3"),
+    # Component cards own their button labels and status text ("Install RenoDX", "Still ready?"),
+    # so the detail panel is not translated without them.
+    ("ViewModels/GameCardViewModel", "W3"),
     ("DragDropHandler", "P1"),
     ("PopupHelper", "P1"),
     ("CogDialog", "P1"),
@@ -105,12 +108,19 @@ NOISE_LINE_PATTERNS = [
     r"nameof\s*\(",
     # settings.json keys / dictionary literals: machine-readable, never translated
     r"^\s*s\[",
+    # Dictionary initializer rows: ["key"] = "value" - the key is an identifier, the value is data.
+    r"^\s*\[",
+    # Indexing with a literal key: map["Foo"], dict["Bar"].
+    r"\[\s*\$?\"",
     r'^\s*\w+\[\s*\$?"',
     r"TryGetValue\s*\(",
     r'\bRemove\s*\(\s*\$?"',
     r'\bContains\s*\(\s*\$?"',
     r"StringComparison\.",
     r"\bswitch\b.*\bcase\b",
+    # Pattern matching: "x is \"A\" or \"B\"" needs constant patterns, so these are never UI text.
+    r"\bis\s+\$?\"",
+    r"\b(or|and)\s+\$?\"",
 ]
 NOISE_LINE_RE = [re.compile(p) for p in NOISE_LINE_PATTERNS]
 
@@ -128,6 +138,10 @@ WHITELIST_EXACT = {
     "HDR10", "Ultra+", "Lilium HDR", "Display Commander", "OptiScaler DLSS-NR", "DLSS Swapper",
     # UI canvas labels that stay as-is
     "Simplified PC Gaming",
+    # Brush/colour names: XAML converts these strings to a Brush. A translation throws
+    # "The value cannot be converted to type Brush" and takes the window down.
+    "Transparent", "White", "Black", "Red", "Green", "Blue", "Gray", "Grey", "Orange",
+    "Yellow", "Purple",
 }
 
 MIN_LENGTH = 3

@@ -2,6 +2,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using Microsoft.UI.Xaml;
 using RenoDXCommander.Models;
 using RenoDXCommander.Services;
+using RenoDXCommander.Localization;
 
 namespace RenoDXCommander.ViewModels;
 
@@ -9,6 +10,8 @@ namespace RenoDXCommander.ViewModels;
 public partial class GameCardViewModel
 {
     // ── Sidebar item styling (computed from IsSelected + managed state) ────────────
+    // Loc.T("Transparent") is a Brush name string that XAML converts to a Brush: translating it throws
+    // "The value cannot be converted to type Brush" and takes the whole window down.
     public string SidebarItemBackground => IsRunning ? "#1A3A20" : IsSelected ? "#1A2840" : "Transparent";
     public string SidebarItemBorderBrush => IsRunning ? "#2A5A30" : IsSelected ? "#2A4060" : "Transparent";
     public string SidebarItemForeground => IsSelected ? "#E2E8FF"
@@ -198,7 +201,7 @@ public partial class GameCardViewModel
     public bool HasUwFixUrl        => !string.IsNullOrEmpty(UwFixUrl);
     public bool HasUltraPlusUrl    => !string.IsNullOrEmpty(UltraPlusUrl);
     public bool HasNameUrl            => !string.IsNullOrEmpty(NameUrl);
-    public string HideButtonLabel     => IsHidden ? "👁 Show" : "🚫 Hide";
+    public string HideButtonLabel     => IsHidden ? Loc.T("👁 Show") : Loc.T("🚫 Hide");
     public string StarForeground       => IsFavourite ? "#FFD700" : "#282840";
     public Visibility IsFavouriteVisibility      => IsFavourite ? Visibility.Visible : Visibility.Collapsed;
     public Visibility IsNotFavouriteVisibility   => IsFavourite ? Visibility.Collapsed : Visibility.Visible;
@@ -282,6 +285,8 @@ public partial class GameCardViewModel
     {
         ["ShortFuse"] = "https://ko-fi.com/shortfuse",
         ["Jon"]       = "https://ko-fi.com/kickfister",
+        // Author handles are dictionary keys used for lookup, and they are people's names:
+        // neither side may be translated or the donation link silently stops resolving.
         ["Forge"]     = "https://ko-fi.com/forge87682",
         ["Voosh"]     = "https://ko-fi.com/notvoosh",
         ["Musa"]      = "https://ko-fi.com/musaqh",
@@ -375,8 +380,8 @@ public partial class GameCardViewModel
             {
                 return new[]
                 {
-                    $"RenoDX: {rdxAuthor}",
-                    $"Luma: {lumaAuthor}",
+                    Loc.T("RenoDX: {0}", rdxAuthor),
+                    Loc.T("Luma: {0}", lumaAuthor),
                 };
             }
 

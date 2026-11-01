@@ -4,6 +4,7 @@ using Microsoft.UI.Xaml.Controls;
 using RenoDXCommander.Models;
 using RenoDXCommander.Services;
 using RenoDXCommander.ViewModels;
+using RenoDXCommander.Localization;
 
 namespace RenoDXCommander;
 
@@ -33,7 +34,7 @@ public partial class DetailPanelBuilder
         if (useLatest)
         {
             // Use the flat staging file (latest) — same as before
-            _window.DispatcherQueue?.TryEnqueue(() => statusBtn.Content = "Staging DLSS5 Tool...");
+            _window.DispatcherQueue?.TryEnqueue(() => statusBtn.Content = Loc.T("Staging DLSS5 Tool..."));
             await rdx5Svc.EnsureStagingAsync().ConfigureAwait(false);
             if (!rdx5Svc.IsStagingReady)
                 throw new InvalidOperationException("DLSS5 Tool staging not ready");
@@ -44,7 +45,7 @@ public partial class DetailPanelBuilder
         else
         {
             // Ensure the specific version is staged
-            _window.DispatcherQueue?.TryEnqueue(() => statusBtn.Content = $"Staging DLSS5 Tool v{requestedVersion}...");
+            _window.DispatcherQueue?.TryEnqueue(() => statusBtn.Content = Loc.T("Staging DLSS5 Tool v{0}...", requestedVersion));
             var staged = await rdx5Svc.EnsureVersionStagedAsync("dlss5tool", requestedVersion!).ConfigureAwait(false);
             if (!staged)
             {
@@ -74,7 +75,7 @@ public partial class DetailPanelBuilder
         }).ConfigureAwait(false);
 
         // Upgrade all DLSS DLLs to latest (SR/RR/FG + NR)
-        _window.DispatcherQueue?.TryEnqueue(() => statusBtn.Content = "Upgrading DLSS DLLs...");
+        _window.DispatcherQueue?.TryEnqueue(() => statusBtn.Content = Loc.T("Upgrading DLSS DLLs..."));
         await UpgradeDlssDllsAsync(card, dlssSvc, nrVersionCombo).ConfigureAwait(false);
 
         // Append the addon file to the Dlss5Tool component record (DLLs recorded in UpgradeDlssDllsAsync)
@@ -276,7 +277,7 @@ public partial class DetailPanelBuilder
         }
         bool useLatestBridge = string.IsNullOrEmpty(requestedBridgeVersion) || requestedBridgeVersion.StartsWith("Latest");
 
-        _window.DispatcherQueue?.TryEnqueue(() => statusBtn.Content = "Downloading DX11 Bridge...");
+        _window.DispatcherQueue?.TryEnqueue(() => statusBtn.Content = Loc.T("Downloading DX11 Bridge..."));
 
         // Resolve Bridge staged path — versioned or latest via AddonPackService
         string? bridgeSourcePath = null;
@@ -310,7 +311,7 @@ public partial class DetailPanelBuilder
         }
 
         // Deploy — Bridge goes in the game root (next to ReShade / exe), not reshade-addons
-        _window.DispatcherQueue?.TryEnqueue(() => statusBtn.Content = "Deploying DX11 Bridge...");
+        _window.DispatcherQueue?.TryEnqueue(() => statusBtn.Content = Loc.T("Deploying DX11 Bridge..."));
         await Task.Run(() =>
         {
             if (bridgeSourcePath == null || !File.Exists(bridgeSourcePath))
@@ -344,7 +345,7 @@ public partial class DetailPanelBuilder
         string sfSourcePath;
         if (useLatest)
         {
-            _window.DispatcherQueue?.TryEnqueue(() => statusBtn.Content = "Staging ShortFuse...");
+            _window.DispatcherQueue?.TryEnqueue(() => statusBtn.Content = Loc.T("Staging ShortFuse..."));
             await rdx5Svc.EnsureSfStagingAsync().ConfigureAwait(false);
             if (!rdx5Svc.IsSfStagingReady)
                 throw new InvalidOperationException("ShortFuse staging not ready");
@@ -353,7 +354,7 @@ public partial class DetailPanelBuilder
         }
         else
         {
-            _window.DispatcherQueue?.TryEnqueue(() => statusBtn.Content = $"Staging ShortFuse v{requestedVersion}...");
+            _window.DispatcherQueue?.TryEnqueue(() => statusBtn.Content = Loc.T("Staging ShortFuse v{0}...", requestedVersion));
             var staged = await rdx5Svc.EnsureVersionStagedAsync("dlsstool", requestedVersion!).ConfigureAwait(false);
             if (!staged)
             {
@@ -371,7 +372,7 @@ public partial class DetailPanelBuilder
             }
         }
 
-        _window.DispatcherQueue?.TryEnqueue(() => statusBtn.Content = "Installing DLSS stack...");
+        _window.DispatcherQueue?.TryEnqueue(() => statusBtn.Content = Loc.T("Installing DLSS stack..."));
 
         // Deploy the SF addon from the resolved source path
         try
@@ -403,7 +404,7 @@ public partial class DetailPanelBuilder
         await rdx5Svc.InstallSfDllsOnlyAsync(installPath, detection.HasAny ? detection : null).ConfigureAwait(false);
 
         // Deploy NR DLL at requested version (or latest)
-        _window.DispatcherQueue?.TryEnqueue(() => statusBtn.Content = "Deploying NR DLL...");
+        _window.DispatcherQueue?.TryEnqueue(() => statusBtn.Content = Loc.T("Deploying NR DLL..."));
         var nrSelectedVersion = await DispatchAsync<string?>(_window.DispatcherQueue!,
             () => nrVersionCombo.SelectedItem as string).ConfigureAwait(false);
         bool nrUseLatest = string.IsNullOrEmpty(nrSelectedVersion) || nrSelectedVersion.StartsWith("Latest");
@@ -456,7 +457,7 @@ public partial class DetailPanelBuilder
         // Apply auto-config (rename ReShade, install UAL, write reshade.ini [INSTALL] keys)
         if (_window.ViewModel.GetSfAutoConfigEnabled(card.GameName, card.Source ?? ""))
         {
-            _window.DispatcherQueue?.TryEnqueue(() => statusBtn.Content = "Configuring ReShade...");
+            _window.DispatcherQueue?.TryEnqueue(() => statusBtn.Content = Loc.T("Configuring ReShade..."));
             await _window.ViewModel.ApplySfAutoConfigAsync(card).ConfigureAwait(false);
         }
     }

@@ -13,6 +13,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Windows.Foundation;
+using RenoDXCommander.Localization;
 
 namespace RenoDXCommander;
 
@@ -40,7 +41,7 @@ public partial class DetailPanelBuilder
         // Use cached state from card instead of File.Exists on UI thread
         bool addonConflict = card.MfgAdaInstalled;
 
-        string statusText  = isInstalled ? (svc.StagedVersion ?? "Installed") : "Ready";
+        string statusText  = isInstalled ? (svc.StagedVersion ?? "Installed") : Loc.T("Ready");
         string statusColor = isInstalled ? "#5ECB7D" : "#A0AABB";
 
         var row = new Grid { ColumnSpacing = 8 };
@@ -54,12 +55,12 @@ public partial class DetailPanelBuilder
         // Col 0 — label
         var label = new TextBlock
         {
-            Text = "20/30 FG Unlock",
+            Text = Loc.T("20/30 FG Unlock"),
             FontSize = 12,
             Foreground = UIFactory.Brush(ResourceKeys.TextSecondaryBrush),
             VerticalAlignment = VerticalAlignment.Center,
         };
-        ToolTipService.SetToolTip(label, "20/30 FG Unlock — enables DLSS Frame Generation (up to 6X) on RTX 20 and 30 series GPUs. D3D12. Needs NVIDIA driver R580 or newer. No ASI Loader or ReShade required.");
+        ToolTipService.SetToolTip(label, Loc.T("20/30 FG Unlock — enables DLSS Frame Generation (up to 6X) on RTX 20 and 30 series GPUs. D3D12. Needs NVIDIA driver R580 or newer. No ASI Loader or ReShade required."));
         Grid.SetColumn(label, 0);
         row.Children.Add(label);
 
@@ -96,7 +97,7 @@ public partial class DetailPanelBuilder
             BorderThickness = new Thickness(1),
             CornerRadius = new CornerRadius(8),
         };
-        ToolTipService.SetToolTip(infoBtn, "Open 20/30 FG Unlock GitHub page");
+        ToolTipService.SetToolTip(infoBtn, Loc.T("Open 20/30 FG Unlock GitHub page"));
         infoBtn.Click += (s, e) =>
             _ = Windows.System.Launcher.LaunchUriAsync(new Uri("https://github.com/sdli1995/dlssg_for_sm86"));
         Grid.SetColumn(infoBtn, 2);
@@ -105,7 +106,7 @@ public partial class DetailPanelBuilder
         // Col 3 — Install button
         var installBtn = new Button
         {
-            Content = isInstalled ? "↺  Reinstall 20/30 FG" : "⬇  Install 20/30 FG",
+            Content = isInstalled ? Loc.T("↺  Reinstall 20/30 FG") : Loc.T("⬇  Install 20/30 FG"),
             FontSize = 12,
             Height = 32,
             HorizontalAlignment = HorizontalAlignment.Stretch,
@@ -120,14 +121,14 @@ public partial class DetailPanelBuilder
         {
             installBtn.IsEnabled = false;
             installBtn.Opacity   = 0.35;
-            installBtn.Content   = "Uninstall MFG Ada Unlock first";
-            ToolTipService.SetToolTip(installBtn, "MFG Ada Unlock (addon) is installed and conflicts. Remove it from the addon picker first.");
+            installBtn.Content   = Loc.T("Uninstall MFG Ada Unlock first");
+            ToolTipService.SetToolTip(installBtn, Loc.T("MFG Ada Unlock (addon) is installed and conflicts. Remove it from the addon picker first."));
         }
         else
         {
             ToolTipService.SetToolTip(installBtn, isInstalled
-                ? $"Reinstall 20/30 FG Unlock (currently deployed as {currentDllName})"
-                : "Install 20/30 FG Unlock — deploys the proxy DLL you choose, dlssg_sm86.ini and the dlssg_sm86 folder");
+                ? Loc.T("Reinstall 20/30 FG Unlock (currently deployed as {0})", currentDllName)
+                : Loc.T("Install 20/30 FG Unlock — deploys the proxy DLL you choose, dlssg_sm86.ini and the dlssg_sm86 folder"));
         }
 
         installBtn.Click += async (s, e) =>
@@ -161,14 +162,14 @@ public partial class DetailPanelBuilder
                 }
                 else
                 {
-                    installBtn.Content   = "Download failed — try again";
+                    installBtn.Content   = Loc.T("Download failed — try again");
                     installBtn.IsEnabled = true;
                 }
             }
             catch (Exception ex)
             {
                 CrashReporter.Log($"[BuildDlssg2030Row] Install failed — {ex.Message}");
-                installBtn.Content   = "Install failed";
+                installBtn.Content   = Loc.T("Install failed");
                 installBtn.IsEnabled = true;
             }
         };
@@ -176,7 +177,7 @@ public partial class DetailPanelBuilder
         row.Children.Add(installBtn);
 
         // Col 4 — Cog button
-        var cogBtn = CogDialog.MakeCogButton("20/30 FG Unlock settings");
+        var cogBtn = CogDialog.MakeCogButton(Loc.T("20/30 FG Unlock settings"));
         cogBtn.Click += async (s, e) =>
         {
             try { await ShowDlssg2030SettingsAsync(installPath, isInstalled); }
@@ -198,7 +199,7 @@ public partial class DetailPanelBuilder
             Opacity = isInstalled ? 1.0 : 0,
             IsHitTestVisible = isInstalled,
         };
-        ToolTipService.SetToolTip(removeBtn, "Remove 20/30 FG Unlock from this game");
+        ToolTipService.SetToolTip(removeBtn, Loc.T("Remove 20/30 FG Unlock from this game"));
         removeBtn.Click += (s, e) =>
         {
             if (string.IsNullOrEmpty(installPath)) return;
@@ -261,15 +262,15 @@ public partial class DetailPanelBuilder
                 VerticalAlignment = VerticalAlignment.Center,
             });
             if (isRecommended)
-                contentRow.Children.Add(MakeBadge("Recommended", "#1A3A20", "#6AE87A", "#2A5A30"));
+                contentRow.Children.Add(MakeBadge(Loc.T("Recommended"), "#1A3A20", "#6AE87A", "#2A5A30"));
             if (isRhiOwned)
-                contentRow.Children.Add(MakeBadge("Used by RHI", "#2A1818", "#CC6666", "#5A2828"));
+                contentRow.Children.Add(MakeBadge(Loc.T("Used by RHI"), "#2A1818", "#CC6666", "#5A2828"));
             if (isCurrent)
-                contentRow.Children.Add(MakeBadge("Current", "#182840", "#7AACDD", "#2A4468"));
+                contentRow.Children.Add(MakeBadge(Loc.T("Current"), "#182840", "#7AACDD", "#2A4468"));
 
             btn.Content = contentRow;
             if (isRhiOwned)
-                ToolTipService.SetToolTip(btn, "This filename is already used by an RHI-managed component. Choose a different name.");
+                ToolTipService.SetToolTip(btn, Loc.T("This filename is already used by an RHI-managed component. Choose a different name."));
 
             btn.Tag    = name;
             btn.Click += (s, ev) =>
@@ -286,7 +287,7 @@ public partial class DetailPanelBuilder
 
         var pickerDialog = new ContentDialog
         {
-            Title = "Choose 20/30 FG Unlock DLL name",
+            Title = Loc.T("Choose 20/30 FG Unlock DLL name"),
             Content = new StackPanel
             {
                 Spacing = 8,
@@ -324,7 +325,7 @@ public partial class DetailPanelBuilder
         var currentDllName = _window.ViewModel.GetRtx40MfgInstalledAs(gameName, store);
 
         // Status
-        string statusText  = isInstalled ? (mfgSvc.StagedVersion ?? "Installed") : "Ready";
+        string statusText  = isInstalled ? (mfgSvc.StagedVersion ?? "Installed") : Loc.T("Ready");
         string statusColor = isInstalled ? "#5ECB7D" : "#A0AABB";
 
         var row = new Grid { ColumnSpacing = 8 };
@@ -338,12 +339,12 @@ public partial class DetailPanelBuilder
         // Col 0 — label
         var label = new TextBlock
         {
-            Text = "RTX 40 MFG",
+            Text = Loc.T("RTX 40 MFG"),
             FontSize = 12,
             Foreground = UIFactory.Brush(ResourceKeys.TextSecondaryBrush),
             VerticalAlignment = VerticalAlignment.Center,
         };
-        ToolTipService.SetToolTip(label, "RTX 40 MFG Unlock — enables DLSS Multi Frame Generation multipliers beyond 2x (up to 6x) on RTX 40 Series GPUs. Standalone DLL, no ASI Loader required.");
+        ToolTipService.SetToolTip(label, Loc.T("RTX 40 MFG Unlock — enables DLSS Multi Frame Generation multipliers beyond 2x (up to 6x) on RTX 40 Series GPUs. Standalone DLL, no ASI Loader required."));
         Grid.SetColumn(label, 0);
         row.Children.Add(label);
 
@@ -359,7 +360,7 @@ public partial class DetailPanelBuilder
         };
         if (isInstalled)
         {
-            ToolTipService.SetToolTip(statusBlock, $"Installed as: {currentDllName}\nClick to open GitHub releases page");
+            ToolTipService.SetToolTip(statusBlock, Loc.T("Installed as: {0}\nClick to open GitHub releases page", currentDllName));
             statusBlock.PointerPressed += (s, e) =>
                 _ = Windows.System.Launcher.LaunchUriAsync(new Uri("https://github.com/dashdogy/RTX40MFG-Unlock/releases"));
         }
@@ -380,7 +381,7 @@ public partial class DetailPanelBuilder
             BorderThickness = new Thickness(1),
             CornerRadius = new CornerRadius(8),
         };
-        ToolTipService.SetToolTip(infoBtn, "Open RTX 40 MFG Unlock GitHub page");
+        ToolTipService.SetToolTip(infoBtn, Loc.T("Open RTX 40 MFG Unlock GitHub page"));
         infoBtn.Click += (s, e) =>
             _ = Windows.System.Launcher.LaunchUriAsync(new Uri("https://github.com/dashdogy/RTX40MFG-Unlock"));
         Grid.SetColumn(infoBtn, 2);
@@ -389,7 +390,7 @@ public partial class DetailPanelBuilder
         // Col 3 — Install button
         var installBtn = new Button
         {
-            Content = isInstalled ? "↺  Reinstall RTX 40 MFG" : "⬇  Install RTX 40 MFG",
+            Content = isInstalled ? Loc.T("↺  Reinstall RTX 40 MFG") : Loc.T("⬇  Install RTX 40 MFG"),
             FontSize = 12,
             Height = 32,
             HorizontalAlignment = HorizontalAlignment.Stretch,
@@ -410,14 +411,14 @@ public partial class DetailPanelBuilder
         {
             installBtn.IsEnabled = false;
             installBtn.Opacity   = 0.35;
-            installBtn.Content   = "Uninstall MFG Ada Unlock first";
-            ToolTipService.SetToolTip(installBtn, "MFG Ada Unlock (addon) is already installed and conflicts with RTX 40 MFG Unlock. Remove it from the addon picker first.");
+            installBtn.Content   = Loc.T("Uninstall MFG Ada Unlock first");
+            ToolTipService.SetToolTip(installBtn, Loc.T("MFG Ada Unlock (addon) is already installed and conflicts with RTX 40 MFG Unlock. Remove it from the addon picker first."));
         }
         else
         {
             ToolTipService.SetToolTip(installBtn, isInstalled
-                ? $"Reinstall RTX 40 MFG Unlock (currently deployed as {currentDllName})"
-                : "Install RTX 40 MFG Unlock — deploys the unlock DLL under a name you choose");
+                ? Loc.T("Reinstall RTX 40 MFG Unlock (currently deployed as {0})", currentDllName)
+                : Loc.T("Install RTX 40 MFG Unlock — deploys the unlock DLL under a name you choose"));
         }
 
         installBtn.Click += async (s, e) =>
@@ -451,14 +452,14 @@ public partial class DetailPanelBuilder
                 }
                 else
                 {
-                    installBtn.Content   = "Download failed — try again";
+                    installBtn.Content   = Loc.T("Download failed — try again");
                     installBtn.IsEnabled = true;
                 }
             }
             catch (Exception ex)
             {
                 CrashReporter.Log($"[BuildRtx40MfgRow] Install failed — {ex.Message}");
-                installBtn.Content   = "Install failed";
+                installBtn.Content   = Loc.T("Install failed");
                 installBtn.IsEnabled = true;
             }
         };
@@ -466,20 +467,20 @@ public partial class DetailPanelBuilder
         row.Children.Add(installBtn);
 
         // Col 4 — Cog button
-        var cogBtn = CogDialog.MakeCogButton("RTX 40 MFG settings");
+        var cogBtn = CogDialog.MakeCogButton(Loc.T("RTX 40 MFG settings"));
         cogBtn.Click += async (s, e) =>
         {
             try
             {
-                var cog = new CogDialog("RTX 40 MFG", _window.Content.XamlRoot);
-                cog.AddIntro("Press Backspace in-game to open the RTX 40 MFG menu. It offers these modes:");
-                cog.AddNote("• Follow game: uses the game's own MFG setting");
-                cog.AddNote("• Fixed 2x to 6x: forces a specific multiplier");
-                cog.AddNote("• Dynamic: targets the display refresh rate or a custom FPS value");
-                cog.AddIntro("If frames freeze above 2x, try setting Frame Generation to Preset B in the NVIDIA App.");
+                var cog = new CogDialog(Loc.T("RTX 40 MFG"), _window.Content.XamlRoot);
+                cog.AddIntro(Loc.T("Press Backspace in-game to open the RTX 40 MFG menu. It offers these modes:"));
+                cog.AddNote(Loc.T("• Follow game: uses the game's own MFG setting"));
+                cog.AddNote(Loc.T("• Fixed 2x to 6x: forces a specific multiplier"));
+                cog.AddNote(Loc.T("• Dynamic: targets the display refresh rate or a custom FPS value"));
+                cog.AddIntro(Loc.T("If frames freeze above 2x, try setting Frame Generation to Preset B in the NVIDIA App."));
                 if (isInstalled)
-                    cog.AddNote($"Currently installed as: {currentDllName}");
-                cog.AddButtons(cog.MakeButton("Open GitHub page", CogButtonKind.Secondary,
+                    cog.AddNote(Loc.T("Currently installed as: {0}", currentDllName));
+                cog.AddButtons(cog.MakeButton(Loc.T("Open GitHub page"), CogButtonKind.Secondary,
                     async () => { await Windows.System.Launcher.LaunchUriAsync(new Uri("https://github.com/dashdogy/RTX40MFG-Unlock")); }));
                 await cog.ShowAsync();
             }
@@ -506,7 +507,7 @@ public partial class DetailPanelBuilder
             Opacity = isInstalled ? 1.0 : 0,
             IsHitTestVisible = isInstalled,
         };
-        ToolTipService.SetToolTip(removeBtn, "Remove RTX 40 MFG Unlock from this game");
+        ToolTipService.SetToolTip(removeBtn, Loc.T("Remove RTX 40 MFG Unlock from this game"));
         removeBtn.Click += (s, e) =>
         {
             if (string.IsNullOrEmpty(installPath)) return;
@@ -572,20 +573,20 @@ public partial class DetailPanelBuilder
                 VerticalAlignment = VerticalAlignment.Center,
             });
             if (isRecommended)
-                contentRow.Children.Add(MakeBadge("Recommended", "#1A3A20", "#6AE87A", "#2A5A30"));
+                contentRow.Children.Add(MakeBadge(Loc.T("Recommended"), "#1A3A20", "#6AE87A", "#2A5A30"));
             if (isRhiOwned)
-                contentRow.Children.Add(MakeBadge("Used by RHI", "#2A1818", "#CC6666", "#5A2828"));
+                contentRow.Children.Add(MakeBadge(Loc.T("Used by RHI"), "#2A1818", "#CC6666", "#5A2828"));
             else if (isDxgiConflict)
-                contentRow.Children.Add(MakeBadge("May conflict with ReShade/OS", "#2A1A10", "#CC9955", "#5A3A18"));
+                contentRow.Children.Add(MakeBadge(Loc.T("May conflict with ReShade/OS"), "#2A1A10", "#CC9955", "#5A3A18"));
             if (isCurrent)
-                contentRow.Children.Add(MakeBadge("Current", "#182840", "#7AACDD", "#2A4468"));
+                contentRow.Children.Add(MakeBadge(Loc.T("Current"), "#182840", "#7AACDD", "#2A4468"));
 
             btn.Content = contentRow;
 
             if (isRhiOwned)
-                ToolTipService.SetToolTip(btn, "This filename is already used by an RHI-managed component. Choose a different name.");
+                ToolTipService.SetToolTip(btn, Loc.T("This filename is already used by an RHI-managed component. Choose a different name."));
             else if (isDxgiConflict)
-                ToolTipService.SetToolTip(btn, "dxgi.dll may conflict with ReShade or OptiScaler if they also use this name.");
+                ToolTipService.SetToolTip(btn, Loc.T("dxgi.dll may conflict with ReShade or OptiScaler if they also use this name."));
 
             btn.Tag    = name;
             btn.Click += (s, ev) =>
@@ -603,7 +604,7 @@ public partial class DetailPanelBuilder
 
         var pickerDialog = new ContentDialog
         {
-            Title = "Choose RTX 40 MFG DLL name",
+            Title = Loc.T("Choose RTX 40 MFG DLL name"),
             Content = new StackPanel
             {
                 Spacing = 8,
@@ -611,7 +612,7 @@ public partial class DetailPanelBuilder
                 {
                     new TextBlock
                     {
-                        Text = "Select the filename to deploy the RTX 40 MFG Unlock DLL as. Choose a name the game loads early, and avoid names already used by other mods.",
+                        Text = Loc.T("Select the filename to deploy the RTX 40 MFG Unlock DLL as. Choose a name the game loads early, and avoid names already used by other mods."),
                         FontSize = 11,
                         Foreground = UIFactory.Brush(ResourceKeys.TextTertiaryBrush),
                         TextWrapping = TextWrapping.Wrap,

@@ -28,7 +28,10 @@ WORKLIST = Path(__file__).resolve().parent / "worklist.json"
 
 REFUSE_LINE = re.compile(
     r"^\s*case\b|^\s*Tag\s*=|^\s*Name\s*=|^\s*Key\s*=|\.Contains\s*\(|\.StartsWith\s*\(|"
-    r"\.EndsWith\s*\(|\.Equals\s*\(|^\s*return\s|\bconst\s|TaskName|SectionKey"
+    r"\.EndsWith\s*\(|\.Equals\s*\(|^\s*return\s|\bconst\s|TaskName|SectionKey|"
+    r"\bis\s+\$?\"|\b(or|and)\s+\$?\""
+    # Comparisons must stay English: "x == \"Ready\"" is a value check, not display text.
+    r"|==\s*\$?\"|\$?\"\s*==|!=\s*\$?\"|\$?\"\s*!="
 )
 
 # Switch-expression arms look like  "ReShade" => (a, b): a method call is not a constant pattern.
@@ -74,9 +77,26 @@ def main() -> int:
         if e["wave"] == args.wave.upper() and e["kind"].startswith("cs-") and e["needs_review"]
     ]
 
+    # One English string often appears in several places ("Ready", "Install", "Info"). The
+    # worklist stores them in occurrences; wiring only the first would leave the rest English.
+    # Only plain literals can be expanded this way - an interpolated string's raw text depends on
+    # the expressions in that particular line, so those stay limited to their recorded position.
     by_file: dict[str, list[dict]] = defaultdict(list)
     for e in entries:
         by_file[e["file"].replace("\\", "/")].append(e)
+        if e["kind"] != "cs-literal":
+            continue
+        for occ in e.get("occurrences", []):
+            if occ.get("wave") != args.wave.upper():
+                continue
+            if occ["file"].replace("\\", "/") == e["file"]:
+                continue
+            if occ["kind"] != "cs-literal":
+                continue
+            clone = dict(e)
+            clone["file"] = occ["file"]
+            clone["line"] = occ["line"]
+            by_file[occ["file"].replace("\\", "/")].append(clone)
 
     total = 0
     refused: list[str] = []

@@ -13,6 +13,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Windows.Foundation;
+using RenoDXCommander.Localization;
 
 namespace RenoDXCommander;
 
@@ -63,7 +64,7 @@ public partial class DetailPanelBuilder
         };
         if (card.IsDxvkInstalled && !isDisabled)
         {
-            ToolTipService.SetToolTip(statusBlock, "Click to open DXVK releases");
+            ToolTipService.SetToolTip(statusBlock, Loc.T("Click to open DXVK releases"));
             statusBlock.PointerPressed += (s, e) => _window.DetailDxvkStatus_PointerPressed(s, e);
             statusBlock.PointerEntered += (s, e) => _window.LinkText_PointerEntered(s, e);
             statusBlock.PointerExited  += (s, e) => _window.LinkText_PointerExited(s, e);
@@ -114,7 +115,7 @@ public partial class DetailPanelBuilder
         row.Children.Add(installBtn);
 
         // Col 4 — Cog button
-        var cogBtn = CogDialog.MakeCogButton("DXVK Settings");
+        var cogBtn = CogDialog.MakeCogButton(Loc.T("DXVK Settings"));
         cogBtn.Tag = card;
         cogBtn.IsEnabled = !isDisabled;
         cogBtn.Opacity = isDisabled ? 0.35 : 1.0;
@@ -139,7 +140,7 @@ public partial class DetailPanelBuilder
             Opacity = showDelete ? 1.0 : 0.0,
             IsHitTestVisible = showDelete,
         };
-        ToolTipService.SetToolTip(deleteBtn, "Remove DXVK");
+        ToolTipService.SetToolTip(deleteBtn, Loc.T("Remove DXVK"));
         deleteBtn.Click += (s, e) => _window.UninstallDxvkButton_Click(s, e);
         Grid.SetColumn(deleteBtn, 5);
         row.Children.Add(deleteBtn);
@@ -162,7 +163,7 @@ public partial class DetailPanelBuilder
         // Status: show deployed version — prefer stored per-game override, else latest from manifest
         string? latestVersion = manifest?.DgVoodooVersions?.Keys.FirstOrDefault();
         var activeVersion = _window.ViewModel.GetDgVoodooVersion(gameName, store) ?? latestVersion;
-        string statusText  = isInstalled ? (activeVersion != null ? $"v{activeVersion}" : "Installed") : "Ready";
+        string statusText  = isInstalled ? (activeVersion != null ? $"v{activeVersion}" : "Installed") : Loc.T("Ready");
         string statusColor = isInstalled ? "#5ECB7D" : "#A0AABB";
 
         // ── Row grid ──────────────────────────────────────────────────────────
@@ -199,7 +200,7 @@ public partial class DetailPanelBuilder
         };
         if (isInstalled)
         {
-            ToolTipService.SetToolTip(statusBlock, "Click to open dgVoodoo2 releases page");
+            ToolTipService.SetToolTip(statusBlock, Loc.T("Click to open dgVoodoo2 releases page"));
             statusBlock.PointerPressed += (s, e) =>
                 _ = Windows.System.Launcher.LaunchUriAsync(new Uri("https://github.com/dege-diosg/dgVoodoo2/releases"));
             statusBlock.PointerEntered += (s, e) => _window.LinkText_PointerEntered(s, e);
@@ -222,7 +223,7 @@ public partial class DetailPanelBuilder
             BorderThickness = new Thickness(1),
             CornerRadius = new CornerRadius(8),
         };
-        ToolTipService.SetToolTip(infoBtn, "Open dgVoodoo2 releases page");
+        ToolTipService.SetToolTip(infoBtn, Loc.T("Open dgVoodoo2 releases page"));
         infoBtn.Click += (s, e) =>
             _ = Windows.System.Launcher.LaunchUriAsync(new Uri("https://github.com/dege-diosg/dgVoodoo2/releases"));
         Grid.SetColumn(infoBtn, 2);
@@ -231,7 +232,7 @@ public partial class DetailPanelBuilder
         // Col 3 — Install button
         var installBtn = new Button
         {
-            Content = isInstalled ? "↺  Redeploy dgVoodoo2" : "⬇  Install dgVoodoo2",
+            Content = isInstalled ? Loc.T("↺  Redeploy dgVoodoo2") : Loc.T("⬇  Install dgVoodoo2"),
             FontSize = 12,
             Height = 32,
             HorizontalAlignment = HorizontalAlignment.Stretch,
@@ -250,8 +251,8 @@ public partial class DetailPanelBuilder
             IsEnabled = manifest?.DgVoodooVersions?.Count > 0,
         };
         ToolTipService.SetToolTip(installBtn,
-            isInstalled ? "Redeploy dgVoodoo2 — refreshes D3D9.dll and dgVoodoo.conf from staged version"
-                        : "Install dgVoodoo2 — deploys D3D9.dll and dgVoodoo.conf to the game folder");
+            isInstalled ? Loc.T("Redeploy dgVoodoo2 — refreshes D3D9.dll and dgVoodoo.conf from staged version")
+                        : Loc.T("Install dgVoodoo2 — deploys D3D9.dll and dgVoodoo.conf to the game folder"));
 
         installBtn.Click += async (s, ev) =>
         {
@@ -320,14 +321,14 @@ public partial class DetailPanelBuilder
                 }
                 else
                 {
-                    installBtn.Content = "❌ Deploy failed";
+                    installBtn.Content = Loc.T("❌ Deploy failed");
                     installBtn.IsEnabled = true;
                 }
             }
             catch (Exception ex)
             {
                 CrashReporter.Log($"[BuildDgVoodooRow] Install failed for '{gameName}' — {ex.Message}");
-                installBtn.Content   = "❌ Failed";
+                installBtn.Content   = Loc.T("❌ Failed");
                 installBtn.IsEnabled = true;
             }
         };
@@ -335,7 +336,7 @@ public partial class DetailPanelBuilder
         row.Children.Add(installBtn);
 
         // Col 4 — Cog
-        var cogBtn = CogDialog.MakeCogButton("dgVoodoo2 Settings");
+        var cogBtn = CogDialog.MakeCogButton(Loc.T("dgVoodoo2 Settings"));
         cogBtn.Click += async (s, ev) =>
         {
             try
@@ -346,7 +347,7 @@ public partial class DetailPanelBuilder
                 var versions = manifest?.DgVoodooVersions?.Keys.ToList() ?? new List<string>();
                 if (versions.Count == 0)
                 {
-                    cog.AddEmpty("No dgVoodoo2 versions are available in the manifest.");
+                    cog.AddEmpty(Loc.T("No dgVoodoo2 versions are available in the manifest."));
                     await cog.ShowAsync();
                     return;
                 }
@@ -361,7 +362,7 @@ public partial class DetailPanelBuilder
                 async Task RedeployAsync(string selectedVersion, string versionUrl)
                 {
                     if (versionCombo != null) versionCombo.IsEnabled = false;
-                    cog.SetStatus($"Deploying dgVoodoo2 v{selectedVersion}...");
+                    cog.SetStatus(Loc.T("Deploying dgVoodoo2 v{0}...", selectedVersion));
                     try
                     {
                         await Task.Run(() => dgSvc.EnsureStagedAsync(selectedVersion, versionUrl));
@@ -369,18 +370,18 @@ public partial class DetailPanelBuilder
                         if (redeployed.Count > 0)
                         {
                             CrashReporter.Log($"[BuildDgVoodooRow] Redeployed dgVoodoo2 v{selectedVersion} for '{gameName}'");
-                            cog.SetSuccess($"dgVoodoo2 v{selectedVersion} deployed to the game folder.");
+                            cog.SetSuccess(Loc.T("dgVoodoo2 v{0} deployed to the game folder.", selectedVersion));
                         }
                         else
                         {
                             CrashReporter.Log($"[BuildDgVoodooRow] Redeploy of v{selectedVersion} deployed no files for '{gameName}'");
-                            cog.SetError($"dgVoodoo2 v{selectedVersion} couldn't be deployed. See the log for details.");
+                            cog.SetError(Loc.T("dgVoodoo2 v{0} couldn't be deployed. See the log for details.", selectedVersion));
                         }
                     }
                     catch (Exception ex)
                     {
                         CrashReporter.Log($"[BuildDgVoodooRow] Redeploy failed — {ex.Message}");
-                        cog.SetError($"dgVoodoo2 v{selectedVersion} couldn't be deployed: {ex.Message}");
+                        cog.SetError(Loc.T("dgVoodoo2 v{0} couldn't be deployed: {1}", selectedVersion, ex.Message));
                     }
                     finally
                     {
@@ -389,7 +390,7 @@ public partial class DetailPanelBuilder
                     RequestExtrasRebuild(card);
                 }
 
-                versionCombo = cog.AddCombo("Version",
+                versionCombo = cog.AddCombo(Loc.T("Version"),
                     "The dgVoodoo2 version used for this game. Older versions can work better with some games (e.g. 2.87.3 for Mass Effect).",
                     versions, currentIdx, i =>
                     {
@@ -400,11 +401,11 @@ public partial class DetailPanelBuilder
                         if (isInstalled && manifest?.DgVoodooVersions?.TryGetValue(selectedVersion, out var versionUrl) == true)
                             _ = RedeployAsync(selectedVersion, versionUrl);
                         else
-                            cog.SetSuccess($"Version set to {selectedVersion}. It will be used when you install dgVoodoo2.");
+                            cog.SetSuccess(Loc.T("Version set to {0}. It will be used when you install dgVoodoo2.", selectedVersion));
                     });
                 versionCombo.MaxDropDownHeight = 300;
 
-                cog.AddNote("If dgVoodoo2 is installed on this game, picking a version redeploys it to the game folder straight away.");
+                cog.AddNote(Loc.T("If dgVoodoo2 is installed on this game, picking a version redeploys it to the game folder straight away."));
 
                 await cog.ShowAsync();
             }
@@ -431,7 +432,7 @@ public partial class DetailPanelBuilder
             Opacity = isInstalled ? 1.0 : 0.0,
             IsHitTestVisible = isInstalled,
         };
-        ToolTipService.SetToolTip(removeBtn, "Remove dgVoodoo2 from this game");
+        ToolTipService.SetToolTip(removeBtn, Loc.T("Remove dgVoodoo2 from this game"));
         removeBtn.Click += async (s, ev) =>
         {
             if (string.IsNullOrEmpty(installPath)) return;

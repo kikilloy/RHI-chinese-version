@@ -1,5 +1,6 @@
 using Microsoft.UI.Xaml;
 using RenoDXCommander.Models;
+using RenoDXCommander.Localization;
 
 namespace RenoDXCommander.ViewModels;
 
@@ -14,9 +15,9 @@ public partial class GameCardViewModel
 
     public string UlActionLabel => UlIsInstalling ? "Installing..."
         : (!IsRsInstalled && !ExcludeFromUpdateAllReShade) ? "⚠  ReShade required"
-        : UlStatus == GameStatus.UpdateAvailable ? "⬆  Update ReLimiter"
-        : UlStatus == GameStatus.Installed ? "↺  Reinstall ReLimiter"
-        : "⬇  Install ReLimiter";
+        : UlStatus == GameStatus.UpdateAvailable ? Loc.T("⬆  Update ReLimiter")
+        : UlStatus == GameStatus.Installed ? Loc.T("↺  Reinstall ReLimiter")
+        : Loc.T("⬇  Install ReLimiter");
 
     public string UlBtnBackground  => UlStatus == GameStatus.UpdateAvailable ? "#201838" : "#182840";
     public string UlBtnForeground  => UlStatus == GameStatus.UpdateAvailable ? "#B898E8" : "#7AACDD";

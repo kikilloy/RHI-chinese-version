@@ -1,6 +1,7 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using Microsoft.UI.Xaml;
 using RenoDXCommander.Models;
+using RenoDXCommander.Localization;
 
 namespace RenoDXCommander.ViewModels;
 
@@ -14,8 +15,8 @@ public partial class GameCardViewModel
         get
         {
             if (IsInstalling) return "Installing...";
-            if (IsRtxHdrEnabled) return "Configure RTX HDR";
-            if (IsAutoHdrEnabled) return "Configure Auto HDR";
+            if (IsRtxHdrEnabled) return Loc.T("Configure RTX HDR");
+            if (IsAutoHdrEnabled) return Loc.T("Configure Auto HDR");
             if (!IsRsInstalled && !ExcludeFromUpdateAllReShade && Mod?.SnapshotUrl != null && !IsExternalOnly)
                 return "⚠  ReShade required";
             // No mod available and nothing manually installed
@@ -23,8 +24,8 @@ public partial class GameCardViewModel
                 return "No RenoDX mod available";
             var name = UseUeExtended ? "UE-Extended" : "RenoDX";
             return Status == GameStatus.UpdateAvailable ? $"⬆  Update {name}"
-                 : Status == GameStatus.Installed       ? $"↺  Reinstall {name}"
-                 : $"⬇  Install {name}";
+                 : Status == GameStatus.Installed       ? Loc.T("↺  Reinstall {0}", name)
+                 : Loc.T("⬇  Install {0}", name);
         }
     }
 
@@ -32,10 +33,10 @@ public partial class GameCardViewModel
 
     public string GenericModLabel => IsGenericMod
         ? (EngineHint.Contains("Unity")
-           ? "Generic Unity"
-           : (IsNativeHdrGame ? "UE Extended Native HDR"
-              : (IsManifestUeExtended || UseUeExtended) ? "UE Extended"
-              : "Generic UE"))
+           ? Loc.T("Generic Unity")
+           : (IsNativeHdrGame ? Loc.T("UE Extended Native HDR")
+              : (IsManifestUeExtended || UseUeExtended) ? Loc.T("UE Extended")
+              : Loc.T("Generic UE")))
         : "";
 
     // Update button colours — purple when an update is available, normal blue otherwise
@@ -44,7 +45,7 @@ public partial class GameCardViewModel
     public string InstallBtnBorderBrush => Status == GameStatus.UpdateAvailable ? "#3A2860" : "#2A4468";
 
     // UE-Extended toggle label and styling
-    public string UeExtendedLabel      => UseUeExtended ? "⚡ UE Extended" : "⚡ Standard UE";
+    public string UeExtendedLabel      => UseUeExtended ? Loc.T("⚡ UE Extended") : Loc.T("⚡ Standard UE");
     public string UeExtendedBackground => UseUeExtended ? "#201838" : "#1E242C";
     public string UeExtendedForeground => UseUeExtended ? "#B898E8" : "#6B7A8E";
     public string UeExtendedBorderBrush => UseUeExtended ? "#3A2860" : "#283240";
@@ -71,12 +72,12 @@ public partial class GameCardViewModel
             if (IsExternalOnly)
             {
                 // External-only: no RenoDX to install, only ReShade
-                if (RsStatus == GameStatus.UpdateAvailable) return "⬆  Update ReShade";
-                if (RsStatus == GameStatus.Installed) return "↺  Reinstall ReShade";
+                if (RsStatus == GameStatus.UpdateAvailable) return Loc.T("⬆  Update ReShade");
+                if (RsStatus == GameStatus.Installed) return Loc.T("↺  Reinstall ReShade");
                 return "⬇  Install ReShade";
             }
-            if (AnyUpdateAvailable) return "⬆  Update All";
-            if (Status == GameStatus.Installed) return "↺  Reinstall All";
+            if (AnyUpdateAvailable) return Loc.T("⬆  Update All");
+            if (Status == GameStatus.Installed) return Loc.T("↺  Reinstall All");
             return "⬇  Install All";
         }
     }
@@ -143,9 +144,9 @@ public partial class GameCardViewModel
     // ── External link label: "Update" when Nexus update available, "Redownload" when installed ──
     public string ExternalDisplayLabel =>
         Status == GameStatus.UpdateAvailable && IsRdxInstalled
-            ? "⬆  Update RenoDX"
+            ? Loc.T("⬆  Update RenoDX")
             : IsRdxInstalled && !string.IsNullOrEmpty(ExternalLabel)
-                ? "↺  " + ExternalLabel.Replace("Download", "Redownload")
+                ? "↺  " + ExternalLabel.Replace("Download", Loc.T("Redownload"))
                 : "⬇  " + ExternalLabel;
 
     // Compact list item highlight — purple when any component has an update available

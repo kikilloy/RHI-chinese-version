@@ -4,6 +4,7 @@
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using RenoDXCommander.ViewModels;
+using RenoDXCommander.Localization;
 
 namespace RenoDXCommander;
 
@@ -37,7 +38,7 @@ public partial class DetailPanelBuilder
         };
         var mgmtTitle = new TextBlock
         {
-            Text       = "Management",
+            Text       = Loc.T("Management"),
             FontSize   = 13,
             FontWeight = Microsoft.UI.Text.FontWeights.SemiBold,
             Foreground = UIFactory.Brush(ResourceKeys.TextPrimaryBrush),
@@ -81,7 +82,7 @@ public partial class DetailPanelBuilder
 
         var changeFolderBtn = new Button
         {
-            Content = "Change install folder",
+            Content = Loc.T("Change install folder"),
             FontSize = 11,
             Height = 32,
             HorizontalAlignment = HorizontalAlignment.Stretch,
@@ -93,7 +94,7 @@ public partial class DetailPanelBuilder
             Tag = card,
         };
         changeFolderBtn.Click += (s, ev) => _window.BrowseFolder_Click(s, ev);
-        ToolTipService.SetToolTip(changeFolderBtn, "Change the install folder for this game. Use when auto-detection picked the wrong directory.");
+        ToolTipService.SetToolTip(changeFolderBtn, Loc.T("Change the install folder for this game. Use when auto-detection picked the wrong directory."));
         Grid.SetColumn(changeFolderBtn, 0);
         mgmtRow.Children.Add(changeFolderBtn);
 
@@ -103,7 +104,7 @@ public partial class DetailPanelBuilder
 
         var removeGameBtn = new Button
         {
-            Content = "Reset / Remove game",
+            Content = Loc.T("Reset / Remove game"),
             FontSize = 11,
             Height = 32,
             HorizontalAlignment = HorizontalAlignment.Stretch,
@@ -115,7 +116,7 @@ public partial class DetailPanelBuilder
             Tag = card,
         };
         removeGameBtn.Click += (s, ev) => _window.RemoveManualGame_Click(s, ev);
-        ToolTipService.SetToolTip(removeGameBtn, "Reset the install folder to auto-detected, or remove a manually added game entirely.");
+        ToolTipService.SetToolTip(removeGameBtn, Loc.T("Reset the install folder to auto-detected, or remove a manually added game entirely."));
         Grid.SetColumn(removeGameBtn, 2);
         mgmtRow.Children.Add(removeGameBtn);
 
@@ -125,7 +126,7 @@ public partial class DetailPanelBuilder
 
         var mgmtResetOverridesBtn = new Button
         {
-            Content = "Reset Overrides",
+            Content = Loc.T("Reset Overrides"),
             FontSize = 11,
             Height = 32,
             HorizontalAlignment = HorizontalAlignment.Stretch,
@@ -141,7 +142,7 @@ public partial class DetailPanelBuilder
             ctx.ResetAction?.Invoke();
         };
         Grid.SetColumn(mgmtResetOverridesBtn, 4);
-        ToolTipService.SetToolTip(mgmtResetOverridesBtn, "Reset all per-game overrides back to defaults (DLL names, channels, shaders, addons, launch settings, update inclusion).");
+        ToolTipService.SetToolTip(mgmtResetOverridesBtn, Loc.T("Reset all per-game overrides back to defaults (DLL names, channels, shaders, addons, launch settings, update inclusion)."));
         mgmtRow.Children.Add(mgmtResetOverridesBtn);
 
         var sep3 = new Border { Width = 1, Background = UIFactory.Brush(ResourceKeys.BorderDefaultBrush), Margin = new Thickness(8, 4, 8, 4) };
@@ -150,7 +151,7 @@ public partial class DetailPanelBuilder
 
         var reportBtn = new Button
         {
-            Content = "Copy Report",
+            Content = Loc.T("Copy Report"),
             FontSize = 11,
             Height = 32,
             HorizontalAlignment = HorizontalAlignment.Stretch,
@@ -168,7 +169,7 @@ public partial class DetailPanelBuilder
                 await GameReportEncoder.ShowAndCopyAsync(_window.Content.XamlRoot, targetCard, _window.ViewModel);
         };
         Grid.SetColumn(reportBtn, 6);
-        ToolTipService.SetToolTip(reportBtn, "Copy a diagnostic report for this game to the clipboard. Useful for Discord or GitHub support.");
+        ToolTipService.SetToolTip(reportBtn, Loc.T("Copy a diagnostic report for this game to the clipboard. Useful for Discord or GitHub support."));
         mgmtRow.Children.Add(reportBtn);
 
         mgmtBody.Children.Add(mgmtRow);

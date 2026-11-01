@@ -518,7 +518,7 @@ public sealed partial class MainWindow
             // Games with a specific engine version (from manifest or auto-detection) cannot be toggled.
             // The badge toggle is only for games with vague "Unreal Engine" (no version suffix).
             if (card.EngineHint != null && card.EngineHint != "Unreal Engine"
-                && card.EngineHint != Loc.T("Unreal Engine 5")
+                && card.EngineHint != "Unreal Engine 5"
                 && System.Text.RegularExpressions.Regex.IsMatch(card.EngineHint, @"Unreal Engine \d"))
                 return;
 

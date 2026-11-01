@@ -1,5 +1,6 @@
 using Microsoft.UI.Xaml;
 using RenoDXCommander.Models;
+using RenoDXCommander.Localization;
 
 namespace RenoDXCommander.ViewModels;
 
@@ -13,10 +14,10 @@ public partial class GameCardViewModel
         : DcStatus == GameStatus.Installed ? "🟢" : "⚪";
 
     public string DcActionLabel => DcIsInstalling ? "Installing..."
-        : (!IsRsInstalled && !ExcludeFromUpdateAllReShade) ? "⚠  ReShade required"
-        : DcStatus == GameStatus.UpdateAvailable ? "⬆  Update DC"
-        : DcStatus == GameStatus.Installed ? "↺  Reinstall DC"
-        : "⬇  Install DC";
+        : (!IsRsInstalled && !ExcludeFromUpdateAllReShade) ? Loc.T("⚠  ReShade required")
+        : DcStatus == GameStatus.UpdateAvailable ? Loc.T("⬆  Update DC")
+        : DcStatus == GameStatus.Installed ? Loc.T("↺  Reinstall DC")
+        : Loc.T("⬇  Install DC");
 
     public string DcBtnBackground  => DcStatus == GameStatus.UpdateAvailable ? "#201838" : "#182840";
     public string DcBtnForeground  => DcStatus == GameStatus.UpdateAvailable ? "#B898E8" : "#7AACDD";
@@ -28,7 +29,7 @@ public partial class GameCardViewModel
         ? Visibility.Visible : Visibility.Collapsed;
 
     public string DcStatusText => DcIsInstalling ? "Installing…"
-        : DcStatus == GameStatus.UpdateAvailable ? "Update"
+        : DcStatus == GameStatus.UpdateAvailable ? Loc.T("Update")
         : DcStatus == GameStatus.Installed ? (DcInstalledVersion ?? "Installed")
         : "Ready";
     public string DcStatusColor => DcIsInstalling ? "#D4A856"
@@ -36,9 +37,9 @@ public partial class GameCardViewModel
         : DcStatus == GameStatus.Installed ? "#5ECB7D"
         : "#A0AABB";
     public string DcShortAction => DcIsInstalling ? "…"
-        : DcStatus == GameStatus.UpdateAvailable ? "⬆ Update"
-        : DcStatus == GameStatus.Installed ? "↺ Reinstall"
-        : "⬇ Install";
+        : DcStatus == GameStatus.UpdateAvailable ? Loc.T("⬆ Update")
+        : DcStatus == GameStatus.Installed ? Loc.T("↺ Reinstall")
+        : Loc.T("⬇ Install");
 
     public bool IsDcNotInstalling => !DcIsInstalling;
     public bool IsDcInstalled => DcStatus == GameStatus.Installed || DcStatus == GameStatus.UpdateAvailable;

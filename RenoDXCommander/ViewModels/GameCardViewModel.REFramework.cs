@@ -1,5 +1,6 @@
 using Microsoft.UI.Xaml;
 using RenoDXCommander.Models;
+using RenoDXCommander.Localization;
 
 namespace RenoDXCommander.ViewModels;
 
@@ -14,9 +15,9 @@ public partial class GameCardViewModel
     // ── REF computed properties ───────────────────────────────────────────────────
 
     public string RefActionLabel => RefIsInstalling ? "Installing..."
-        : RefStatus == GameStatus.UpdateAvailable ? "⬆  Update RE Framework"
-        : RefStatus == GameStatus.Installed ? "↺  Reinstall RE Framework"
-        : "⬇  Install RE Framework";
+        : RefStatus == GameStatus.UpdateAvailable ? Loc.T("⬆  Update RE Framework")
+        : RefStatus == GameStatus.Installed ? Loc.T("↺  Reinstall RE Framework")
+        : Loc.T("⬇  Install RE Framework");
 
     public string RefBtnBackground  => RefStatus == GameStatus.UpdateAvailable ? "#201838" : "#182840";
     public string RefBtnForeground  => RefStatus == GameStatus.UpdateAvailable ? "#B898E8" : "#7AACDD";

@@ -5,6 +5,7 @@ using Microsoft.UI.Xaml.Controls;
 using RenoDXCommander.Models;
 using RenoDXCommander.Services;
 using RenoDXCommander.ViewModels;
+using RenoDXCommander.Localization;
 
 namespace RenoDXCommander;
 
@@ -163,7 +164,7 @@ public partial class DetailPanelBuilder
                 }
                 else
                 {
-                    _window.DetailRsStatus.Text = "Ready";
+                    _window.DetailRsStatus.Text = Loc.T("Ready");
                     _window.DetailRsStatus.Foreground = UIFactory.GetBrush("#A0AABB");
                     _window.DetailRsStatus.TextDecorations = Windows.UI.Text.TextDecorations.None;
                 }

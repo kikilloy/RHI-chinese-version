@@ -1,10 +1,11 @@
-﻿// DetailPanelBuilder.Overrides.ShadersAddons.cs — Shaders, Addons, Launch, and Reset Overrides sections.
+// DetailPanelBuilder.Overrides.ShadersAddons.cs — Shaders, Addons, Launch, and Reset Overrides sections.
 
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using RenoDXCommander.Models;
 using RenoDXCommander.Services;
 using RenoDXCommander.ViewModels;
+using RenoDXCommander.Localization;
 
 namespace RenoDXCommander;
 
@@ -28,7 +29,7 @@ public partial class DetailPanelBuilder
         var shadersAddonsLeftColumn = new StackPanel { Spacing = 6 };
         shadersAddonsLeftColumn.Children.Add(new TextBlock
         {
-            Text = "Shaders and Addons",
+            Text = Loc.T("Shaders and Addons"),
             FontSize = 12,
             Foreground = UIFactory.Brush(ResourceKeys.TextPrimaryBrush),
             Margin = new Thickness(0, 0, 0, 4),
@@ -106,10 +107,10 @@ public partial class DetailPanelBuilder
                 {
                     var infoDlg = new ContentDialog
                     {
-                        Title = "Select Addons",
+                        Title = Loc.T("Select Addons"),
                         Content = new TextBlock
                         {
-                            Text = "Addon service is not yet wired. Complete Task 9.1 to enable addon selection.",
+                            Text = Loc.T("Addon service is not yet wired. Complete Task 9.1 to enable addon selection."),
                             FontSize = 13,
                             Foreground = UIFactory.Brush(ResourceKeys.TextPrimaryBrush),
                         },
@@ -165,7 +166,7 @@ public partial class DetailPanelBuilder
 
         var addonLabel = new TextBlock
         {
-            Text = "Addons",
+            Text = Loc.T("Addons"),
             FontSize = 11,
             Foreground = UIFactory.Brush(ResourceKeys.TextSecondaryBrush),
         };
@@ -179,7 +180,7 @@ public partial class DetailPanelBuilder
         // "Select ReShade Preset" button
         var presetBtn = new Button
         {
-            Content = "Select ReShade Preset",
+            Content = Loc.T("Select ReShade Preset"),
             FontSize = 12,
             Height = 32,
             HorizontalAlignment = HorizontalAlignment.Stretch,
@@ -208,8 +209,8 @@ public partial class DetailPanelBuilder
                     {
                         var shaderDialog = new ContentDialog
                         {
-                            Title = "🔧 Install Shaders?",
-                            Content = "Also install the required shaders and textures?",
+                            Title = Loc.T("🔧 Install Shaders?"),
+                            Content = Loc.T("Also install the required shaders and textures?"),
                             PrimaryButtonText = "Yes",
                             CloseButtonText = "No",
                             XamlRoot = _window.Content.XamlRoot,
@@ -274,8 +275,8 @@ public partial class DetailPanelBuilder
                 : null); // exe scan deferred — label updates asynchronously
 
         var headerText = string.IsNullOrEmpty(effectiveExe)
-            ? "Launch executable"
-            : $"Launch executable  —  {effectiveExe}";
+            ? Loc.T("Launch executable")
+            : Loc.T("Launch executable  —  {0}", effectiveExe);
         var exeHeaderText = new TextBlock
         {
             Text = headerText,
@@ -306,7 +307,7 @@ public partial class DetailPanelBuilder
                     _window.DispatcherQueue?.TryEnqueue(() =>
                     {
                         if (_window.ViewModel.SelectedGame == card)
-                            exeHeaderText.Text = $"Launch executable  —  {scannedExe}";
+                            exeHeaderText.Text = Loc.T("Launch executable  —  {0}", scannedExe);
                     });
             });
         }
@@ -323,7 +324,7 @@ public partial class DetailPanelBuilder
         var launchExeBox = new TextBox
         {
             Text = currentLaunchExe,
-            PlaceholderText = "Auto-detect (or paste path)",
+            PlaceholderText = Loc.T("Auto-detect (or paste path)"),
             FontSize = 11,
             HorizontalAlignment = HorizontalAlignment.Stretch,
         };
@@ -344,13 +345,13 @@ public partial class DetailPanelBuilder
         var launchArgsBox = new TextBox
         {
             Text = currentLaunchArgs,
-            PlaceholderText = "Launch arguments",
+            PlaceholderText = Loc.T("Launch arguments"),
             FontSize = 11,
             HorizontalAlignment = HorizontalAlignment.Stretch,
         };
-        var argsTooltip = "Command-line arguments passed to the game on launch. Saves on focus lost.";
+        var argsTooltip = Loc.T("Command-line arguments passed to the game on launch. Saves on focus lost.");
         if (card.Source.Equals("Epic", StringComparison.OrdinalIgnoreCase))
-            argsTooltip += "\n\nNote: Setting arguments disables Epic protocol launch. EOS-protected games may fail to launch with arguments.";
+            argsTooltip += Loc.T("\n\nNote: Setting arguments disables Epic protocol launch. EOS-protected games may fail to launch with arguments.");
         ToolTipService.SetToolTip(launchArgsBox, argsTooltip);
         launchArgsBox.LostFocus += (s, ev) =>
         {
@@ -396,10 +397,10 @@ public partial class DetailPanelBuilder
                 var ofn = new NativeInterop.OpenFileName();
                 ofn.structSize = System.Runtime.InteropServices.Marshal.SizeOf(ofn);
                 ofn.hwndOwner = hwnd;
-                ofn.filter = "Executables (*.exe)\0*.exe\0All Files (*.*)\0*.*\0";
+                ofn.filter = Loc.T("Executables (*.exe) *.exe All Files (*.*) *.* ");
                 ofn.file = new string(new char[260]);
                 ofn.maxFile = ofn.file.Length;
-                ofn.title = "Select Game Executable";
+                ofn.title = Loc.T("Select Game Executable");
                 var browseDir = card.InstallPath is { Length: > 0 } bp && System.IO.Directory.Exists(bp) ? bp
                               : card.DetectedGame?.InstallPath is { Length: > 0 } dp && System.IO.Directory.Exists(dp) ? dp
                               : Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles);
@@ -415,7 +416,7 @@ public partial class DetailPanelBuilder
             }
         };
         Grid.SetColumn(browseLaunchBtn, 0);
-        ToolTipService.SetToolTip(browseLaunchBtn, "Browse for a game executable to use as the launch target.");
+        ToolTipService.SetToolTip(browseLaunchBtn, Loc.T("Browse for a game executable to use as the launch target."));
         launchBtnRow.Children.Add(browseLaunchBtn);
 
         var resetLaunchBtn = new Button
@@ -437,7 +438,7 @@ public partial class DetailPanelBuilder
             _window.ViewModel.SaveSettingsPublic();
         };
         Grid.SetColumn(resetLaunchBtn, 1);
-        ToolTipService.SetToolTip(resetLaunchBtn, "Clear the launch executable override and revert to auto-detection.");
+        ToolTipService.SetToolTip(resetLaunchBtn, Loc.T("Clear the launch executable override and revert to auto-detection."));
         launchBtnRow.Children.Add(resetLaunchBtn);
         Grid.SetRow(launchBtnRow, 2);
         shadersAddonsRightColumn.Children.Add(launchBtnRow);
@@ -449,7 +450,7 @@ public partial class DetailPanelBuilder
 
         var resetOverridesBtn = new Button
         {
-            Content = "Reset Overrides",
+            Content = Loc.T("Reset Overrides"),
             FontSize = 12,
             Height = 32,
             HorizontalAlignment = HorizontalAlignment.Stretch,
@@ -485,7 +486,7 @@ public partial class DetailPanelBuilder
             if (_window.ViewModel.IsUpdateAllExcludedOs(ctx.CapturedName, card.Source))
                 _window.ViewModel.ToggleUpdateAllExclusionOs(ctx.CapturedName, card.Source);
             UpdateInclusionHelper.RefreshSummary(ctx.UpdateSummaryText, _window.ViewModel, ctx.CapturedName, card.IsREEngineGame, card.DxvkEnabled, card.Source ?? "");
-            ctx.WikiExcludeCombo.SelectedItem = "Included";
+            ctx.WikiExcludeCombo.SelectedItem = Loc.T("Included");
 
             // Persist all reset values immediately
             var resetName = (ctx.OriginalStoreName ?? gameName).Trim();
