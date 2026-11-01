@@ -2,7 +2,8 @@
 
 **fork [RHI](https://github.com/RankFTW/RHI)**
 
-**better dlss5-swapper**👊👊👊  
+**[📖 详细指南](docs/DETAILED_GUIDE.zh-CN.md)**
+
 **easy to use DLSS 5**👊👊👊  
 更适合中国宝宝体质的**RHI**  
 基于原来的RHI，我为他添加了中文，同时下载组件可以走镜像站，加快下载。你也可以自己指定镜像站。
