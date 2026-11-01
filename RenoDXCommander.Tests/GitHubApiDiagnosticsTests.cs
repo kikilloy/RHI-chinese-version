@@ -46,6 +46,19 @@ public class GitHubApiDiagnosticsTests
     }
 
     [Fact]
+    public void FineGrainedTokenWithoutRepositoryAccess_PointsAtTheTokenSettings()
+    {
+        const string body = """
+        { "message": "Resource not accessible by personal access token", "documentation_url": "https://docs.github.com/rest" }
+        """;
+
+        var text = GitHubApiDiagnostics.Explain(403, body);
+        Assert.Contains("fine-grained", text, StringComparison.OrdinalIgnoreCase);
+        Assert.Contains("Public repositories", text, StringComparison.OrdinalIgnoreCase);
+        Assert.Equal("fine-grained token not allowed for this repo", GitHubApiDiagnostics.ExplainBrief(403, body));
+    }
+
+    [Fact]
     public void ForbiddenWithoutExplanation_StaysHonest()
     {
         var text = GitHubApiDiagnostics.Explain(403, null);
