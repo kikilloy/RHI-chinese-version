@@ -55,10 +55,10 @@ public partial class GameCardViewModel
                 if (effectiveStatus == GameStatus.UpdateAvailable
                     || RsStatus == GameStatus.UpdateAvailable
                     || LumaStatus == GameStatus.UpdateAvailable)
-                    return "⬆  Manage";
-                return "↺  Manage";
+                    return Loc.T("⬆  Manage");
+                return Loc.T("↺  Manage");
             }
-            return "⬇  Install";
+            return Loc.T("⬇  Install");
         }
     }
 

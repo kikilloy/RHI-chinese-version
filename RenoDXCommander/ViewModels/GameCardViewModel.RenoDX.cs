@@ -74,11 +74,11 @@ public partial class GameCardViewModel
                 // External-only: no RenoDX to install, only ReShade
                 if (RsStatus == GameStatus.UpdateAvailable) return Loc.T("⬆  Update ReShade");
                 if (RsStatus == GameStatus.Installed) return Loc.T("↺  Reinstall ReShade");
-                return "⬇  Install ReShade";
+                return Loc.T("⬇  Install ReShade");
             }
             if (AnyUpdateAvailable) return Loc.T("⬆  Update All");
             if (Status == GameStatus.Installed) return Loc.T("↺  Reinstall All");
-            return "⬇  Install All";
+            return Loc.T("⬇  Install All");
         }
     }
 

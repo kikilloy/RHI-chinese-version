@@ -146,6 +146,8 @@ WHITELIST_EXACT = {
     "ASI Loader", "Ultimate ASI Loader", "DLSS5 Tool", "DX11 Bridge", "NR Cost Scaler",
     "Cost Scaler", "MFG Ada Unlock", "20/30 FG Unlock", "RTX 40 MFG Unlock",
     "ShortFuse DLSS Tool", "MFG Unlocks", "DLSS Tool",
+    # Status words the user asked to leave alone (screenshot feedback): "就绪" reads worse than Ready.
+    "Ready",
     # Brush/colour names: XAML converts these strings to a Brush. A translation throws
     # "The value cannot be converted to type Brush" and takes the window down.
     "Transparent", "White", "Black", "Red", "Green", "Blue", "Gray", "Grey", "Orange",

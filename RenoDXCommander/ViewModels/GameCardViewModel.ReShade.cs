@@ -51,14 +51,14 @@ public partial class GameCardViewModel
             {
                 bool layerInstalled = _vulkanLayerInstalled;
                 if (RsStatus == GameStatus.UpdateAvailable && layerInstalled && IsVulkanRsActive)
-                    return "⬆  Update Vulkan ReShade";
+                    return Loc.T("⬆  Update Vulkan ReShade");
                 if (layerInstalled && IsVulkanRsActive) return Loc.T("↺  Reinstall Vulkan ReShade");
                 if (layerInstalled) return Loc.T("⬇  Install Vulkan ReShade");
-                return "⬇  Install Vulkan Layer";
+                return Loc.T("⬇  Install Vulkan Layer");
             }
-            return RsStatus == GameStatus.UpdateAvailable ? "⬆  Update ReShade"
-                 : RsStatus == GameStatus.Installed       ? "↺  Reinstall ReShade"
-                 : "⬇  Install ReShade";
+            return RsStatus == GameStatus.UpdateAvailable ? Loc.T("⬆  Update ReShade")
+                 : RsStatus == GameStatus.Installed       ? Loc.T("↺  Reinstall ReShade")
+                 : Loc.T("⬇  Install ReShade");
         }
     }
 
