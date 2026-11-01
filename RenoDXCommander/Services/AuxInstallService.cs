@@ -445,7 +445,15 @@ public partial class AuxInstallService : IAuxInstallService, IAuxFileService
 
             using (var netStream = await response.Content.ReadAsStreamAsync())
             using (var fileStream = File.Create(tempExe))
-                await netStream.CopyToAsync(fileStream);
+            {
+                await DownloadProgress.CopyWithProgressAsync(
+                    netStream,
+                    fileStream,
+                    response.Content.Headers.ContentLength,
+                    $"ReShade {version}",
+                    CancellationToken.None,
+                    fraction => progress?.Report(($"Downloading ReShade {version}...", 10 + (int)(fraction * 50))));
+            }
 
             progress?.Report(($"Extracting ReShade {version}...", 60));
 

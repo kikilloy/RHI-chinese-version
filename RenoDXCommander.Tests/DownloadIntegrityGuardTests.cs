@@ -7,6 +7,7 @@ namespace RenoDXCommander.Tests;
 /// Digest lookups must degrade quietly: no answer from GitHub means "unverified", never
 /// "installation blocked". The 24 h cache is what keeps the unauthenticated API budget intact.
 /// </summary>
+[Collection(MirrorGlobalStateCollection.Name)]
 public class DownloadIntegrityGuardTests : IDisposable
 {
     private static readonly Uri AssetUri =

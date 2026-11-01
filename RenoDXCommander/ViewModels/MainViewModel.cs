@@ -848,6 +848,9 @@ public partial class MainViewModel : ObservableObject
         _rtx40MfgService = App.Services.GetRequiredService<Rtx40MfgService>();
         _dlssg2030Service = App.Services.GetRequiredService<Dlssg20_30Service>();
         _ualService    = App.Services.GetRequiredService<UltimateAsiLoaderService>();
+
+        // Download progress (services -> status bar). Lives for the app's lifetime, like the VM.
+        DownloadProgress.Changed += NotifyActivityChanged;
         _autoUpdateService = App.Services.GetRequiredService<AutoUpdateService>();
         _autoUpdateService.SetViewModel(this);
         _customReShadeHashService = App.Services.GetRequiredService<CustomReShadeHashService>();

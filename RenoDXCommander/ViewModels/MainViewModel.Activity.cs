@@ -1,5 +1,7 @@
 // MainViewModel.Activity.cs -- What RHI is doing in the background right now, for the status bar.
 
+using RenoDXCommander.Services;
+
 namespace RenoDXCommander.ViewModels;
 
 public partial class MainViewModel
@@ -14,7 +16,15 @@ public partial class MainViewModel
     /// </summary>
     public string CurrentActivityText
     {
-        get { lock (_activityLock) return _activities.Count > 0 ? _activities[^1].Text : ""; }
+        get
+        {
+            // A running download is the most useful thing to show — it is what the user is
+            // staring at the window for. It wins over "Checking for updates...".
+            var downloading = DownloadProgress.Current;
+            if (!string.IsNullOrEmpty(downloading)) return downloading;
+
+            lock (_activityLock) return _activities.Count > 0 ? _activities[^1].Text : "";
+        }
     }
 
     /// <summary>

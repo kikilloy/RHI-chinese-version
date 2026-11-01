@@ -8,6 +8,7 @@ namespace RenoDXCommander.Tests;
 /// custom prefix → manifest prefix list → built-in defaults, and it must never end up with an
 /// unusable (http, relative, or GitHub) prefix.
 /// </summary>
+[Collection(MirrorGlobalStateCollection.Name)]
 public class MirrorRuntimeTests : IDisposable
 {
     public void Dispose() => MirrorRuntime.Reset();

@@ -12,6 +12,7 @@ namespace RenoDXCommander.Tests;
 /// circuit breaker. These tests drive the real handler with a fake inner handler, so ordering,
 /// the 15 s budget and the "never retry a POST" rule are covered without a network.
 /// </summary>
+[Collection(MirrorGlobalStateCollection.Name)]
 public class MirrorRewriteHandlerTests : IDisposable
 {
     private static readonly string[] OneMirror = { "https://m1.example/" };

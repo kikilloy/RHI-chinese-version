@@ -146,7 +146,9 @@ public class Dlssg20_30Service
                 await using var net  = await response.Content.ReadAsStreamAsync().ConfigureAwait(false);
                 await using var file = new FileStream(zipPath, FileMode.Create, FileAccess.Write, FileShare.None,
                     bufferSize: 1024 * 1024, useAsync: true);
-                await net.CopyToAsync(file).ConfigureAwait(false);
+                await DownloadProgress.CopyWithProgressAsync(
+                    net, file, response.Content.Headers.ContentLength, "20/30 FG Unlock", CancellationToken.None,
+                    fraction => progress?.Report(("Downloading 20/30 FG Unlock...", 10 + (int)(fraction * 50)))).ConfigureAwait(false);
             }
 
             progress?.Report(("Extracting 20/30 FG Unlock...", 70));

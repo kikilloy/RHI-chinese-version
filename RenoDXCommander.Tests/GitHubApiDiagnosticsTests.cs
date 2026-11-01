@@ -7,6 +7,7 @@ namespace RenoDXCommander.Tests;
 /// "Verification skipped" is only useful if it says why. These are the GitHub API failure shapes
 /// seen in practice: a revoked token looks exactly like a rate limit (403) until you read the body.
 /// </summary>
+[Collection(MirrorGlobalStateCollection.Name)]
 public class GitHubApiDiagnosticsTests
 {
     private const string BadCredentials = """

@@ -149,7 +149,10 @@ public class ReShadeNightlyService
             {
                 using (var netStream = await response.Content.ReadAsStreamAsync())
                 using (var fileStream = File.Create(tempZip))
-                    await netStream.CopyToAsync(fileStream);
+                {
+                    await DownloadProgress.CopyWithProgressAsync(
+                        netStream, fileStream, response.Content.Headers.ContentLength, "ReShade Nightly", CancellationToken.None);
+                }
 
                 zipSize = new FileInfo(tempZip).Length;
 

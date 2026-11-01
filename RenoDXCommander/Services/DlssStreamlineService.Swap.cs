@@ -455,7 +455,9 @@ public partial class DlssStreamlineService
             Directory.CreateDirectory(cacheDir);
             var tempZip = Path.Combine(cacheDir, "download.zip.tmp");
 
-            using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(120));
+            // A 44 MB package on a slow mirror needs more than the original 2 minutes; a hard
+            // timeout here is what produced "Download timed out" on a direct connection.
+            using var cts = new CancellationTokenSource(TimeSpan.FromMinutes(10));
             using var response = await _http.GetAsync(url, HttpCompletionOption.ResponseHeadersRead, cts.Token).ConfigureAwait(false);
             if (!response.IsSuccessStatusCode)
             {
@@ -466,7 +468,10 @@ public partial class DlssStreamlineService
             using (var stream = await response.Content.ReadAsStreamAsync(cts.Token).ConfigureAwait(false))
             using (var file = new FileStream(tempZip, FileMode.Create, FileAccess.Write, FileShare.None, 1024 * 1024, useAsync: true))
             {
-                await stream.CopyToAsync(file, cts.Token).ConfigureAwait(false);
+                // These packages are 40+ MB; without a visible progress line the window looks
+                // frozen for a minute (see DownloadProgress).
+                await DownloadProgress.CopyWithProgressAsync(
+                    stream, file, response.Content.Headers.ContentLength, expectedDllName, cts.Token).ConfigureAwait(false);
             }
 
             // Extract the DLL from the zip
@@ -509,7 +514,7 @@ public partial class DlssStreamlineService
             Directory.CreateDirectory(cacheDir);
             var tempZip = Path.Combine(cacheDir, "download.zip.tmp");
 
-            using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(120));
+            using var cts = new CancellationTokenSource(TimeSpan.FromMinutes(10));
             using var response = await _http.GetAsync(url, HttpCompletionOption.ResponseHeadersRead, cts.Token).ConfigureAwait(false);
             if (!response.IsSuccessStatusCode)
             {
@@ -520,7 +525,8 @@ public partial class DlssStreamlineService
             using (var stream = await response.Content.ReadAsStreamAsync(cts.Token).ConfigureAwait(false))
             using (var file = new FileStream(tempZip, FileMode.Create, FileAccess.Write, FileShare.None, 1024 * 1024, useAsync: true))
             {
-                await stream.CopyToAsync(file, cts.Token).ConfigureAwait(false);
+                await DownloadProgress.CopyWithProgressAsync(
+                    stream, file, response.Content.Headers.ContentLength, "Streamline", cts.Token).ConfigureAwait(false);
             }
 
             // Extract all sl.*.dll files from the zip (flat structure)

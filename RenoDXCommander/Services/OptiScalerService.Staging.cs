@@ -455,9 +455,16 @@ public partial class OptiScalerService
                     return;
                 }
 
-                var bytes = await dlResp.Content.ReadAsByteArrayAsync();
-                await File.WriteAllBytesAsync(stagedAsiPath, bytes);
-                CrashReporter.Log($"[OptiScalerService.EnsureOptiPatcherStagingAsync] Downloaded {bytes.Length} bytes");
+                // Stream to disk instead of buffering the whole file in memory, with a visible
+                // progress line and a moving dialog bar.
+                await using (var net = await dlResp.Content.ReadAsStreamAsync())
+                await using (var file = new FileStream(stagedAsiPath, FileMode.Create, FileAccess.Write, FileShare.None, 1024 * 1024, useAsync: true))
+                {
+                    await DownloadProgress.CopyWithProgressAsync(
+                        net, file, dlResp.Content.Headers.ContentLength, "OptiPatcher", CancellationToken.None,
+                        fraction => progress?.Report(($"Downloading OptiPatcher ({version})...", 30 + (int)(fraction * 30))));
+                }
+                CrashReporter.Log($"[OptiScalerService.EnsureOptiPatcherStagingAsync] Downloaded {new FileInfo(stagedAsiPath).Length} bytes");
             }
             catch (Exception ex)
             {

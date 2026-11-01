@@ -80,7 +80,15 @@ public class REFrameworkService : IREFrameworkService
 
             await using (var fs = new FileStream(zipPath, FileMode.Create, FileAccess.Write, FileShare.None))
             {
-                await response.Content.CopyToAsync(fs);
+                // Keep the dialog bar moving 10 -> 50% while the zip streams in, and show the
+                // byte counter in the status bar (this is the download users call "slow").
+                await DownloadProgress.CopyWithProgressAsync(
+                    await response.Content.ReadAsStreamAsync(),
+                    fs,
+                    response.Content.Headers.ContentLength,
+                    "RE Framework",
+                    CancellationToken.None,
+                    fraction => progress?.Report(("Downloading RE Framework...", 10 + (int)(fraction * 40))));
             }
 
             progress?.Report(("Extracting dinput8.dll...", 50));
@@ -277,7 +285,13 @@ public class REFrameworkService : IREFrameworkService
             {
                 response.EnsureSuccessStatusCode();
                 await using var fs = new FileStream(outerZipPath, FileMode.Create, FileAccess.Write, FileShare.None);
-                await response.Content.CopyToAsync(fs);
+                await DownloadProgress.CopyWithProgressAsync(
+                    await response.Content.ReadAsStreamAsync(),
+                    fs,
+                    response.Content.Headers.ContentLength,
+                    "PD-Upscaler RE Framework",
+                    CancellationToken.None,
+                    fraction => progress?.Report(("Downloading PD-Upscaler REFramework...", 10 + (int)(fraction * 30))));
             }
 
             progress?.Report(("Extracting PD-Upscaler REFramework...", 40));

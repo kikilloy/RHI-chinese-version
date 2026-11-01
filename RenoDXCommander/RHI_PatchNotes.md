@@ -20,6 +20,10 @@ If you use **Sign in with GitHub**, click **Sign out** in the same place, revoke
 - **Test mirrors** downloads a small file through every mirror in the list and reports the time for each, so you can see which one is actually fast for you.
 - **Verify downloads** (on by default) compares mirrored files against the hash GitHub publishes. If a mirror returns a different file, RHI rejects it, marks that mirror as unreliable and falls back to the direct connection. When GitHub cannot provide that hash — an expired token or a used-up rate limit, for example — the Downloads section tells you which one it is instead of skipping the check silently.
 
+**Download progress**
+- Component downloads now show what they are doing instead of working silently. The status bar counts bytes and speed ("Downloading nvngx_dlss.dll: 12.3/44.5 MB (27%) · 0.95 MB/s"), and the progress bar in the install dialog moves during the download instead of sitting still. Applies to the DLSS/Streamline packages, RE Framework and ReShade.
+- The DLSS/Streamline download timeout went from 2 to 10 minutes, so a slow-but-working connection can finish instead of being cut off.
+
 **Per-game FPS limit**
 - Driver Settings on each game's page now has an FPS Limit option, so you can cap a single game without setting a limit for every game. Global follows the limit on the Settings page, Off turns the driver limit off for that game, and Custom... lets you enter any value from 20 to 1000. Restore Defaults has moved to the bottom row of Driver Settings to make room.
 
