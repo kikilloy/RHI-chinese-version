@@ -4,7 +4,7 @@
 
 RHI finds your games across eight storefronts, then installs, updates and removes ReShade, RenoDX and Luma HDR mods, frame limiters, DLSS/Streamline files, OptiScaler, Neural Rendering tools and more, with per-game control over every one of them.
 
-**[Download the latest release](https://github.com/RankFTW/RHI/releases/latest)** · **[Detailed Guide](docs/DETAILED_GUIDE.md)** · **[Discord](https://discord.gg/ultraplace)**
+**[Download the latest release](https://github.com/kikilloy/RHI-chinese-version/releases/latest)** · **[Detailed Guide](docs/DETAILED_GUIDE.md)** · **[Discord](https://discord.gg/ultraplace)**
 
 ![RHI showing a game's detail panel with Components, Neural Rendering and Extras](screenshots/game_view.png)
 
