@@ -68,7 +68,7 @@ GLOSSARY: list[tuple[str, str]] = [
     ("Patch notes", "更新日志"), ("Troubleshooting", "故障排查"),
     # Feature names that stay English (user preference): the Chinese ones are harder to spot.
     ("Neural Rendering", "Neural Rendering"), ("DLSS Super Resolution", "DLSS Super Resolution"),
-    ("Ray Reconstruction", "Ray Reconstruction"),
+    ("Ray Reconstruction", "Ray Reconstruction"), ("DLSS Enabler", "DLSS Enabler"),
 ]
 
 PLACEHOLDER_RE = re.compile(r"\{\d+(?::[^}]*)?\}")

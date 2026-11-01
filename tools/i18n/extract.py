@@ -141,7 +141,7 @@ WHITELIST_EXACT = {
     # Technical feature names the user asked to keep in English (screenshot feedback, 2026-11-01):
     # "神经网络渲染" and "DLSS 超分辨率技术" are harder to recognise than the originals.
     "Neural Rendering", "Neural Rendering (nvngx_dlssnr.dll)", "DLSS Super Resolution",
-    "Ray Reconstruction",
+    "Ray Reconstruction", "DLSS Enabler",
     # Brush/colour names: XAML converts these strings to a Brush. A translation throws
     # "The value cannot be converted to type Brush" and takes the window down.
     "Transparent", "White", "Black", "Red", "Green", "Blue", "Gray", "Grey", "Orange",
