@@ -66,6 +66,9 @@ GLOSSARY: list[tuple[str, str]] = [
     ("Cancel", "取消"), ("Close", "关闭"), ("Refresh", "刷新"), ("Mirror", "镜像"),
     ("Integrity", "完整性"), ("Fallback", "回退"), ("Game library", "游戏库"),
     ("Patch notes", "更新日志"), ("Troubleshooting", "故障排查"),
+    # Feature names that stay English (user preference): the Chinese ones are harder to spot.
+    ("Neural Rendering", "Neural Rendering"), ("DLSS Super Resolution", "DLSS Super Resolution"),
+    ("Ray Reconstruction", "Ray Reconstruction"),
 ]
 
 PLACEHOLDER_RE = re.compile(r"\{\d+(?::[^}]*)?\}")

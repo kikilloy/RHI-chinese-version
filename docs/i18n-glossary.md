@@ -11,6 +11,7 @@
 | 厂商/平台 | NVIDIA、AMD、Intel、Steam、Epic、GOG、Xbox、Game Pass、Nexus、PCGamingWiki、Discord |
 | 渠道/模式值 | Stable、Nightly、Development、Global、Custom、Select、Off、Auto |
 | 技术标识 | 文件名、路径、.ini 键名、版本号（v2.0.1）、日志文本、游戏名、存档/插件文件名 |
+| 功能名（保留英文） | **Neural Rendering、DLSS Super Resolution、Ray Reconstruction** —— 主人 2026-11-01 看截图时明确要求：译成"神经网络渲染""DLSS 超分辨率技术""射线重建"反而认不出来，用原文。它们已进 `extract.py` 白名单，不会再被采集/翻译。`Frame Generation`（帧生成）等其余功能名沿用现有译法，除非主人另外指定 |
 
 ## 2. 统一译法（必译）
 
