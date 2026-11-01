@@ -285,7 +285,9 @@ public partial class SettingsHandler
         var skipReason = MirrorRuntime.IntegritySkipReason;
         if (settings.VerifyDownloads && !string.IsNullOrWhiteSpace(skipReason))
         {
-            text += Loc.T("\nLast mirrored download was NOT verified: {0}", skipReason);
+            // GitHubApiDiagnostics returns stable English text (tests assert on it, and it goes to
+            // the log too), so it is translated here, where it is actually shown.
+            text += Loc.T("\nLast mirrored download was NOT verified: {0}", Loc.T(skipReason));
             warn = true;
         }
 

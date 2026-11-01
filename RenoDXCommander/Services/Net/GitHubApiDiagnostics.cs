@@ -5,6 +5,7 @@
 // anonymous limit, or GitHub is simply down. Pure functions so the wording is unit-tested.
 
 using System.Text.Json;
+using RenoDXCommander.Localization;
 
 namespace RenoDXCommander.Services.Net;
 
@@ -29,7 +30,7 @@ public static class GitHubApiDiagnostics
         if (statusCode == 403 && MentionsFineGrainedDenial(message))
         {
             return "This fine-grained token (github_pat_…) is not allowed to read this repository — "
-                 + "edit it and give it Public repositories (read-only) access, or use a classic token (ghp_…) with no scopes";
+                 + Loc.T("edit it and give it Public repositories (read-only) access, or use a classic token (ghp_…) with no scopes");
         }
 
         if (statusCode == 403)

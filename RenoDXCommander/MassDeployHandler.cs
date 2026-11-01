@@ -4,6 +4,7 @@ using Microsoft.UI.Xaml.Controls;
 using RenoDXCommander.Models;
 using RenoDXCommander.Services;
 using RenoDXCommander.ViewModels;
+using RenoDXCommander.Localization;
 
 namespace RenoDXCommander;
 
@@ -29,9 +30,9 @@ public class MassDeployHandler
             var eligible = _window.ViewModel.AllCards.Where(c => c.RsStatus == GameStatus.Installed && !string.IsNullOrEmpty(c.InstallPath)).ToList();
             var confirmDialog = new ContentDialog
             {
-                Title = "Confirm Mass Deployment",
-                Content = $"This will deploy ReShade.ini to {eligible.Count} game(s) with ReShade installed.\n\nCustom hotkey and screenshot path settings are preserved.\n\nContinue?",
-                PrimaryButtonText = "Deploy",
+                Title = Loc.T("Confirm Mass Deployment"),
+                Content = Loc.T("This will deploy ReShade.ini to {0} game(s) with ReShade installed.\n\nCustom hotkey and screenshot path settings are preserved.\n\nContinue?", eligible.Count),
+                PrimaryButtonText = Loc.T("Deploy"),
                 CloseButtonText = "Cancel",
                 XamlRoot = _window.Content.XamlRoot,
                 RequestedTheme = ElementTheme.Dark,
@@ -81,7 +82,7 @@ public class MassDeployHandler
             var confirmDialog = new ContentDialog
             {
                 Title = "Confirm Mass Deployment",
-                Content = $"This will deploy relimiter.ini to {eligible.Count} game(s) with ReLimiter installed.\n\nContinue?",
+                Content = Loc.T("This will deploy relimiter.ini to {0} game(s) with ReLimiter installed.\n\nContinue?", eligible.Count),
                 PrimaryButtonText = "Deploy",
                 CloseButtonText = "Cancel",
                 XamlRoot = _window.Content.XamlRoot,
@@ -122,7 +123,7 @@ public class MassDeployHandler
             var confirmDialog = new ContentDialog
             {
                 Title = "Confirm Mass Deployment",
-                Content = $"This will deploy DisplayCommander.ini to {eligible.Count} game(s) with Display Commander installed.\n\nContinue?",
+                Content = Loc.T("This will deploy DisplayCommander.ini to {0} game(s) with Display Commander installed.\n\nContinue?", eligible.Count),
                 PrimaryButtonText = "Deploy",
                 CloseButtonText = "Cancel",
                 XamlRoot = _window.Content.XamlRoot,
@@ -172,7 +173,7 @@ public class MassDeployHandler
             var confirmDialog = new ContentDialog
             {
                 Title = "Confirm Mass Deployment",
-                Content = $"This will deploy OptiScaler.ini to {eligible.Count} game(s) with OptiScaler installed.\n\nContinue?",
+                Content = Loc.T("This will deploy OptiScaler.ini to {0} game(s) with OptiScaler installed.\n\nContinue?", eligible.Count),
                 PrimaryButtonText = "Deploy",
                 CloseButtonText = "Cancel",
                 XamlRoot = _window.Content.XamlRoot,
@@ -210,11 +211,11 @@ public class MassDeployHandler
     private async Task ShowDeployResult(string iniName, int count)
     {
         var message = count > 0
-            ? $"✅ Deployed {iniName} to {count} game(s)."
-            : $"No games found with the corresponding component installed.";
+            ? Loc.T("✅ Deployed {0} to {1} game(s).", iniName, count)
+            : Loc.T("No games found with the corresponding component installed.");
         var dialog = new ContentDialog
         {
-            Title = "Mass INI Deployment",
+            Title = Loc.T("Mass INI Deployment"),
             Content = message,
             CloseButtonText = "OK",
             XamlRoot = _window.Content.XamlRoot,
@@ -239,8 +240,8 @@ public class MassDeployHandler
         {
             var noGamesDialog = new ContentDialog
             {
-                Title = "No Games Available",
-                Content = "No games with ReShade installed were found. Install ReShade on at least one game first.",
+                Title = Loc.T("No Games Available"),
+                Content = Loc.T("No games with ReShade installed were found. Install ReShade on at least one game first."),
                 CloseButtonText = "OK",
                 XamlRoot = xamlRoot,
                 RequestedTheme = ElementTheme.Dark,
@@ -255,14 +256,14 @@ public class MassDeployHandler
         // Select All / Deselect All buttons
         var selectAllBtn = new Button
         {
-            Content = "Select All",
+            Content = Loc.T("Select All"),
             FontSize = 11,
             Padding = new Thickness(8, 4, 8, 4),
             Margin = new Thickness(0, 0, 8, 8),
         };
         var deselectAllBtn = new Button
         {
-            Content = "Deselect All",
+            Content = Loc.T("Deselect All"),
             FontSize = 11,
             Padding = new Thickness(8, 4, 8, 4),
             Margin = new Thickness(0, 0, 0, 8),
@@ -347,8 +348,8 @@ public class MassDeployHandler
         // ── 4. Offer shader installation ─────────────────────────────────────
         var shaderDialog = new ContentDialog
         {
-            Title = "🔧 Install Shaders?",
-            Content = $"Presets deployed to {selectedGames.Count} game(s).\n\nAlso install the required shader packs for these games?",
+            Title = Loc.T("🔧 Install Shaders?"),
+            Content = Loc.T("Presets deployed to {0} game(s).\n\nAlso install the required shader packs for these games?", selectedGames.Count),
             PrimaryButtonText = "Yes",
             CloseButtonText = "No",
             XamlRoot = xamlRoot,

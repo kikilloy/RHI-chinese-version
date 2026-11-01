@@ -4,6 +4,7 @@ using CommunityToolkit.Mvvm.Input;
 using Microsoft.Extensions.DependencyInjection;
 using RenoDXCommander.Models;
 using RenoDXCommander.Services;
+using RenoDXCommander.Localization;
 
 namespace RenoDXCommander.ViewModels;
 
@@ -120,7 +121,7 @@ public partial class MainViewModel
             card.IsExternalOnly = effectiveMod?.SnapshotUrl == null &&
                                   (effectiveMod?.NexusUrl != null || effectiveMod?.DiscordUrl != null);
             card.ExternalUrl    = effectiveMod?.NexusUrl ?? effectiveMod?.DiscordUrl ?? "";
-            card.ExternalLabel  = effectiveMod?.NexusUrl != null ? "Download from Nexus Mods" : "Download from Discord";
+            card.ExternalLabel  = effectiveMod?.NexusUrl != null ? Loc.T("Download from Nexus Mods") : Loc.T("Download from Discord");
             card.NexusUrl       = effectiveMod?.NexusUrl;
             card.DiscordUrl     = effectiveMod?.DiscordUrl;
             card.WikiStatus     = (mod == null && fallback != null && !card.UseUeExtended && !card.IsNativeHdrGame)
@@ -665,9 +666,9 @@ public partial class MainViewModel
                            ? (useUeExt && engine == EngineType.Unknown ? FormatEngineHint(EngineType.Unreal, scanPath) : engineOverrideLabel)
                            : (useUeExt && engine == EngineType.Unknown) ? FormatEngineHint(EngineType.Unreal, scanPath)
                            : engine == EngineType.Unreal       ? FormatEngineHint(EngineType.Unreal, scanPath)
-                           : engine == EngineType.UnrealLegacy ? "Unreal (Legacy)"
+                           : engine == EngineType.UnrealLegacy ? Loc.T("Unreal (Legacy)")
                            : engine == EngineType.Unity        ? "Unity"
-                           : engine == EngineType.REEngine     ? "RE Engine" : "",
+                           : engine == EngineType.REEngine     ? Loc.T("RE Engine") : "",
             Notes          = effectiveMod != null ? BuildNotes(game.Name, effectiveMod, fallback, _genericNotes, isNativeHdr) : "",
             InstalledAddonFileName = record?.AddonFileName,
             RdxInstalledVersion = record != null ? AuxInstallService.ReadInstalledVersion(record.InstallPath, record.AddonFileName) : null,
@@ -716,7 +717,7 @@ public partial class MainViewModel
         if (game.Name.Equals("Ryubing", StringComparison.OrdinalIgnoreCase))
         {
             card.IsEmulator = true;
-            card.VulkanRenderingPath = "Vulkan"; // Force Vulkan ReShade
+            card.VulkanRenderingPath = Loc.T("Vulkan"); // Force Vulkan ReShade
             if (_manifest?.EmulatorGames?.TryGetValue("Ryubing", out var emuConfig) == true)
             {
                 card.EmulatorAddonNames = emuConfig.Addons;
@@ -834,7 +835,7 @@ public partial class MainViewModel
             card.Mod.SnapshotUrl = card.Mod.SnapshotUrl32;
         if (string.IsNullOrEmpty(card.InstallPath))
         {
-            card.ActionMessage = "No install path — use 📁 to pick the game folder.";
+            card.ActionMessage = Loc.T("No install path — use 📁 to pick the game folder.");
             return;
         }
 
@@ -1030,7 +1031,7 @@ public partial class MainViewModel
                 card.InstalledAddonFileName = record.AddonFileName;
                 card.RdxInstalledVersion    = AuxInstallService.ReadInstalledVersion(record.InstallPath, record.AddonFileName);
                 card.Status                 = GameStatus.Installed;
-                card.FadeMessage(m => card.ActionMessage = m, "✅ Installed! Press Home in-game to open ReShade.");
+                card.FadeMessage(m => card.ActionMessage = m, Loc.T("✅ Installed! Press Home in-game to open ReShade."));
                 _crashReporter.Log($"[MainViewModel.InstallModAsync] Install complete: {card.GameName} — {record.AddonFileName}");
                 // Reset Nexus baseline so update indicator clears after install
                 _nexusUpdateService.ResetBaseline(card.GameName);
@@ -1052,7 +1053,7 @@ public partial class MainViewModel
         catch (Exception ex)
         {
             DispatcherQueue?.TryEnqueue(() => card.ActionMessage = $"❌ Failed: {ex.Message}");
-            _crashReporter.WriteCrashReport("InstallModAsync", ex, note: $"Game: {card.GameName}, Path: {card.InstallPath}");
+            _crashReporter.WriteCrashReport("InstallModAsync", ex, note: Loc.T("Game: {0}, Path: {1}", card.GameName, card.InstallPath));
         }
         finally
         {
@@ -1083,7 +1084,7 @@ public partial class MainViewModel
         card.InstalledAddonFileName = null;
         card.RdxInstalledVersion    = null;
         card.Status                 = GameStatus.Available;
-        card.ActionMessage          = "✖ Mod removed.";
+        card.ActionMessage          = Loc.T("✖ Mod removed.");
         card.FadeMessage(m => card.ActionMessage = m, card.ActionMessage);
         // Clear the addon file cache so the next Refresh doesn't think a file is still there.
         if (!string.IsNullOrEmpty(card.InstallPath))

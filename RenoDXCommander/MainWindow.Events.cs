@@ -9,6 +9,7 @@ using Microsoft.UI.Xaml.Media;
 using RenoDXCommander.Models;
 using RenoDXCommander.Services;
 using RenoDXCommander.ViewModels;
+using RenoDXCommander.Localization;
 
 namespace RenoDXCommander;
 
@@ -30,16 +31,9 @@ public sealed partial class MainWindow
 
             var dialog = new ContentDialog
             {
-                Title = "Full Refresh",
-                Content = "This will clear all caches and re-scan everything from scratch:\n\n" +
-                          "• Re-detects all games from every storefront\n" +
-                          "• Re-scans DLSS/Streamline DLL paths\n" +
-                          "• Re-detects graphics APIs and engine types\n" +
-                          "• Rebuilds shader and addon deployment state\n\n" +
-                          "Try a normal Refresh first — it handles most issues without the full rescan. " +
-                          "Use Full Refresh as a last resort if games are missing, paths have changed, DLSS has been added to a game, or the DLSS section is missing from a game card.\n\n" +
-                          "The next couple of restarts may take a few seconds longer while caches are rebuilt.\n\n" +
-                          "Do not close RHI while the refresh is in progress — closing early will result in a missing library and the scan will need to be repeated.",
+                Title = Loc.T("Full Refresh"),
+                Content = Loc.T("This will clear all caches and re-scan everything from scratch:\n\n") +
+                          Loc.T("• Re-detects all games from every storefront\n• Re-scans DLSS/Streamline DLL paths\n• Re-detects graphics APIs and engine types\n• Rebuilds shader and addon deployment state\n\nTry a normal Refresh first — it handles most issues without the full rescan. Use Full Refresh as a last resort if games are missing, paths have changed, DLSS has been added to a game, or the DLSS section is missing from a game card.\n\nThe next couple of restarts may take a few seconds longer while caches are rebuilt.\n\nDo not close RHI while the refresh is in progress — closing early will result in a missing library and the scan will need to be repeated."),
                 PrimaryButtonText = "Continue",
                 CloseButtonText = "Cancel",
                 DefaultButton = ContentDialogButton.Close,
@@ -68,14 +62,14 @@ public sealed partial class MainWindow
             var progressPanel = new StackPanel { Spacing = 8 };
             var progressRow = new StackPanel { Orientation = Microsoft.UI.Xaml.Controls.Orientation.Horizontal, Spacing = 12 };
             var progressRing = new ProgressRing { IsActive = true, Width = 20, Height = 20 };
-            var progressText = new TextBlock { Text = "Fetching manifest...", FontSize = 13, Foreground = UIFactory.Brush(ResourceKeys.TextSecondaryBrush) };
+            var progressText = new TextBlock { Text = Loc.T("Fetching manifest..."), FontSize = 13, Foreground = UIFactory.Brush(ResourceKeys.TextSecondaryBrush) };
             progressRow.Children.Add(progressRing);
             progressRow.Children.Add(progressText);
             progressPanel.Children.Add(progressRow);
 
             var progressDialog = new ContentDialog
             {
-                Title = "Checking for updates...",
+                Title = Loc.T("Checking for updates..."),
                 Content = progressPanel,
                 XamlRoot = Content.XamlRoot,
                 RequestedTheme = ElementTheme.Dark,
@@ -90,7 +84,7 @@ public sealed partial class MainWindow
                 ViewModel.ForceNextUpdateCheck();
 
                 // Trigger a Refresh (which fetches manifests + wiki + runs update checks)
-                DispatcherQueue?.TryEnqueue(() => progressText.Text = "Checking components...");
+                DispatcherQueue?.TryEnqueue(() => progressText.Text = Loc.T("Checking components..."));
                 await ViewModel.RefreshAsync();
 
                 // A manual check restarts the 4-hour background countdown (shown on the Settings page)
@@ -100,7 +94,7 @@ public sealed partial class MainWindow
                 ViewModel.TriggerAutoUpdate();
 
                 // Check app update
-                DispatcherQueue?.TryEnqueue(() => progressText.Text = "Checking app version...");
+                DispatcherQueue?.TryEnqueue(() => progressText.Text = Loc.T("Checking app version..."));
                 // The update prompt needs the same modal slot; close progress first.
                 await progressSession.DisposeAsync();
                 await _dialogService.CheckForAppUpdateAsync();
@@ -159,22 +153,21 @@ public sealed partial class MainWindow
             // Only for Unreal Engine games that have a Luma mod
             if (card.LumaMod == null)
             {
-                cog.AddEmpty("There's no Luma mod for this game, so there's nothing to set here.");
+                cog.AddEmpty(Loc.T("There's no Luma mod for this game, so there's nothing to set here."));
             }
             else if (card.EngineHint?.Contains("Unreal") != true)
             {
-                cog.AddEmpty("Luma's settings are for Unreal Engine games. This game has nothing to set here.");
+                cog.AddEmpty(Loc.T("Luma's settings are for Unreal Engine games. This game has nothing to set here."));
             }
             else
             {
-                cog.AddSection("Unreal Engine");
+                cog.AddSection(Loc.T("Unreal Engine"));
 
                 // ── HDR on First Boot ──────────────────────────────────────────────
                 var currentHdr = AuxInstallService.GetLumaReshadeIniValue(card.InstallPath, "EnableHDR");
                 // Default = key absent or never set by RHI; Off = "0"; On = "1"
-                cog.AddCombo("HDR on First Boot",
-                    "Sets EnableHDR and DisplayMode in the [Luma] section of reshade.ini. " +
-                    "Default leaves both to Luma; Off sets them to 0; On sets them to 1.",
+                cog.AddCombo(Loc.T("HDR on First Boot"),
+                    Loc.T("Sets EnableHDR and DisplayMode in the [Luma] section of reshade.ini. Default leaves both to Luma; Off sets them to 0; On sets them to 1."),
                     new[] { "Default", "Off", "On" },
                     currentHdr == null ? 0 : currentHdr == "0" ? 1 : 2,
                     i =>
@@ -183,22 +176,21 @@ public sealed partial class MainWindow
                         {
                             AuxInstallService.RemoveLumaReshadeIniValue(card.InstallPath, "EnableHDR");
                             AuxInstallService.RemoveLumaReshadeIniValue(card.InstallPath, "DisplayMode");
-                            cog.SetSuccess("HDR reset to Luma default.");
+                            cog.SetSuccess(Loc.T("HDR reset to Luma default."));
                         }
                         else
                         {
                             bool hdrOn = i == 2;
                             AuxInstallService.SetLumaReshadeIniValue(card.InstallPath, "EnableHDR", hdrOn ? "1" : "0");
                             AuxInstallService.SetLumaReshadeIniValue(card.InstallPath, "DisplayMode", hdrOn ? "1" : "0");
-                            cog.SetSuccess(hdrOn ? "HDR turned on in reshade.ini." : "HDR turned off in reshade.ini.");
+                            cog.SetSuccess(hdrOn ? Loc.T("HDR turned on in reshade.ini.") : Loc.T("HDR turned off in reshade.ini."));
                         }
                         CrashReporter.Log($"[MainWindow.LumaCogButton_Click] HDR on First Boot = {i} for '{card.GameName}'");
                     });
 
                 // ── TAA Settings ───────────────────────────────────────────────────
-                cog.AddCombo("TAA Settings",
-                    "On writes r.DefaultFeature.AntiAliasing=2 and r.PostProcessAAQuality=4 to Engine.ini, " +
-                    "forcing high-quality TAA for Luma HDR compatibility. Off removes them.",
+                cog.AddCombo(Loc.T("TAA Settings"),
+                    Loc.T("On writes r.DefaultFeature.AntiAliasing=2 and r.PostProcessAAQuality=4 to Engine.ini, forcing high-quality TAA for Luma HDR compatibility. Off removes them."),
                     new[] { "Off", "On" },
                     ViewModel.IsLumaTaaEnabled(card.GameName) ? 1 : 0,
                     i =>
@@ -213,7 +205,7 @@ public sealed partial class MainWindow
                             AuxInstallService.ApplyEngineIniCustomKeys(
                                 card.InstallPath, taaKeys, card.EngineIniProjectOverride, card.GameName, card.Source);
                             ViewModel.SetLumaTaaEnabled(card.GameName, true);
-                            cog.SetSuccess("TAA settings written to Engine.ini.");
+                            cog.SetSuccess(Loc.T("TAA settings written to Engine.ini."));
                         }
                         else
                         {
@@ -222,7 +214,7 @@ public sealed partial class MainWindow
                                 taaKeys.Select(k => k.Key),
                                 card.EngineIniProjectOverride, card.GameName, card.Source);
                             ViewModel.SetLumaTaaEnabled(card.GameName, false);
-                            cog.SetSuccess("TAA settings removed from Engine.ini.");
+                            cog.SetSuccess(Loc.T("TAA settings removed from Engine.ini."));
                         }
                         CrashReporter.Log($"[MainWindow.LumaCogButton_Click] TAA Settings = {(i == 1 ? "On" : "Off")} for '{card.GameName}'");
                     });
@@ -290,8 +282,8 @@ public sealed partial class MainWindow
             {
                 await DialogService.ShowSafeAsync(new ContentDialog
                 {
-                    Title = "Support the Mod Authors",
-                    Content = "No donation links available.",
+                    Title = Loc.T("Support the Mod Authors"),
+                    Content = Loc.T("No donation links available."),
                     CloseButtonText = "Close",
                     XamlRoot = Content.XamlRoot,
                     RequestedTheme = ElementTheme.Dark,
@@ -304,7 +296,7 @@ public sealed partial class MainWindow
 
             var intro = new TextBlock
             {
-                Text = "These are the people who make the mods RHI manages. If you enjoy their work, consider supporting them.",
+                Text = Loc.T("These are the people who make the mods RHI manages. If you enjoy their work, consider supporting them."),
                 FontSize = 12,
                 Foreground = UIFactory.Brush(ResourceKeys.TextSecondaryBrush),
                 TextWrapping = TextWrapping.Wrap,
@@ -314,7 +306,7 @@ public sealed partial class MainWindow
 
             var warning = new TextBlock
             {
-                Text = "⚠ Important: To receive early access to RenoDX mods, you MUST link your Discord account to Ko-fi BEFORE donating. Donations made without linking first cannot be retroactively credited.",
+                Text = Loc.T("⚠ Important: To receive early access to RenoDX mods, you MUST link your Discord account to Ko-fi BEFORE donating. Donations made without linking first cannot be retroactively credited."),
                 FontSize = 12,
                 Foreground = UIFactory.GetBrush("#F0A500"),
                 TextWrapping = TextWrapping.Wrap,
@@ -399,7 +391,7 @@ public sealed partial class MainWindow
 
             var dialog = new ContentDialog
             {
-                Title = "❤ Support the Mod Authors",
+                Title = Loc.T("❤ Support the Mod Authors"),
                 Content = scroll,
                 CloseButtonText = "Close",
                 XamlRoot = Content.XamlRoot,
@@ -501,7 +493,7 @@ public sealed partial class MainWindow
                 if (requiresVulkan)
                     ViewModel.DeployShadersForCard(gameName);
 
-                card.RsActionMessage = "✅ reshade.ini merged into game folder.";
+                card.RsActionMessage = Loc.T("✅ reshade.ini merged into game folder.");
             }
             catch (Exception ex)
             {
@@ -524,7 +516,7 @@ public sealed partial class MainWindow
             {
                 var installPath = card.InstallPath;
                 await Task.Run(() => AuxInstallService.CopyUlIni(installPath));
-                card.UlActionMessage = "✅ relimiter.ini copied to game folder.";
+                card.UlActionMessage = Loc.T("✅ relimiter.ini copied to game folder.");
             }
             catch (Exception ex)
             {
@@ -547,7 +539,7 @@ public sealed partial class MainWindow
             {
                 var installPath = card.InstallPath;
                 await Task.Run(() => AuxInstallService.CopyDcIni(installPath));
-                card.DcActionMessage = "✅ DisplayCommander.ini copied to game folder.";
+                card.DcActionMessage = Loc.T("✅ DisplayCommander.ini copied to game folder.");
                 card.FadeMessage(m => card.DcActionMessage = m, card.DcActionMessage);
             }
             catch (Exception ex)
@@ -572,7 +564,7 @@ public sealed partial class MainWindow
                 var sourceIni = Services.OptiScalerService.OsIniPath;
                 if (!File.Exists(sourceIni))
                 {
-                    card.OsActionMessage = "❌ No OptiScaler.ini found in INIs folder.";
+                    card.OsActionMessage = Loc.T("❌ No OptiScaler.ini found in INIs folder.");
                     return;
                 }
                 var installPath = card.InstallPath;
@@ -582,7 +574,7 @@ public sealed partial class MainWindow
                     File.Copy(sourceIni, destIni, overwrite: true);
                     Services.OptiScalerService.EnforceLoadReshade(destIni);
                 });
-                card.OsActionMessage = "✅ OptiScaler.ini copied to game folder.";
+                card.OsActionMessage = Loc.T("✅ OptiScaler.ini copied to game folder.");
                 card.FadeMessage(m => card.OsActionMessage = m, card.OsActionMessage);
             }
             catch (Exception ex)
@@ -655,7 +647,7 @@ public sealed partial class MainWindow
         // ── Open Folder ──
         var openFolderItem = new MenuFlyoutItem
         {
-            Text = "Open Folder",
+            Text = Loc.T("Open Folder"),
             Tag = card,
         };
         openFolderItem.Click += CardOpenFolder_Click;
@@ -664,7 +656,7 @@ public sealed partial class MainWindow
         // ── Favourite ──
         var favItem = new MenuFlyoutItem
         {
-            Text = card.IsFavourite ? "Unfavourite" : "Favourite",
+            Text = card.IsFavourite ? Loc.T("Unfavourite") : "Favourite",
             Tag  = card,
         };
         favItem.Click += (s, ev) => ViewModel.ToggleFavouriteCommand.Execute(card);
@@ -673,7 +665,7 @@ public sealed partial class MainWindow
         // ── Hide / Show ──
         var hideItem = new MenuFlyoutItem
         {
-            Text = card.IsHidden ? "Show" : "Hide",
+            Text = card.IsHidden ? Loc.T("Show") : Loc.T("Hide"),
             Tag = card,
         };
         hideItem.Click += (s, ev) => ViewModel.ToggleHideGameCommand.Execute(card);
@@ -686,7 +678,7 @@ public sealed partial class MainWindow
         {
             var discussionItem = new MenuFlyoutItem
             {
-                Text = "Discussion / Instructions",
+                Text = Loc.T("Discussion / Instructions"),
                 Tag = card,
             };
             discussionItem.Click += async (s, ev) =>
@@ -702,7 +694,7 @@ public sealed partial class MainWindow
         {
             var notesItem = new MenuFlyoutItem
             {
-                Text = "View Notes",
+                Text = Loc.T("View Notes"),
                 Tag = card,
             };
             notesItem.Click += async (s, ev) =>
@@ -719,7 +711,7 @@ public sealed partial class MainWindow
         menu.Items.Add(new MenuFlyoutSeparator());
         var shortcutItem = new MenuFlyoutItem
         {
-            Text = "Create Desktop Shortcut",
+            Text = Loc.T("Create Desktop Shortcut"),
             Tag  = card,
         };
         shortcutItem.Click += async (s, ev) => await CreateDesktopShortcutAsync(card);
@@ -738,8 +730,8 @@ public sealed partial class MainWindow
                 card.GameName, card, _gameNameService, ViewModel.Manifest, http, pcgw);
 
             var msg = lnkPath != null
-                ? $"Shortcut created on Desktop for {card.GameName}"
-                : $"Failed to create shortcut for {card.GameName}";
+                ? Loc.T("Shortcut created on Desktop for {0}", card.GameName)
+                : Loc.T("Failed to create shortcut for {0}", card.GameName);
             ShowStatusBarMessage(msg, TimeSpan.FromSeconds(8));
         }
         catch (Exception ex)
@@ -963,7 +955,7 @@ public sealed partial class MainWindow
             var currentQuery = SearchBox.Text?.Trim() ?? "";
             if (string.IsNullOrEmpty(currentQuery)) return;
 
-            var nameBox = new TextBox { PlaceholderText = "Filter name", Text = currentQuery, Width = 350 };
+            var nameBox = new TextBox { PlaceholderText = Loc.T("Filter name"), Text = currentQuery, Width = 350 };
             var errorText = new TextBlock
             {
                 Text = "",
@@ -975,7 +967,7 @@ public sealed partial class MainWindow
 
             var dialog = new ContentDialog
             {
-                Title = "Save Custom Filter",
+                Title = Loc.T("Save Custom Filter"),
                 Content = new StackPanel
                 {
                     Spacing = 8,
@@ -983,7 +975,7 @@ public sealed partial class MainWindow
                     {
                         new TextBlock
                         {
-                            Text = $"Save the current search \"{currentQuery}\" as a custom filter:",
+                            Text = Loc.T("Save the current search \"{0}\" as a custom filter:", currentQuery),
                             TextWrapping = TextWrapping.Wrap,
                             Foreground = Brush(ResourceKeys.TextSecondaryBrush),
                         },
@@ -1004,14 +996,14 @@ public sealed partial class MainWindow
                 var name = nameBox.Text?.Trim() ?? "";
                 if (string.IsNullOrEmpty(name))
                 {
-                    errorText.Text = "Please enter a filter name.";
+                    errorText.Text = Loc.T("Please enter a filter name.");
                     errorText.Visibility = Visibility.Visible;
                     args.Cancel = true;
                     return;
                 }
                 if (ViewModel.Filter.CustomFilterNameExists(name))
                 {
-                    errorText.Text = $"A filter named \"{name}\" already exists.";
+                    errorText.Text = Loc.T("A filter named \"{0}\" already exists.", name);
                     errorText.Visibility = Visibility.Visible;
                     args.Cancel = true;
                     return;
@@ -1113,10 +1105,10 @@ public sealed partial class MainWindow
                     var ofn = new NativeInterop.OpenFileName();
                     ofn.structSize = System.Runtime.InteropServices.Marshal.SizeOf(ofn);
                     ofn.hwndOwner = hwnd;
-                    ofn.filter = "Executables (*.exe)\0*.exe\0All Files (*.*)\0*.*\0";
+                    ofn.filter = Loc.T("Executables (*.exe) *.exe All Files (*.*) *.* ");
                     ofn.file = new string(new char[260]);
                     ofn.maxFile = ofn.file.Length;
-                    ofn.title = "Select Game Executable";
+                    ofn.title = Loc.T("Select Game Executable");
                     ofn.flags = 0x00080000 | 0x00001000; // OFN_EXPLORER | OFN_FILEMUSTEXIST
 
                     return NativeInterop.GetOpenFileName(ref ofn) ? ofn.file.TrimEnd('\0') : null;
@@ -1143,18 +1135,18 @@ public sealed partial class MainWindow
             nameBox.SelectAll();
             var nameDialog = new ContentDialog
             {
-                Title           = "Name This Game",
+                Title           = Loc.T("Name This Game"),
                 Content         = new StackPanel
                 {
                     Spacing = 10,
                     Children =
                     {
-                        new TextBlock { Text = $"Selected: {filePath}", TextWrapping = TextWrapping.Wrap, Foreground = Brush(ResourceKeys.TextSecondaryBrush), FontSize = 11 },
-                        new TextBlock { Text = "Enter the game name:", TextWrapping = TextWrapping.Wrap, Foreground = Brush(ResourceKeys.TextSecondaryBrush) },
+                        new TextBlock { Text = Loc.T("Selected: {0}", filePath), TextWrapping = TextWrapping.Wrap, Foreground = Brush(ResourceKeys.TextSecondaryBrush), FontSize = 11 },
+                        new TextBlock { Text = Loc.T("Enter the game name:"), TextWrapping = TextWrapping.Wrap, Foreground = Brush(ResourceKeys.TextSecondaryBrush) },
                         nameBox
                     }
                 },
-                PrimaryButtonText   = "Add Game",
+                PrimaryButtonText   = Loc.T("Add Game"),
                 CloseButtonText     = "Cancel",
                 XamlRoot            = Content.XamlRoot,
                 Background          = Brush(ResourceKeys.SurfaceToolbarBrush),
@@ -1184,7 +1176,7 @@ public sealed partial class MainWindow
     private void Filter_Click(object sender, RoutedEventArgs e)
     {
         if (sender is not Button btn) return;
-        ViewModel.SetFilterCommand.Execute(btn.Tag as string ?? "Detected");
+        ViewModel.SetFilterCommand.Execute(btn.Tag as string ?? Loc.T("Detected"));
         RefreshFilterButtonStyles();
     }
 
@@ -1230,12 +1222,11 @@ public sealed partial class MainWindow
             {
                 var warningDialog = new ContentDialog
                 {
-                    Title = "⚠ ReShade Addons",
+                    Title = Loc.T("⚠ ReShade Addons"),
                     Content = new TextBlock
                     {
-                        Text = "ReShade addons are advanced features intended for experienced users who understand what they are.\n\n" +
-                               "Addons can modify game rendering behaviour and may cause instability. " +
-                               "Only proceed if you are comfortable managing ReShade addons.",
+                        Text = Loc.T("ReShade addons are advanced features intended for experienced users who understand what they are.\n\n") +
+                               Loc.T("Addons can modify game rendering behaviour and may cause instability. Only proceed if you are comfortable managing ReShade addons."),
                         TextWrapping = Microsoft.UI.Xaml.TextWrapping.Wrap,
                         MaxWidth = 450,
                     },

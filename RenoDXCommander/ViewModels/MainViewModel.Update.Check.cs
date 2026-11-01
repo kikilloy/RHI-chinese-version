@@ -1,6 +1,7 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection;
 using RenoDXCommander.Models;
 using RenoDXCommander.Services;
+using RenoDXCommander.Localization;
 
 namespace RenoDXCommander.ViewModels;
 
@@ -285,8 +286,8 @@ public partial class MainViewModel
                         App.Services.GetRequiredService<IUpdateLogService>().Record(new Models.UpdateLogEntry
                         {
                             Timestamp     = DateTime.UtcNow,
-                            Category      = "Component",
-                            ComponentName = "RTX Encore",
+                            Category      = Loc.T("Component"),
+                            ComponentName = Loc.T("RTX Encore"),
                             OldVersion    = rtxOldVersion,
                             NewVersion    = rtxEncoreSvc.StagedVersion,
                         });

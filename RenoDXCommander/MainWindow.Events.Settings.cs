@@ -1234,7 +1234,7 @@ public sealed partial class MainWindow
                 // Writing to HKLM requires admin — use a reg.exe process with elevation
                 var regValue = value.ToString();
                 var psi = new System.Diagnostics.ProcessStartInfo("reg.exe",
-                    Loc.T("add \"HKLM\\SOFTWARE\\NVIDIA Corporation\\Global\\NGXCore\" /v ShowDlssIndicator /t REG_DWORD /d {0} /f", regValue))
+                    $"add \"HKLM\\SOFTWARE\\NVIDIA Corporation\\Global\\NGXCore\" /v ShowDlssIndicator /t REG_DWORD /d {regValue} /f")
                 {
                     UseShellExecute = true,
                     Verb = "runas",

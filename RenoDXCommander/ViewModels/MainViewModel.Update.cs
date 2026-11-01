@@ -1,8 +1,9 @@
-﻿// MainViewModel.Update.cs -- Update-all commands, update checking, UL caching, and version management.
+// MainViewModel.Update.cs -- Update-all commands, update checking, UL caching, and version management.
 
 using Microsoft.Extensions.DependencyInjection;
 using RenoDXCommander.Models;
 using RenoDXCommander.Services;
+using RenoDXCommander.Localization;
 
 namespace RenoDXCommander.ViewModels;
 
@@ -84,7 +85,7 @@ public partial class MainViewModel
                     if (gd?.FileName != null)
                     {
                         var fi = System.Diagnostics.FileVersionInfo.GetVersionInfo(gd.FileName);
-                        gpuDriver = $" | GPU driver: {gd.ModuleName} v{fi.FileVersion}";
+                        gpuDriver = Loc.T(" | GPU driver: {0} v{1}", gd.ModuleName, fi.FileVersion);
                     }
                 }
                 catch (Exception) { /* at-freeze diagnostic only; driver version is optional */ }
@@ -412,7 +413,7 @@ public partial class MainViewModel
         try
         {
             var path = AppPaths.InExeDir("RHI_PatchNotes.md");
-            if (!File.Exists(path)) return "Patch notes file not found.";
+            if (!File.Exists(path)) return Loc.T("Patch notes file not found.");
 
             var lines = File.ReadAllLines(path);
             var sections = new List<string>();
@@ -460,7 +461,7 @@ public partial class MainViewModel
 
             var body = sections.Count > 0
                 ? string.Join("\n\n---\n\n", sections)
-                : "No patch notes available.";
+                : Loc.T("No patch notes available.");
 
             // Prepend preamble (e.g. the GitHub API warning banner) if present
             var preambleText = string.Join("\n", preamble).Trim();

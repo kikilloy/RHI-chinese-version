@@ -1,6 +1,7 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection;
 using RenoDXCommander.Models;
 using RenoDXCommander.Services;
+using RenoDXCommander.Localization;
 
 namespace RenoDXCommander.ViewModels;
 
@@ -131,18 +132,18 @@ public partial class MainViewModel
                             var delta = thread1.TotalProcessorTime - t0.Value;
                             cpuIdle = delta.TotalMilliseconds < 900;
                             cpuInfo = cpuIdle
-                                ? $"IDLE ({delta.TotalMilliseconds:F0}ms/1s — waiting on lock or native call)"
-                                : $"PEGGED ({delta.TotalMilliseconds:F0}ms/1s — layout or compute loop)";
+                                ? Loc.T("IDLE ({0:F0}ms/1s — waiting on lock or native call)", delta.TotalMilliseconds)
+                                : Loc.T("PEGGED ({0:F0}ms/1s — layout or compute loop)", delta.TotalMilliseconds);
                         }
-                        else cpuInfo = "UI thread not found in process";
+                        else cpuInfo = Loc.T("UI thread not found in process");
                     }
-                    else cpuInfo = "UI thread ID not captured";
+                    else cpuInfo = Loc.T("UI thread ID not captured");
                 }
                 catch (Exception ex) { cpuInfo = $"CPU sample failed: {ex.Message}"; }
 
                 // ── 3. WM_NULL pump probe ─────────────────────────────────────────
                 bool pumpAlive = false;
-                string pumpInfo = "hwnd not captured";
+                string pumpInfo = Loc.T("hwnd not captured");
                 try
                 {
                     var hwnd = MainWindowHwnd;
@@ -155,7 +156,7 @@ public partial class MainViewModel
                         pumpAlive = smtResult != IntPtr.Zero;
                         bool isHung = NativeInterop.IsHungAppWindow(hwnd);
                         pumpInfo = pumpAlive
-                            ? "responded (pump alive)"
+                            ? Loc.T("responded (pump alive)")
                             : $"timed out (pump not responding) | IsHungAppWindow={isHung}";
                     }
                 }
@@ -166,7 +167,7 @@ public partial class MainViewModel
                 if (recentActions.Count > 0)
                 {
                     var summary = string.Join(" → ", recentActions);
-                    if (summary.Length > 4096) summary = summary.Substring(0, 4096) + "… (truncated)";
+                    if (summary.Length > 4096) summary = summary.Substring(0, 4096) + Loc.T("… (truncated)");
                     CrashReporter.LogSync($"[Heartbeat] Recent UI actions: {summary}");
                 }
 
@@ -217,7 +218,7 @@ public partial class MainViewModel
                                 var state = uiThread.ThreadState;
                                 string waitInfo = state == System.Diagnostics.ThreadState.Wait
                                     ? $"WaitReason={uiThread.WaitReason} ({(int)uiThread.WaitReason})"
-                                    : "N/A (not in Wait state)";
+                                    : Loc.T("N/A (not in Wait state)");
                                 CrashReporter.LogSync($"[Heartbeat.Wait] UI thread state={state} | {waitInfo}");
                             }
                             else CrashReporter.LogSync($"[Heartbeat.Wait] UI thread not found (OSId={uiNativeId})");
@@ -313,7 +314,7 @@ public partial class MainViewModel
                             var createRuntime = firstVersion.GetType().GetMethod("CreateRuntime", Type.EmptyTypes);
                             var runtime = createRuntime?.Invoke(firstVersion, null);
                             if (runtime == null) { CrashReporter.LogSync("[Heartbeat.Stack] ClrMD: CreateRuntime returned null"); return; }
-                            var threads = runtime.GetType().GetProperty("Threads")?.GetValue(runtime) as System.Collections.IEnumerable;
+                            var threads = runtime.GetType().GetProperty(Loc.T("Threads"))?.GetValue(runtime) as System.Collections.IEnumerable;
                             var sb = new System.Text.StringBuilder();
                             sb.AppendLine("[Heartbeat.Stack] Managed thread stacks at time of freeze:");
                             int threadCount = 0;
@@ -322,7 +323,7 @@ public partial class MainViewModel
                                 foreach (var thread in threads)
                                 {
                                     threadCount++;
-                                    var osId = (uint)(thread.GetType().GetProperty("OSThreadId")?.GetValue(thread) ?? 0u);
+                                    var osId = (uint)(thread.GetType().GetProperty(Loc.T("OSThreadId"))?.GetValue(thread) ?? 0u);
                                     var managedId = (int)(thread.GetType().GetProperty("ManagedThreadId")?.GetValue(thread) ?? 0);
                                     bool isUiThread = UiThreadNativeId > 0 && osId == UiThreadNativeId;
                                     sb.AppendLine($"  Thread OSId={osId}{(isUiThread ? " <-- UI THREAD" : "")} ManagedId={managedId}");
@@ -331,8 +332,8 @@ public partial class MainViewModel
                                         var enumStackTrace = thread.GetType().GetMethod("EnumerateStackTrace", new[] { typeof(bool) });
                                         var frames = enumStackTrace?.Invoke(thread, new object[] { true }) as System.Collections.IEnumerable;
                                         int frameCount = 0;
-                                        if (frames != null) foreach (var frame in frames) { sb.AppendLine($"    {frame}"); if (++frameCount >= 40) { sb.AppendLine("    ... (truncated)"); break; } }
-                                        if (frameCount == 0) sb.AppendLine($"    (0 managed frames)");
+                                        if (frames != null) foreach (var frame in frames) { sb.AppendLine($"    {frame}"); if (++frameCount >= 40) { sb.AppendLine(Loc.T("    ... (truncated)")); break; } }
+                                        if (frameCount == 0) sb.AppendLine(Loc.T("    (0 managed frames)"));
                                     }
                                     catch (Exception frameEx) { sb.AppendLine($"    (frame enumeration threw: {frameEx.GetType().Name}: {frameEx.Message})"); }
                                 }
@@ -395,7 +396,7 @@ public partial class MainViewModel
                                 }
                                 catch (Exception pruneEx) { CrashReporter.LogSync($"[Heartbeat.Dump] Prune failed: {pruneEx.Message}"); }
 
-                                var timestamp = DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss UTC");
+                                var timestamp = DateTime.UtcNow.ToString(Loc.T("yyyy-MM-dd HH:mm:ss UTC"));
                                 CrashReporter.LogSync($"[Heartbeat.Dump] Writing minidump at {timestamp} to '{dumpPath}'...");
                                 var pendingMarker = System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "RHI", "rhi_pending_dump");
                                 try { System.IO.File.WriteAllText(pendingMarker, dumpPath); } catch { }

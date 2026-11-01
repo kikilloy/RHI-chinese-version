@@ -1,0 +1,50 @@
+[
+  {
+    "file": "RenoDXCommander/DialogService.Game.cs",
+    "start": 32,
+    "end": 34,
+    "key": "RHI cannot identify this file as ReShade or Display Commander. It may belong to another mod (e.g. DXVK, Special K, ENB).\n\nOverwriting it may break the existing mod. Do you want to proceed?"
+  },
+  {
+    "file": "RenoDXCommander/DialogService.Game.cs",
+    "start": 232,
+    "end": 233,
+    "key": "It works at the GPU level without injecting DLLs into the game, making it compatible with anti-cheat systems.\n\nRequires: NVIDIA App installed, Game Filter/Freestyle enabled, RTX GPU, driver 550+."
+  },
+  {
+    "file": "RenoDXCommander/DialogService.Game.cs",
+    "start": 832,
+    "end": 835,
+    "key": "Installing the Vulkan ReShade layer requires writing to C:\\ProgramData\\ReShade\\ and modifying system registry keys, which needs administrator privileges.\n\nEnable Admin Mode — RHI will always launch elevated (no UAC prompt after setup).\n\nRestart as Admin — one-time elevated restart to complete this install."
+  },
+  {
+    "file": "RenoDXCommander/InstallEventHandler.cs",
+    "start": 537,
+    "end": 538,
+    "key": "There's no guarantee they'll work well together. If you're using RenoDX for HDR and just want Luma for DLAA, make sure to disable HDR in the Luma mod settings to avoid conflicts.\n\nIf something doesn't look right, uninstalling one of them is the first thing to try. We can't offer support for issues that come from running both together."
+  },
+  {
+    "file": "RenoDXCommander/MainWindow.Events.cs",
+    "start": 36,
+    "end": 43,
+    "key": "• Re-detects all games from every storefront\n• Re-scans DLSS/Streamline DLL paths\n• Re-detects graphics APIs and engine types\n• Rebuilds shader and addon deployment state\n\nTry a normal Refresh first — it handles most issues without the full rescan. Use Full Refresh as a last resort if games are missing, paths have changed, DLSS has been added to a game, or the DLSS section is missing from a game card.\n\nThe next couple of restarts may take a few seconds longer while caches are rebuilt.\n\nDo not close RHI while the refresh is in progress — closing early will result in a missing library and the scan will need to be repeated."
+  },
+  {
+    "file": "RenoDXCommander/MainWindow.Events.cs",
+    "start": 177,
+    "end": 178,
+    "key": "Sets EnableHDR and DisplayMode in the [Luma] section of reshade.ini. Default leaves both to Luma; Off sets them to 0; On sets them to 1."
+  },
+  {
+    "file": "RenoDXCommander/MainWindow.Events.cs",
+    "start": 201,
+    "end": 202,
+    "key": "On writes r.DefaultFeature.AntiAliasing=2 and r.PostProcessAAQuality=4 to Engine.ini, forcing high-quality TAA for Luma HDR compatibility. Off removes them."
+  },
+  {
+    "file": "RenoDXCommander/MainWindow.Events.cs",
+    "start": 1238,
+    "end": 1239,
+    "key": "Addons can modify game rendering behaviour and may cause instability. Only proceed if you are comfortable managing ReShade addons."
+  }
+]

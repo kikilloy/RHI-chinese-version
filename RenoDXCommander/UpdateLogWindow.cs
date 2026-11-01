@@ -9,6 +9,7 @@ using Microsoft.UI.Xaml.Media;
 using RenoDXCommander.Models;
 using RenoDXCommander.Services;
 using WinRT.Interop;
+using RenoDXCommander.Localization;
 
 namespace RenoDXCommander;
 
@@ -25,7 +26,7 @@ public sealed class UpdateLogWindow : Window
     {
         _updateLogService = updateLogService;
 
-        Title = "Component Updates";
+        Title = Loc.T("Component Updates");
 
         // Size — 720 × 500 logical px, DPI-scaled
         var hwnd = WindowNative.GetWindowHandle(this);
@@ -109,14 +110,14 @@ public sealed class UpdateLogWindow : Window
         };
         var entries = _updateLogService.GetAll();
         countText.Text = entries.Count == 0
-            ? "No updates recorded yet."
+            ? Loc.T("No updates recorded yet.")
             : $"{entries.Count} update{(entries.Count == 1 ? "" : "s")} recorded";
         Grid.SetColumn(countText, 0);
         footerRow.Children.Add(countText);
 
         var clearBtn = new Button
         {
-            Content     = "Clear History",
+            Content     = Loc.T("Clear History"),
             FontSize    = 11,
             Padding     = new Thickness(10, 4, 10, 4),
             Margin      = new Thickness(0, 0, 8, 0),
@@ -165,7 +166,7 @@ public sealed class UpdateLogWindow : Window
         {
             listPanel.Children.Add(new TextBlock
             {
-                Text       = "No component updates have been recorded yet.\n\nUpdates are captured whenever RHI downloads a new version of ReShade, RenoDX addons, shader packs, OptiScaler, Display Commander, or other components.",
+                Text       = Loc.T("No component updates have been recorded yet.\n\nUpdates are captured whenever RHI downloads a new version of ReShade, RenoDX addons, shader packs, OptiScaler, Display Commander, or other components."),
                 FontSize   = 12,
                 Foreground = UIFactory.Brush(ResourceKeys.TextTertiaryBrush),
                 TextWrapping = TextWrapping.Wrap,
@@ -181,8 +182,8 @@ public sealed class UpdateLogWindow : Window
         string GroupLabel(DateTime dt)
         {
             var d = dt.ToLocalTime().Date;
-            if (d == today)     return "Today";
-            if (d == yesterday) return "Yesterday";
+            if (d == today)     return Loc.T("Today");
+            if (d == yesterday) return Loc.T("Yesterday");
             return d.ToString("d MMMM yyyy");
         }
 

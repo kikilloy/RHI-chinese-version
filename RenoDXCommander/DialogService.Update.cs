@@ -3,6 +3,7 @@ using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media;
 using RenoDXCommander.Services;
 using RenoDXCommander.ViewModels;
+using RenoDXCommander.Localization;
 
 namespace RenoDXCommander;
 
@@ -78,7 +79,7 @@ public partial class DialogService
     {
         var dlg = new ContentDialog
         {
-            Title   = "🔄 Update Available",
+            Title   = Loc.T("🔄 Update Available"),
             Content = new StackPanel
             {
                 Spacing = 8,
@@ -89,15 +90,15 @@ public partial class DialogService
                         TextWrapping = TextWrapping.Wrap,
                         Foreground   = Brush(ResourceKeys.TextSecondaryBrush),
                         FontSize     = 14,
-                        Text         = $"A new version of RHI is available!\n\n" +
-                                       $"Installed:  v{updateInfo.CurrentVersion}\n" +
-                                       $"Available:  v{updateInfo.DisplayVersion ?? updateInfo.RemoteVersion.ToString()}\n\n" +
-                                       "Would you like to update now?",
+                        Text         = Loc.T("A new version of RHI is available!\n\n") +
+                                       Loc.T("Installed:  v{0}\n", updateInfo.CurrentVersion) +
+                                       Loc.T("Available:  v{0}\n\nWould you like to update now?",
+                                           updateInfo.DisplayVersion ?? updateInfo.RemoteVersion.ToString()),
                     },
                 },
             },
-            PrimaryButtonText   = "Update Now",
-            CloseButtonText     = "Later",
+            PrimaryButtonText   = Loc.T("Update Now"),
+            CloseButtonText     = Loc.T("Later"),
             XamlRoot            = _window.Content.XamlRoot,
             Background          = Brush(ResourceKeys.SurfaceRaisedBrush),
             RequestedTheme      = ElementTheme.Dark,
@@ -115,7 +116,7 @@ public partial class DialogService
         // Create a non-dismissable progress dialog
         var progressText = new TextBlock
         {
-            Text         = "Starting download...",
+            Text         = Loc.T("Starting download..."),
             TextWrapping = TextWrapping.Wrap,
             Foreground   = Brush(ResourceKeys.TextSecondaryBrush),
             FontSize     = 13,
@@ -130,7 +131,7 @@ public partial class DialogService
         };
         var downloadDlg = new ContentDialog
         {
-            Title   = "⬇ Downloading Update",
+            Title   = Loc.T("⬇ Downloading Update"),
             Content = new StackPanel
             {
                 Spacing = 12,
@@ -162,7 +163,7 @@ public partial class DialogService
         if (string.IsNullOrEmpty(installerPath))
         {
             // Download failed — update dialog to show error with a Close button
-            progressText.Text = "❌ Download failed. Please try again later or download manually from GitHub.";
+            progressText.Text = Loc.T("❌ Download failed. Please try again later or download manually from GitHub.");
             progressBar.Value = 0;
             downloadDlg.CloseButtonText = "Close";
             await progressSession.Completion;
@@ -214,7 +215,7 @@ public partial class DialogService
             try
             {
                 Directory.CreateDirectory(PatchNotesDir);
-                File.WriteAllText(markerFile, $"Patch notes shown for v{versionStr}");
+                File.WriteAllText(markerFile, Loc.T("Patch notes shown for v{0}", versionStr));
             }
             catch (Exception ex)
             {
@@ -262,7 +263,7 @@ public partial class DialogService
 
         var dlg = new ContentDialog
         {
-            Title              = "📋 Patch Notes — What's New",
+            Title              = Loc.T("📋 Patch Notes — What's New"),
             Content            = scrollViewer,
             CloseButtonText    = "Close",
             XamlRoot           = _window.Content.XamlRoot,
@@ -314,7 +315,7 @@ public partial class DialogService
     {
         var dlg = new ContentDialog
         {
-            Title = "📢 Message from RHI",
+            Title = Loc.T("📢 Message from RHI"),
             Content = new ScrollViewer
             {
                 Content = new TextBlock

@@ -29,6 +29,7 @@ Usage:
 from __future__ import annotations
 
 import argparse
+import html
 import json
 import os
 import re
@@ -334,6 +335,17 @@ def looks_like_ui_text(text: str) -> str | None:
     # Command lines (/Query /TN, -applaunch ...) must never be translated.
     if re.match(r"^(/[A-Za-z]|--?[A-Za-z])", t):
         return "command line"
+    # "channel={0}, useNormalReShade={1}", "Handles={0} Threads={1}" - diagnostic format strings.
+    if re.search(r"[A-Za-z_]\w*=\{\d", t):
+        return "technical format"
+    # Regex patterns ("Unreal Engine \d") - translating one breaks the match.
+    if re.search(r"\\[dDwWsSbB]", t):
+        return "regex pattern"
+    # Command lines with switches: reg.exe "add ... /v X /t REG_DWORD /f", 7z "x \"..\" -o\"..\" -y".
+    if re.search(r"\s/[a-zA-Z]\s", t) or re.match(r"^x\s+\"", t) or re.search(r"\s-[a-zA-Z]\"", t):
+        return "command line"
+    if re.search(r"\b(HKLM|HKCU|SOFTWARE\\|REG_DWORD|REG_SZ)\b", t):
+        return "registry"
     if re.search(r"%[0-9]*[sdfux]", t):
         return "printf format"
     if re.fullmatch(r"[\w.\-+]+@[\w.\-]+", t):
@@ -349,10 +361,13 @@ def looks_like_ui_text(text: str) -> str | None:
             # "TitleBarButtonPressedBackground": a resource key, not a label.
             if CAMEL_CASE_RE.match(t):
                 return "resource key"
+            # "Souperman9", "DLSSG20": identifiers and handles, not words.
+            if any(ch.isdigit() for ch in t):
+                return "identifier with digits"
             return None
         return "single token"
     # Multi-word: reject things that look like code.
-    if re.search(r"[{};=<>|&]", t) and not PLACEHOLDER_RE.search(t):
+    if re.search(r"[{};=<>|]", t) and not PLACEHOLDER_RE.search(t):
         return "code-like"
     if re.fullmatch(r"[\W\d_ ]+", t):
         return "no words"
@@ -433,7 +448,9 @@ def extract_xaml(path: Path, rel: str, wave: str) -> tuple[list[Candidate], Coun
         if stripped.startswith("<!--"):
             continue
         for m in XAML_ATTR_RE.finditer(line):
-            value = m.group(2).strip()
+            # XAML escapes & as &amp; ("Accounts &amp; Data"); the UI shows the unescaped text,
+            # which is what the language pack must be keyed by.
+            value = html.unescape(m.group(2).strip())
             if not value or value.startswith("{"):
                 continue
             reason = looks_like_ui_text(value)

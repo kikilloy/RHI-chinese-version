@@ -9,6 +9,7 @@ using Microsoft.UI.Xaml.Media;
 using RenoDXCommander.Models;
 using RenoDXCommander.Services;
 using RenoDXCommander.ViewModels;
+using RenoDXCommander.Localization;
 
 namespace RenoDXCommander;
 
@@ -41,7 +42,7 @@ public sealed partial class MainWindow
 
             var dialog = new ContentDialog
             {
-                Title = "Updating All Components",
+                Title = Loc.T("Updating All Components"),
                 Content = panel,
                 XamlRoot = Content.XamlRoot,
                 RequestedTheme = ElementTheme.Dark,
@@ -54,39 +55,39 @@ public sealed partial class MainWindow
             {
                 if (!ViewModel.Settings.GlobalSkipRsUpdates)
                 {
-                    statusText.Text = "Updating ReShade...";
+                    statusText.Text = Loc.T("Updating ReShade...");
                     await ViewModel.UpdateAllReShadeAsync();
                 }
                 if (!ViewModel.Settings.GlobalSkipRdxUpdates)
                 {
-                    statusText.Text = "Updating RenoDX...";
+                    statusText.Text = Loc.T("Updating RenoDX...");
                     await ViewModel.UpdateAllRenoDxAsync();
                 }
                 if (!ViewModel.Settings.GlobalSkipUlUpdates)
                 {
-                    statusText.Text = "Updating ReLimiter...";
+                    statusText.Text = Loc.T("Updating ReLimiter...");
                     await ViewModel.UpdateAllUlAsync();
                 }
                 if (!ViewModel.Settings.GlobalSkipDcUpdates)
                 {
-                    statusText.Text = "Updating Display Commander...";
+                    statusText.Text = Loc.T("Updating Display Commander...");
                     await ViewModel.UpdateAllDcAsync();
                 }
                 if (!ViewModel.Settings.GlobalSkipOsUpdates)
                 {
-                    statusText.Text = "Updating OptiScaler...";
+                    statusText.Text = Loc.T("Updating OptiScaler...");
                     await ViewModel.UpdateAllOsAsync();
                 }
                 if (!ViewModel.Settings.GlobalSkipRefUpdates)
                 {
-                    statusText.Text = "Updating RE Framework...";
+                    statusText.Text = Loc.T("Updating RE Framework...");
                     await ViewModel.UpdateAllRefAsync();
                 }
-                statusText.Text = "Updating DXVK...";
+                statusText.Text = Loc.T("Updating DXVK...");
                 await ViewModel.UpdateAllDxvkAsync();
-                statusText.Text = "Updating Luma...";
+                statusText.Text = Loc.T("Updating Luma...");
                 await ViewModel.UpdateAllLumaAsync();
-                statusText.Text = "Updating DOF Fix...";
+                statusText.Text = Loc.T("Updating DOF Fix...");
                 await ViewModel.UpdateAllDofFixAsync();
             }
             catch (Exception ex)
@@ -165,14 +166,14 @@ public sealed partial class MainWindow
             if (sender is not FrameworkElement { Tag: GameCardViewModel card }) return;
 
             // Build DXVK info content with game-specific notes from manifest
-            var content = "DXVK translates DirectX 8/9/10/11 API calls into Vulkan.\n\n"
+            var content = Loc.T("DXVK translates DirectX 8/9/10/11 API calls into Vulkan.\n\n")
                 + "Benefits:\n"
-                + "• Enables ReShade compute shaders on older DX games\n"
-                + "• May improve performance and reduce shader stutter\n"
+                + Loc.T("• Enables ReShade compute shaders on older DX games\n")
+                + Loc.T("• May improve performance and reduce shader stutter\n")
                 + "• Enables HDR output via dxvk.conf\n"
-                + "• Borderless fullscreen recommended over exclusive fullscreen\n\n"
-                + "⚠ Anti-cheat games may ban players using DXVK.\n"
-                + "⚠ Game overlays (Steam, NVIDIA, RTSS) may conflict.";
+                + Loc.T("• Borderless fullscreen recommended over exclusive fullscreen\n\n")
+                + Loc.T("⚠ Anti-cheat games may ban players using DXVK.\n")
+                + Loc.T("⚠ Game overlays (Steam, NVIDIA, RTSS) may conflict.");
 
             // Append game-specific notes from manifest
             var manifest = ViewModel.Manifest;
@@ -180,12 +181,12 @@ public sealed partial class MainWindow
                 && manifest.DxvkGameNotes.TryGetValue(card.GameName, out var noteEntry)
                 && !string.IsNullOrWhiteSpace(noteEntry.Notes))
             {
-                content += $"\n\n── Game Notes ──\n{noteEntry.Notes}";
+                content += Loc.T("\n\n── Game Notes ──\n{0}", noteEntry.Notes);
             }
 
             var dialog = new ContentDialog
             {
-                Title = "ℹ DXVK Info",
+                Title = Loc.T("ℹ DXVK Info"),
                 Content = new TextBlock
                 {
                     Text = content,
@@ -296,7 +297,7 @@ public sealed partial class MainWindow
             if (card.DofFixIsInstalling || string.IsNullOrEmpty(card.InstallPath)) return;
 
             card.DofFixIsInstalling = true;
-            card.DofFixActionMessage = "Installing DOF Fix...";
+            card.DofFixActionMessage = Loc.T("Installing DOF Fix...");
             card.DofFixProgress = 0;
             try
             {
@@ -310,13 +311,13 @@ public sealed partial class MainWindow
                 {
                     card.DofFixInstalledVersion = _dofFixService.StagedVersion;
                     card.DofFixStatus = Models.GameStatus.Installed;
-                    card.DofFixActionMessage = "✅ DOF Fix installed!";
+                    card.DofFixActionMessage = Loc.T("✅ DOF Fix installed!");
                     card.NotifyAll();
                     card.FadeMessage(m => card.DofFixActionMessage = m, card.DofFixActionMessage);
                 }
                 else
                 {
-                    card.DofFixActionMessage = "❌ Install failed";
+                    card.DofFixActionMessage = Loc.T("❌ Install failed");
                 }
             }
             catch (Exception ex)
@@ -344,13 +345,13 @@ public sealed partial class MainWindow
         {
             card.DofFixStatus = Models.GameStatus.NotInstalled;
             card.DofFixInstalledVersion = null;
-            card.DofFixActionMessage = "✖ DOF Fix removed.";
+            card.DofFixActionMessage = Loc.T("✖ DOF Fix removed.");
             card.NotifyAll();
             card.FadeMessage(m => card.DofFixActionMessage = m, card.DofFixActionMessage);
         }
         else
         {
-            card.DofFixActionMessage = "❌ Uninstall failed";
+            card.DofFixActionMessage = Loc.T("❌ Uninstall failed");
         }
     }
 
@@ -369,12 +370,12 @@ public sealed partial class MainWindow
 
             var dialog = new ContentDialog
             {
-                Title = "UE DOF Fix — Release Notes",
+                Title = Loc.T("UE DOF Fix — Release Notes"),
                 Content = new ScrollViewer
                 {
                     Content = new TextBlock
                     {
-                        Text = notes ?? "No release notes available.",
+                        Text = notes ?? Loc.T("No release notes available."),
                         TextWrapping = Microsoft.UI.Xaml.TextWrapping.Wrap,
                         IsTextSelectionEnabled = true,
                     },
@@ -517,7 +518,7 @@ public sealed partial class MainWindow
             // Games with a specific engine version (from manifest or auto-detection) cannot be toggled.
             // The badge toggle is only for games with vague "Unreal Engine" (no version suffix).
             if (card.EngineHint != null && card.EngineHint != "Unreal Engine"
-                && card.EngineHint != "Unreal Engine 5"
+                && card.EngineHint != Loc.T("Unreal Engine 5")
                 && System.Text.RegularExpressions.Regex.IsMatch(card.EngineHint, @"Unreal Engine \d"))
                 return;
 
@@ -533,7 +534,7 @@ public sealed partial class MainWindow
                 var panel = new StackPanel { Spacing = 8 };
                 panel.Children.Add(new TextBlock
                 {
-                    Text = "This toggles the engine version to Unreal Engine 5.0–5.6, making this game eligible for the DOF Fix addon.\n\nUse this when RHI cannot detect the UE version automatically (e.g. Game Pass games).",
+                    Text = Loc.T("This toggles the engine version to Unreal Engine 5.0–5.6, making this game eligible for the DOF Fix addon.\n\nUse this when RHI cannot detect the UE version automatically (e.g. Game Pass games)."),
                     TextWrapping = Microsoft.UI.Xaml.TextWrapping.Wrap,
                     FontSize = 12,
                 });
@@ -541,7 +542,7 @@ public sealed partial class MainWindow
 
                 var dialog = new ContentDialog
                 {
-                    Title = "Engine Version Override",
+                    Title = Loc.T("Engine Version Override"),
                     Content = panel,
                     PrimaryButtonText = "Continue",
                     CloseButtonText = "Cancel",
@@ -1097,14 +1098,14 @@ public sealed partial class MainWindow
                     var panel = new StackPanel { Spacing = 8 };
                     panel.Children.Add(new TextBlock
                     {
-                        Text = $"Remove {card.GameName} from RHI?",
+                        Text = Loc.T("Remove {0} from RHI?", card.GameName),
                         FontSize = 13,
                         FontWeight = Microsoft.UI.Text.FontWeights.SemiBold,
                         Foreground = UIFactory.Brush(ResourceKeys.TextPrimaryBrush),
                     });
                     panel.Children.Add(new TextBlock
                     {
-                        Text = $"The following components are installed: {componentList}.",
+                        Text = Loc.T("The following components are installed: {0}.", componentList),
                         TextWrapping = Microsoft.UI.Xaml.TextWrapping.Wrap,
                         FontSize = 12,
                         Foreground = UIFactory.Brush(ResourceKeys.TextSecondaryBrush),
@@ -1112,7 +1113,7 @@ public sealed partial class MainWindow
 
                     var uninstallCheck = new CheckBox
                     {
-                        Content = "Also uninstall all RHI-managed components from game folder",
+                        Content = Loc.T("Also uninstall all RHI-managed components from game folder"),
                         FontSize = 12,
                         IsChecked = false,
                     };
@@ -1120,7 +1121,7 @@ public sealed partial class MainWindow
 
                     var dialog = new ContentDialog
                     {
-                        Title = "Remove Game",
+                        Title = Loc.T("Remove Game"),
                         Content = panel,
                         PrimaryButtonText = "Remove",
                         CloseButtonText = "Cancel",
@@ -1211,7 +1212,7 @@ public sealed partial class MainWindow
         var progressPanel = new StackPanel { Spacing = 8 };
         var progressRow = new StackPanel { Orientation = Microsoft.UI.Xaml.Controls.Orientation.Horizontal, Spacing = 12 };
         var progressRing = new ProgressRing { IsActive = true, Width = 20, Height = 20 };
-        var progressText = new TextBlock { Text = "Clearing caches...", FontSize = 13, Foreground = UIFactory.Brush(ResourceKeys.TextSecondaryBrush) };
+        var progressText = new TextBlock { Text = Loc.T("Clearing caches..."), FontSize = 13, Foreground = UIFactory.Brush(ResourceKeys.TextSecondaryBrush) };
         progressRow.Children.Add(progressRing);
         progressRow.Children.Add(progressText);
         progressPanel.Children.Add(progressRow);

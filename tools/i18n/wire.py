@@ -31,6 +31,9 @@ REFUSE_LINE = re.compile(
     r"\.EndsWith\s*\(|\.Equals\s*\(|^\s*return\s|\bconst\s|TaskName|SectionKey"
 )
 
+# Switch-expression arms look like  "ReShade" => (a, b): a method call is not a constant pattern.
+SWITCH_ARM = re.compile(r"^\s*[\"']")
+
 
 def cs_literal(text: str) -> str:
     out = (
@@ -98,7 +101,7 @@ def main() -> int:
                 notfound.append(f"{rel}:{lineno}")
                 continue
             line = lines[idx]
-            if REFUSE_LINE.search(line):
+            if REFUSE_LINE.search(line) or SWITCH_ARM.match(line):
                 for e in per_line[lineno]:
                     refused.append(f"{rel}:{lineno} {e['key'][:50]!r}")
                 continue

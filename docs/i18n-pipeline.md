@@ -102,7 +102,10 @@ E:/python/python.exe tools/i18n/wire.py --wave W1
 3. **`const string` 不能包**：`Loc.T` 不是编译期常量。`DownloadSectionKey`、`AdminTaskName = "RHI Admin Mode"` 都属于机器标识，本就不该翻。
 4. **复杂插值留人工**：`key {expr ? "" : "s"}.` 这类先拆成完整句子再包，否则包了半截会破坏语法。
 5. **多行拼接串**（`"a" +` 换行 `"b"`）在 worklist 里只有第一段，接线时要么整段合成一个 key，要么留着英文。
-6. 数字/浮点解析**保持 InvariantCulture**；`Loc.T` 的格式化也用 InvariantCulture，译文不可能改变数字写法。
+6. **switch 表达式的分支标签不能包**：`"ReShade" => (bg, fg)` 里的字符串是**常量模式**，包了直接编译不过。`wire.py` 已拒绝"行首是引号"的行。
+7. **正则模式 / 注册表参数 / 命令行开关绝不能包**：`Regex.IsMatch(hint, @"Unreal Engine \d")`、`reg.exe add ... /v X /t REG_DWORD /f`、`7z x "{0}" -o"{1}" -y` —— 翻了会静默坏功能。extract 现在按 `\d` 形式、`/v` 开关、`HKLM|REG_DWORD` 排除。
+8. **XAML 实体要反转义再当 key**：`Text="Accounts &amp; Data"` 在界面上是 `Accounts & Data`，语言包必须用后者做键，否则永远匹配不上（而 `&` 又容易被"code-like"规则误杀）。
+9. 数字/浮点解析**保持 InvariantCulture**；`Loc.T` 的格式化也用 InvariantCulture，译文不可能改变数字写法。
 
 ## 5. 每波的固定流程
 

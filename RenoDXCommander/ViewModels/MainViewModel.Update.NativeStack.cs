@@ -1,6 +1,7 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection;
 using RenoDXCommander.Models;
 using RenoDXCommander.Services;
+using RenoDXCommander.Localization;
 
 namespace RenoDXCommander.ViewModels;
 
@@ -236,7 +237,7 @@ public partial class MainViewModel
                 sb.AppendLine($"  {i,2}: {frameName}");
             }
             if (frameCount == 0)
-                sb.AppendLine("  (no frames captured — thread may be in kernel wait or context was invalid)");
+                sb.AppendLine(Loc.T("  (no frames captured — thread may be in kernel wait or context was invalid)"));
             CrashReporter.LogSync(sb.ToString());
 
             // ── RSP stack scan — heuristic return-address search ─────────────────
@@ -369,16 +370,16 @@ public partial class MainViewModel
                                         // Apply threshold: large offsets get RVA only (not a misleading name)
                                         scanFrame = expName != null
                                             ? $"{expName}+0x{expDisp:X}"
-                                            : $"{scanModName}+0x{scanRva:X} (no nearby export)";
+                                            : Loc.T("{0}+0x{1:X} (no nearby export)", scanModName, scanRva);
                                     }
                                     catch { scanFrame = $"{scanModName}+0x{candidate - scanModBase:X}"; }
 
-                                    scanSb.AppendLine($"  {hits,2}: {scanFrame}  (rsp+0x{off:X})");
+                                    scanSb.AppendLine(Loc.T("  {0}: {1}  (rsp+0x{2:X})", hits,2, scanFrame, off));
                                     hits++;
                                 }
                             }
                             if (hits == 0)
-                                scanSb.AppendLine("  (no return addresses found)");
+                                scanSb.AppendLine(Loc.T("  (no return addresses found)"));
                             CrashReporter.LogSync(scanSb.ToString());
                         }
                     }

@@ -5,6 +5,7 @@ using Microsoft.UI.Xaml.Media;
 using RenoDXCommander.Models;
 using RenoDXCommander.Services;
 using RenoDXCommander.ViewModels;
+using RenoDXCommander.Localization;
 
 namespace RenoDXCommander;
 
@@ -20,19 +21,17 @@ public partial class DialogService
 
         var dlg = new ContentDialog
         {
-            Title               = "⚠ Unknown dxgi.dll Detected",
+            Title               = Loc.T("⚠ Unknown dxgi.dll Detected"),
             Content             = new TextBlock
             {
                 TextWrapping = TextWrapping.Wrap,
                 Foreground   = Brush(ResourceKeys.AccentAmberBrush),
                 FontSize     = 13,
-                Text         = $"A dxgi.dll file was found in:\n{card.InstallPath}\n\n" +
-                               $"File size: {sizeKB:N0} KB\n\n" +
-                               "RHI cannot identify this file as ReShade or Display Commander. " +
-                               "It may belong to another mod (e.g. DXVK, Special K, ENB).\n\n" +
-                               "Overwriting it may break the existing mod. Do you want to proceed?",
+                Text         = Loc.T("A dxgi.dll file was found in:\n{0}\n\n", card.InstallPath) +
+                               Loc.T("File size: {0:N0} KB\n\n", sizeKB) +
+                               Loc.T("RHI cannot identify this file as ReShade or Display Commander. It may belong to another mod (e.g. DXVK, Special K, ENB).\n\nOverwriting it may break the existing mod. Do you want to proceed?"),
             },
-            PrimaryButtonText   = "Overwrite",
+            PrimaryButtonText   = Loc.T("Overwrite"),
             CloseButtonText     = "Cancel",
             XamlRoot            = _window.Content.XamlRoot,
             Background          = Brush(ResourceKeys.SurfaceOverlayBrush),
@@ -218,7 +217,7 @@ public partial class DialogService
                 BorderThickness     = new Thickness(1),
                 Child = new TextBlock
                 {
-                    Text       = "RTX HDR Enabled",
+                    Text       = Loc.T("RTX HDR Enabled"),
                     FontSize   = 12,
                     Foreground = Brush(ResourceKeys.AccentGreenBrush),
                 }
@@ -227,21 +226,20 @@ public partial class DialogService
 
             panel.Children.Add(new TextBlock
             {
-                Text = "RTX HDR uses NVIDIA's driver-level HDR injection to upgrade SDR games to HDR. " +
-                       "It works at the GPU level without injecting DLLs into the game, making it compatible with anti-cheat systems.\n\n" +
-                       "Requires: NVIDIA App installed, Game Filter/Freestyle enabled, RTX GPU, driver 550+.",
+                Text = Loc.T("RTX HDR uses NVIDIA's driver-level HDR injection to upgrade SDR games to HDR. ") +
+                       Loc.T("It works at the GPU level without injecting DLLs into the game, making it compatible with anti-cheat systems.\n\nRequires: NVIDIA App installed, Game Filter/Freestyle enabled, RTX GPU, driver 550+."),
                 TextWrapping = TextWrapping.Wrap,
                 Foreground   = textColour,
                 FontSize     = 13,
                 LineHeight   = 22,
             });
 
-            AddHyperlinkBlock(panel, "RTX HDR Calibration Guide", manifest?.RtxHdrInfoUrl ?? "https://www.reddit.com/r/nvidia/comments/1b03yfg/rtx_hdr_paper_white_gamma_reference_settings/", linkColour);
+            AddHyperlinkBlock(panel, Loc.T("RTX HDR Calibration Guide"), manifest?.RtxHdrInfoUrl ?? "https://www.reddit.com/r/nvidia/comments/1b03yfg/rtx_hdr_paper_white_gamma_reference_settings/", linkColour);
 
             // Still show HDR Gaming Database link if available
             if (!string.IsNullOrEmpty(result.HdrAnalysisUrl))
             {
-                AddHyperlinkBlock(panel, "HDR Analysis — HDR Gaming Database", result.HdrAnalysisUrl, linkColour);
+                AddHyperlinkBlock(panel, Loc.T("HDR Analysis — HDR Gaming Database"), result.HdrAnalysisUrl, linkColour);
             }
 
             return; // Skip regular RenoDX content
@@ -289,13 +287,13 @@ public partial class DialogService
         // ── Wiki page link (NameUrl) as clickable hyperlink ──────────────────
         if (!string.IsNullOrEmpty(result.Url))
         {
-            AddHyperlinkBlock(panel, result.UrlLabel ?? "View wiki page", result.Url, linkColour);
+            AddHyperlinkBlock(panel, result.UrlLabel ?? Loc.T("View wiki page"), result.Url, linkColour);
         }
 
         // ── "Also available on Nexus" link (Snapshot+Nexus games only) ───────
         if (!card.IsExternalOnly && card.Mod?.SnapshotUrl != null && !string.IsNullOrEmpty(card.NexusUrl))
         {
-            AddHyperlinkBlock(panel, "Also available on Nexus Mods", card.NexusUrl, linkColour);
+            AddHyperlinkBlock(panel, Loc.T("Also available on Nexus Mods"), card.NexusUrl, linkColour);
         }
 
         // ── HDR Gaming Database link (supplementary) ─────────────────────────
@@ -309,7 +307,7 @@ public partial class DialogService
         {
             panel.Children.Add(new TextBlock
             {
-                Text       = "No additional RenoDX notes for this game.",
+                Text       = Loc.T("No additional RenoDX notes for this game."),
                 Foreground = dimColour,
                 FontSize   = 13,
             });
@@ -336,7 +334,7 @@ public partial class DialogService
         if (card.LumaMod?.IsGenericLuma != true)
         {
             var lumaLabel = card.LumaMod != null
-                ? $"Luma — {card.LumaMod.Status} {card.LumaMod.Author}".TrimEnd()
+                ? Loc.T("Luma — {0} {1}", card.LumaMod.Status, card.LumaMod.Author).TrimEnd()
                 : "Luma";
             var lumaBadge = new Border
             {
@@ -364,7 +362,7 @@ public partial class DialogService
             if (card.LumaDlssFsrSupported)
                 flagPanel.Children.Add(new TextBlock
                 {
-                    Text = "✅ DLSS / FSR",
+                    Text = Loc.T("✅ DLSS / FSR"),
                     FontSize = 12,
                     Foreground = Brush(ResourceKeys.AccentGreenBrush),
                 });
@@ -372,7 +370,7 @@ public partial class DialogService
             if (card.LumaHdrSupported)
                 flagPanel.Children.Add(new TextBlock
                 {
-                    Text = "✅ HDR",
+                    Text = Loc.T("✅ HDR"),
                     FontSize = 12,
                     Foreground = Brush(ResourceKeys.AccentGreenBrush),
                 });
@@ -463,7 +461,7 @@ public partial class DialogService
             {
                 panel.Children.Add(new TextBlock
                 {
-                    Text       = "No additional Luma notes for this game.",
+                    Text       = Loc.T("No additional Luma notes for this game."),
                     Foreground = dimColour,
                     FontSize   = 13,
                 });
@@ -490,7 +488,7 @@ public partial class DialogService
             // ── Standard OptiScaler Compatibility section ─────────────────────
             if (result.OptiScalerCompat != null)
             {
-                BuildOptiScalerSection(panel, "OptiScaler Compatibility",
+                BuildOptiScalerSection(panel, Loc.T("OptiScaler Compatibility"),
                     result.OptiScalerCompat, textColour, linkColour);
             }
 
@@ -501,7 +499,7 @@ public partial class DialogService
                 if (result.OptiScalerCompat != null)
                     panel.Children.Add(new Border { Height = 4 });
 
-                BuildOptiScalerSection(panel, "FSR4 Compatibility",
+                BuildOptiScalerSection(panel, Loc.T("FSR4 Compatibility"),
                     result.OptiScalerFsr4Compat, textColour, linkColour);
             }
 
@@ -534,7 +532,7 @@ public partial class DialogService
         {
             panel.Children.Add(new TextBlock
             {
-                Text       = "No OptiScaler compatibility data available for this game.",
+                Text       = Loc.T("No OptiScaler compatibility data available for this game."),
                 Foreground = dimColour,
                 FontSize   = 13,
             });
@@ -554,7 +552,7 @@ public partial class DialogService
     {
         var upscalers = entry.Upscalers.Count > 0
             ? string.Join(", ", entry.Upscalers)
-            : "None listed";
+            : Loc.T("None listed");
 
         // Section header with status
         panel.Children.Add(new TextBlock
@@ -570,7 +568,7 @@ public partial class DialogService
         // Upscaler list
         panel.Children.Add(new TextBlock
         {
-            Text         = $"Upscalers: {upscalers}",
+            Text         = Loc.T("Upscalers: {0}", upscalers),
             TextWrapping = TextWrapping.Wrap,
             Foreground   = textColour,
             FontSize     = 13,
@@ -600,7 +598,7 @@ public partial class DialogService
             };
             link.Inlines.Add(new Microsoft.UI.Xaml.Documents.Run
             {
-                Text     = "View details",
+                Text     = Loc.T("View details"),
                 FontSize = 13,
             });
             var para = new Microsoft.UI.Xaml.Documents.Paragraph();
@@ -664,7 +662,7 @@ public partial class DialogService
         {
             panel.Children.Add(new TextBlock
             {
-                Text       = $"Installed: {installedVersion}",
+                Text       = Loc.T("Installed: {0}", installedVersion),
                 Foreground = dimColour,
                 FontSize   = 12,
                 Margin     = new Thickness(0, 0, 0, 4),
@@ -727,7 +725,7 @@ public partial class DialogService
         }
 
         // Always show link to the releases page
-        AddHyperlinkBlock(panel, "View all releases on GitHub", releasesPageUrl, linkColour);
+        AddHyperlinkBlock(panel, Loc.T("View all releases on GitHub"), releasesPageUrl, linkColour);
     }
 
     // ── Shared helpers for dialog content ────────────────────────────────────────
@@ -823,18 +821,15 @@ public partial class DialogService
 
             var dlg = new ContentDialog
             {
-                Title = "Administrator Privileges Required",
+                Title = Loc.T("Administrator Privileges Required"),
                 Content = new TextBlock
                 {
                     TextWrapping = TextWrapping.Wrap,
                     FontSize = 13,
-                    Text = "Installing the Vulkan ReShade layer requires writing to C:\\ProgramData\\ReShade\\ " +
-                           "and modifying system registry keys, which needs administrator privileges.\n\n" +
-                           "Enable Admin Mode — RHI will always launch elevated (no UAC prompt after setup).\n\n" +
-                           "Restart as Admin — one-time elevated restart to complete this install.",
+                    Text = Loc.T("Installing the Vulkan ReShade layer requires writing to C:\\ProgramData\\ReShade\\ and modifying system registry keys, which needs administrator privileges.\n\nEnable Admin Mode — RHI will always launch elevated (no UAC prompt after setup).\n\nRestart as Admin — one-time elevated restart to complete this install."),
                 },
-                PrimaryButtonText = "Enable Admin Mode",
-                SecondaryButtonText = "Restart as Admin",
+                PrimaryButtonText = Loc.T("Enable Admin Mode"),
+                SecondaryButtonText = Loc.T("Restart as Admin"),
                 CloseButtonText = "Cancel",
                 XamlRoot = _window.Content.XamlRoot,
                 Background = Brush(ResourceKeys.SurfaceOverlayBrush),

@@ -5,6 +5,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using RenoDXCommander.Models;
 using RenoDXCommander.Services;
+using RenoDXCommander.Localization;
 
 namespace RenoDXCommander.ViewModels;
 
@@ -41,7 +42,7 @@ public partial class MainViewModel
             if (latestFile == null)
             {
                 _crashReporter.Log($"[MainViewModel.InstallNexusModAsync] No MAIN file found for '{card.GameName}'");
-                DispatcherQueue?.TryEnqueue(() => { card.ActionMessage = "No downloadable file found."; card.IsInstalling = false; });
+                DispatcherQueue?.TryEnqueue(() => { card.ActionMessage = Loc.T("No downloadable file found."); card.IsInstalling = false; });
                 return;
             }
 
@@ -50,7 +51,7 @@ public partial class MainViewModel
         catch (Exception ex)
         {
             _crashReporter.Log($"[MainViewModel.InstallNexusModAsync] '{card.GameName}' — {ex.Message}");
-            DispatcherQueue?.TryEnqueue(() => { card.ActionMessage = $"Install failed: {ex.Message}"; card.IsInstalling = false; });
+            DispatcherQueue?.TryEnqueue(() => { card.ActionMessage = Loc.T("Install failed: {0}", ex.Message); card.IsInstalling = false; });
         }
     }
 
@@ -82,7 +83,7 @@ public partial class MainViewModel
         if (!await CheckInstallWarningAsync(card.GameName, "renodx")) return;
 
         card.IsInstalling = true;
-        card.ActionMessage = "Resolving download link...";
+        card.ActionMessage = Loc.T("Resolving download link...");
 
         try
         {
@@ -107,7 +108,7 @@ public partial class MainViewModel
             if (uri == null)
             {
                 _crashReporter.Log($"[MainViewModel.HandleNxmLinkAsync] Could not resolve download URI for '{card.GameName}'");
-                DispatcherQueue?.TryEnqueue(() => { card.ActionMessage = "Could not resolve download link."; card.IsInstalling = false; });
+                DispatcherQueue?.TryEnqueue(() => { card.ActionMessage = Loc.T("Could not resolve download link."); card.IsInstalling = false; });
                 return;
             }
 
@@ -116,7 +117,7 @@ public partial class MainViewModel
             {
                 FileId    = link.FileId,
                 FileName  = $"nexus_{link.Domain}_{link.ModId}_{link.FileId}.zip",
-                CategoryName = "MAIN",
+                CategoryName = Loc.T("MAIN"),
             };
 
             // Try to enrich with actual file info (best-effort, won't fail the install)
@@ -166,7 +167,7 @@ public partial class MainViewModel
         if (uri == null)
         {
             _crashReporter.Log($"[MainViewModel.InstallNexusFileAsync] Could not get CDN URI for '{card.GameName}' file {file.FileId}");
-            DispatcherQueue?.TryEnqueue(() => { card.ActionMessage = "Download link unavailable."; card.IsInstalling = false; });
+            DispatcherQueue?.TryEnqueue(() => { card.ActionMessage = Loc.T("Download link unavailable."); card.IsInstalling = false; });
             return;
         }
 
@@ -181,7 +182,7 @@ public partial class MainViewModel
     {
         if (string.IsNullOrEmpty(card.InstallPath))
         {
-            DispatcherQueue?.TryEnqueue(() => { card.ActionMessage = "No install path set."; card.IsInstalling = false; });
+            DispatcherQueue?.TryEnqueue(() => { card.ActionMessage = Loc.T("No install path set."); card.IsInstalling = false; });
             return;
         }
 
@@ -241,7 +242,7 @@ public partial class MainViewModel
                 if (addonFiles.Count == 0)
                 {
                     _crashReporter.Log($"[MainViewModel.DownloadAndDeployNexusFileAsync] No renodx-*.addon64/32 found in archive for '{card.GameName}'");
-                    DispatcherQueue?.TryEnqueue(() => { card.ActionMessage = "No addon file found in archive."; card.IsInstalling = false; });
+                    DispatcherQueue?.TryEnqueue(() => { card.ActionMessage = Loc.T("No addon file found in archive."); card.IsInstalling = false; });
                     return;
                 }
 
@@ -327,7 +328,7 @@ public partial class MainViewModel
                     card.Status                 = GameStatus.Installed;
                     card.IsInstalling           = false;
                     card.InstallProgress        = 0;
-                    card.FadeMessage(m => card.ActionMessage = m, "✅ Installed!");
+                    card.FadeMessage(m => card.ActionMessage = m, Loc.T("✅ Installed!"));
                     _crashReporter.Log($"[MainViewModel.DownloadAndDeployNexusFileAsync] Complete: '{card.GameName}' — {addonFileName}");
 
                     if (!string.IsNullOrEmpty(card.InstallPath))

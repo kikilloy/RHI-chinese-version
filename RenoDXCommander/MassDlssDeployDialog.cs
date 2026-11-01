@@ -5,6 +5,7 @@ using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media;
 using RenoDXCommander.Services;
 using RenoDXCommander.ViewModels;
+using RenoDXCommander.Localization;
 
 namespace RenoDXCommander;
 
@@ -43,8 +44,8 @@ public class MassDlssDeployDialog
         {
             var emptyDialog = new ContentDialog
             {
-                Title = "No DLSS/Streamline Games",
-                Content = "No games with DLSS or Streamline DLLs were detected.\nRun a Full Refresh to scan for them.",
+                Title = Loc.T("No DLSS/Streamline Games"),
+                Content = Loc.T("No games with DLSS or Streamline DLLs were detected.\nRun a Full Refresh to scan for them."),
                 CloseButtonText = "OK",
                 XamlRoot = _xamlRoot,
                 RequestedTheme = ElementTheme.Dark,
@@ -70,7 +71,7 @@ public class MassDlssDeployDialog
                     : Windows.UI.Color.FromArgb(255, 220, 220, 220)),
             };
             if (isV1)
-                ToolTipService.SetToolTip(cb, "Skipped — v1.x DLSS/Streamline not compatible with newer versions");
+                ToolTipService.SetToolTip(cb, Loc.T("Skipped — v1.x DLSS/Streamline not compatible with newer versions"));
             checkBoxes.Add(cb);
             gameListPanel.Children.Add(cb);
         }
@@ -115,7 +116,7 @@ public class MassDlssDeployDialog
 
         // Force visual refresh when switching away from "NVIDIA Override" — WinUI doesn't clear the old text otherwise
         static void ForceComboRefresh(ComboBox cb) =>
-            cb.SelectionChanged += (s, e) => VisualStateManager.GoToState(cb, "Normal", false);
+            cb.SelectionChanged += (s, e) => VisualStateManager.GoToState(cb, Loc.T("Normal"), false);
         ForceComboRefresh(dlssCombo);
         ForceComboRefresh(dlssdCombo);
         ForceComboRefresh(dlssgCombo);
@@ -126,9 +127,9 @@ public class MassDlssDeployDialog
         var fgPresetCombo = BuildPresetCombo(DlssPresetService.FgPresets, settings.DefaultFgPreset);
 
         var rightPanel = new StackPanel { Spacing = 8, Width = 320 };
-        rightPanel.Children.Add(BuildDropdownSection("DLSS Super Resolution", dlssCombo));
-        rightPanel.Children.Add(BuildDropdownSection("DLSS Ray Reconstruction", dlssdCombo));
-        rightPanel.Children.Add(BuildDropdownSection("DLSS Frame Generation", dlssgCombo));
+        rightPanel.Children.Add(BuildDropdownSection(Loc.T("DLSS Super Resolution"), dlssCombo));
+        rightPanel.Children.Add(BuildDropdownSection(Loc.T("DLSS Ray Reconstruction"), dlssdCombo));
+        rightPanel.Children.Add(BuildDropdownSection(Loc.T("DLSS Frame Generation"), dlssgCombo));
         rightPanel.Children.Add(BuildDropdownSection("Streamline", slCombo));
 
         // Presets section
@@ -138,9 +139,9 @@ public class MassDlssDeployDialog
             Background = new SolidColorBrush(Windows.UI.Color.FromArgb(255, 60, 70, 90)),
             Margin = new Thickness(0, 4, 0, 4),
         });
-        rightPanel.Children.Add(BuildDropdownSection("SR Preset", srPresetCombo));
-        rightPanel.Children.Add(BuildDropdownSection("RR Preset", rrPresetCombo));
-        rightPanel.Children.Add(BuildDropdownSection("FG Preset", fgPresetCombo));
+        rightPanel.Children.Add(BuildDropdownSection(Loc.T("SR Preset"), srPresetCombo));
+        rightPanel.Children.Add(BuildDropdownSection(Loc.T("RR Preset"), rrPresetCombo));
+        rightPanel.Children.Add(BuildDropdownSection(Loc.T("FG Preset"), fgPresetCombo));
 
         var rightScroll = new ScrollViewer
         {
@@ -152,7 +153,7 @@ public class MassDlssDeployDialog
         // Auto-create profiles checkbox — lives outside the scroll so it's always visible
         var autoCreateCheck = new CheckBox
         {
-            Content = "Auto-create NVIDIA profiles",
+            Content = Loc.T("Auto-create NVIDIA profiles"),
             IsChecked = true,
             FontSize = 11,
             Foreground = new SolidColorBrush(Windows.UI.Color.FromArgb(255, 180, 190, 220)),
@@ -199,7 +200,7 @@ public class MassDlssDeployDialog
             Title = "Batch DLSS & Streamline Deploy",
             Content = mainGrid,
             PrimaryButtonText = "Deploy",
-            SecondaryButtonText = "Restore",
+            SecondaryButtonText = Loc.T("Restore"),
             CloseButtonText = "Cancel",
             XamlRoot = _xamlRoot,
             RequestedTheme = ElementTheme.Dark,
@@ -259,7 +260,7 @@ public class MassDlssDeployDialog
         // Show progress
         var progressText = new TextBlock
         {
-            Text = "Deploying to selected games...",
+            Text = Loc.T("Deploying to selected games..."),
             FontSize = 12,
             Foreground = new SolidColorBrush(Windows.UI.Color.FromArgb(255, 200, 200, 200)),
             TextWrapping = TextWrapping.Wrap,
@@ -476,32 +477,32 @@ public class MassDlssDeployDialog
 
         // ── Show results ──
         var report = new System.Text.StringBuilder();
-        if (dlssCount > 0) report.AppendLine($"DLSS SR deployed to {dlssCount} game(s)");
-        if (dlssdCount > 0) report.AppendLine($"DLSS RR deployed to {dlssdCount} game(s)");
-        if (dlssgCount > 0) report.AppendLine($"DLSS FG deployed to {dlssgCount} game(s)");
-        if (slCount > 0) report.AppendLine($"Streamline deployed to {slCount} game(s)");
-        if (srPresetCount > 0) report.AppendLine($"SR Preset applied to {srPresetCount} game(s)");
-        if (rrPresetCount > 0) report.AppendLine($"RR Preset applied to {rrPresetCount} game(s)");
-        if (fgPresetCount > 0) report.AppendLine($"FG Preset applied to {fgPresetCount} game(s)");
-        if (srDriverCount > 0) report.AppendLine($"SR NVIDIA Override set on {srDriverCount} game(s)");
-        if (rrDriverCount > 0) report.AppendLine($"RR NVIDIA Override set on {rrDriverCount} game(s)");
-        if (fgDriverCount > 0) report.AppendLine($"FG NVIDIA Override set on {fgDriverCount} game(s)");
+        if (dlssCount > 0) report.AppendLine(Loc.T("DLSS SR deployed to {0} game(s)", dlssCount));
+        if (dlssdCount > 0) report.AppendLine(Loc.T("DLSS RR deployed to {0} game(s)", dlssdCount));
+        if (dlssgCount > 0) report.AppendLine(Loc.T("DLSS FG deployed to {0} game(s)", dlssgCount));
+        if (slCount > 0) report.AppendLine(Loc.T("Streamline deployed to {0} game(s)", slCount));
+        if (srPresetCount > 0) report.AppendLine(Loc.T("SR Preset applied to {0} game(s)", srPresetCount));
+        if (rrPresetCount > 0) report.AppendLine(Loc.T("RR Preset applied to {0} game(s)", rrPresetCount));
+        if (fgPresetCount > 0) report.AppendLine(Loc.T("FG Preset applied to {0} game(s)", fgPresetCount));
+        if (srDriverCount > 0) report.AppendLine(Loc.T("SR NVIDIA Override set on {0} game(s)", srDriverCount));
+        if (rrDriverCount > 0) report.AppendLine(Loc.T("RR NVIDIA Override set on {0} game(s)", rrDriverCount));
+        if (fgDriverCount > 0) report.AppendLine(Loc.T("FG NVIDIA Override set on {0} game(s)", fgDriverCount));
         if (autoCreateProfiles && presetService.ProfilesCreatedCount > 0)
-            report.AppendLine($"NVIDIA profiles created: {presetService.ProfilesCreatedCount}");
-        if (skippedAlreadyAtVersion > 0) report.AppendLine($"\nSkipped: {skippedAlreadyAtVersion} (already at selected version)");
-        if (skippedNoComponent > 0) report.AppendLine($"Skipped: {skippedNoComponent} (component not present)");
-        if (presetMissedCount > 0) report.AppendLine($"Presets missed: {presetMissedCount} game(s) (no NVIDIA profile found)");
+            report.AppendLine(Loc.T("NVIDIA profiles created: {0}", presetService.ProfilesCreatedCount));
+        if (skippedAlreadyAtVersion > 0) report.AppendLine(Loc.T("\nSkipped: {0} (already at selected version)", skippedAlreadyAtVersion));
+        if (skippedNoComponent > 0) report.AppendLine(Loc.T("Skipped: {0} (component not present)", skippedNoComponent));
+        if (presetMissedCount > 0) report.AppendLine(Loc.T("Presets missed: {0} game(s) (no NVIDIA profile found)", presetMissedCount));
         if (failedGames.Count > 0)
         {
-            report.AppendLine($"\nFailed: {failedGames.Count} game(s)");
+            report.AppendLine(Loc.T("\nFailed: {0} game(s)", failedGames.Count));
             foreach (var f in failedGames) report.AppendLine($"  • {f}");
         }
 
-        if (report.Length == 0) report.Append("No changes made.");
+        if (report.Length == 0) report.Append(Loc.T("No changes made."));
 
         var resultDialog = new ContentDialog
         {
-            Title = "Batch Deploy Complete",
+            Title = Loc.T("Batch Deploy Complete"),
             Content = new TextBlock { Text = report.ToString().TrimEnd(), TextWrapping = TextWrapping.Wrap, FontSize = 12 },
             CloseButtonText = "OK",
             XamlRoot = _xamlRoot,
@@ -520,7 +521,7 @@ public class MassDlssDeployDialog
         // Show progress
         var progressText = new TextBlock
         {
-            Text = "Restoring selected games...",
+            Text = Loc.T("Restoring selected games..."),
             FontSize = 12,
             Foreground = new SolidColorBrush(Windows.UI.Color.FromArgb(255, 200, 200, 200)),
             TextWrapping = TextWrapping.Wrap,
@@ -559,7 +560,7 @@ public class MassDlssDeployDialog
             var detection = card.DlssDetection;
             if (detection == null) continue;
 
-            progressText.Text = $"Restoring {card.GameName}...";
+            progressText.Text = Loc.T("Restoring {0}...", card.GameName);
             await Task.Delay(1);
 
             // Restore DLL backups
@@ -584,13 +585,13 @@ public class MassDlssDeployDialog
         await progressSession.DisposeAsync();
 
         var reportText = new System.Text.StringBuilder();
-        if (restoredCount > 0) reportText.AppendLine($"Restored {restoredCount} game(s) to default DLLs.");
-        if (presetsResetCount > 0) reportText.AppendLine($"Reset presets to Default on {presetsResetCount} game(s).");
-        if (restoredCount == 0 && presetsResetCount == 0) reportText.Append("No games had backups to restore or presets to reset.");
+        if (restoredCount > 0) reportText.AppendLine(Loc.T("Restored {0} game(s) to default DLLs.", restoredCount));
+        if (presetsResetCount > 0) reportText.AppendLine(Loc.T("Reset presets to Default on {0} game(s).", presetsResetCount));
+        if (restoredCount == 0 && presetsResetCount == 0) reportText.Append(Loc.T("No games had backups to restore or presets to reset."));
 
         var resultDialog = new ContentDialog
         {
-            Title = "Restore Complete",
+            Title = Loc.T("Restore Complete"),
             Content = new TextBlock
             {
                 Text = reportText.ToString().TrimEnd(),
