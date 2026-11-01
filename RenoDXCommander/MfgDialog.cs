@@ -1,5 +1,6 @@
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
+using RenoDXCommander.Localization;
 using RenoDXCommander.Services;
 using RenoDXCommander.ViewModels;
 
@@ -38,11 +39,7 @@ public static class MfgDialog
             var warningPanel = new StackPanel { Spacing = 12 };
             warningPanel.Children.Add(new TextBlock
             {
-                Text = "Multi Frame Generation (MFG) and Dynamic MFG are only supported on NVIDIA 50 Series GPUs (Blackwell architecture).\n\n" +
-                       "Minimum driver requirements:\n" +
-                       "• MFG (Fixed): Driver 572.16+\n" +
-                       "• DMFG (Dynamic): Driver 595.97+\n\n" +
-                       "These settings will have no effect on 40 Series or older hardware.",
+                Text = Loc.T("Multi Frame Generation (MFG) and Dynamic MFG are only supported on NVIDIA 50 Series GPUs (Blackwell architecture).\n\nMinimum driver requirements:\n• MFG (Fixed): Driver 572.16+\n• DMFG (Dynamic): Driver 595.97+\n\nThese settings will have no effect on 40 Series or older hardware."),
                 TextWrapping = TextWrapping.Wrap,
                 FontSize = 13,
                 Foreground = UIFactory.Brush(ResourceKeys.AccentAmberBrush),
@@ -50,7 +47,7 @@ public static class MfgDialog
 
             var dontShowCheck = new CheckBox
             {
-                Content = "Don't show this warning again",
+                Content = Loc.T("Don't show this warning again"),
                 FontSize = 12,
                 Foreground = UIFactory.Brush(ResourceKeys.TextSecondaryBrush),
             };
@@ -58,10 +55,10 @@ public static class MfgDialog
 
             var warningDialog = new ContentDialog
             {
-                Title = "⚠ Hardware Requirement",
+                Title = Loc.T("⚠ Hardware Requirement"),
                 Content = warningPanel,
-                PrimaryButtonText = "OK",
-                CloseButtonText = "Cancel",
+                PrimaryButtonText = Loc.T("OK"),
+                CloseButtonText = Loc.T("Cancel"),
                 XamlRoot = xamlRoot,
                 RequestedTheme = ElementTheme.Dark,
             };
@@ -102,13 +99,13 @@ public static class MfgDialog
         // ── FG Mode ──
         panel.Children.Add(new TextBlock
         {
-            Text = "FG Mode",
+            Text = Loc.T("FG Mode"),
             FontSize = 11,
             FontWeight = Microsoft.UI.Text.FontWeights.SemiBold,
             Foreground = UIFactory.Brush(ResourceKeys.TextPrimaryBrush),
         });
 
-        var modeItems = new[] { "Default", "Fixed", "Dynamic" };
+        var modeItems = new[] { Loc.T("Default"), Loc.T("Fixed"), Loc.T("Dynamic") };
         int modeIndex = currentMode switch
         {
             MODE_FIXED => 1,
@@ -124,13 +121,13 @@ public static class MfgDialog
             CornerRadius = new CornerRadius(6),
         };
         ToolTipService.SetToolTip(modeCombo,
-            "Default = application controls frame generation. Fixed = always generate a fixed multiplier of frames. Dynamic = generate up to a target frame rate.");
+            Loc.T("Default = application controls frame generation. Fixed = always generate a fixed multiplier of frames. Dynamic = generate up to a target frame rate."));
         panel.Children.Add(modeCombo);
 
         // ── Frame Count ──
         panel.Children.Add(new TextBlock
         {
-            Text = "Frame Count",
+            Text = Loc.T("Frame Count"),
             FontSize = 11,
             FontWeight = Microsoft.UI.Text.FontWeights.SemiBold,
             Foreground = UIFactory.Brush(ResourceKeys.TextPrimaryBrush),
@@ -144,13 +141,13 @@ public static class MfgDialog
             CornerRadius = new CornerRadius(6),
         };
         ToolTipService.SetToolTip(countCombo,
-            "Fixed: exact frame multiplier (2x-6x). Dynamic: maximum frames the driver may generate (Up to 3x-6x). 50 Series GPUs only for 3x+.");
+            Loc.T("Fixed: exact frame multiplier (2x-6x). Dynamic: maximum frames the driver may generate (Up to 3x-6x). 50 Series GPUs only for 3x+."));
         panel.Children.Add(countCombo);
 
         // ── Target Frame Rate ──
         panel.Children.Add(new TextBlock
         {
-            Text = "Target Frame Rate",
+            Text = Loc.T("Target Frame Rate"),
             FontSize = 11,
             FontWeight = Microsoft.UI.Text.FontWeights.SemiBold,
             Foreground = UIFactory.Brush(ResourceKeys.TextPrimaryBrush),
@@ -164,13 +161,13 @@ public static class MfgDialog
             CornerRadius = new CornerRadius(6),
         };
         ToolTipService.SetToolTip(fpsCombo,
-            "The target output frame rate for dynamic frame generation. Only active in Dynamic mode.");
+            Loc.T("The target output frame rate for dynamic frame generation. Only active in Dynamic mode."));
         panel.Children.Add(fpsCombo);
 
         // Inline custom FPS input (shown when "Custom..." is selected)
         var customFpsPanel = new StackPanel { Orientation = Orientation.Horizontal, Spacing = 8, Visibility = Visibility.Collapsed };
         var customFpsBox = new TextBox { PlaceholderText = "20-1000", FontSize = 13, MinWidth = 100 };
-        var customFpsBtn = new Button { Content = "Set", FontSize = 12 };
+        var customFpsBtn = new Button { Content = Loc.T("Set"), FontSize = 12 };
         customFpsPanel.Children.Add(customFpsBox);
         customFpsPanel.Children.Add(customFpsBtn);
         panel.Children.Add(customFpsPanel);
@@ -205,11 +202,11 @@ public static class MfgDialog
             }
             else if (selectedModeIndex == 2) // Dynamic
             {
-                countCombo.Items.Add("Up to 2x");
-                countCombo.Items.Add("Up to 3x");
-                countCombo.Items.Add("Up to 4x");
-                countCombo.Items.Add("Up to 5x");
-                countCombo.Items.Add("Up to 6x");
+                countCombo.Items.Add(Loc.T("Up to 2x"));
+                countCombo.Items.Add(Loc.T("Up to 3x"));
+                countCombo.Items.Add(Loc.T("Up to 4x"));
+                countCombo.Items.Add(Loc.T("Up to 5x"));
+                countCombo.Items.Add(Loc.T("Up to 6x"));
                 countCombo.IsEnabled = true;
 
                 // Select based on current dynamic max count
@@ -267,17 +264,17 @@ public static class MfgDialog
 
             if (selectedModeIndex == 2) // Dynamic
             {
-                fpsCombo.Items.Add("Off");
-                fpsCombo.Items.Add("Max Refresh Rate");
+                fpsCombo.Items.Add(Loc.T("Off"));
+                fpsCombo.Items.Add(Loc.T("Max Refresh Rate"));
                 foreach (var item in fpsItemsList)
-                    fpsCombo.Items.Add(item.Label);
+                    fpsCombo.Items.Add(Loc.T(item.Label));
 
                 // If current value is a custom FPS (not in VRR presets), insert it before Custom
                 if (currentTargetFps > 0 && currentTargetFps != TARGET_FPS_MAX_REFRESH
                     && !vrrFpsSet.Contains(currentTargetFps))
-                    fpsCombo.Items.Add($"{currentTargetFps} FPS (Custom)");
+                    fpsCombo.Items.Add(Loc.T("{0} FPS (Custom)", currentTargetFps));
 
-                fpsCombo.Items.Add("Custom...");
+                fpsCombo.Items.Add(Loc.T("Custom..."));
                 fpsCombo.IsEnabled = true;
 
                 // Select based on current value

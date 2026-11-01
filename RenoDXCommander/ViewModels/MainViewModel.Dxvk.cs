@@ -1,4 +1,5 @@
 using Microsoft.UI.Xaml.Controls;
+using RenoDXCommander.Localization;
 using RenoDXCommander.Models;
 using RenoDXCommander.Services;
 using RenoDXCommander.ViewModels;
@@ -30,7 +31,7 @@ public partial class MainViewModel
         {
             var dontShowAgain = new CheckBox
             {
-                Content = "Don't show this warning again",
+                Content = Loc.T("Don't show this warning again"),
                 Foreground = UIFactory.Brush(ResourceKeys.TextSecondaryBrush),
                 Margin = new Microsoft.UI.Xaml.Thickness(0, 8, 0, 0),
             };
@@ -38,20 +39,7 @@ public partial class MainViewModel
             var contentPanel = new StackPanel();
             contentPanel.Children.Add(new TextBlock
             {
-                Text = "⚠ ADVANCED FEATURE — USE AT YOUR OWN RISK\n\n"
-                    + "DXVK is an unofficial DirectX-to-Vulkan translation layer.\n"
-                    + "No support will be provided if a game is not compatible.\n\n"
-                    + "WHO SHOULD USE THIS:\n"
-                    + "• Primarily benefits older DX8/DX9 games (e.g. FFXIV, Morrowind)\n"
-                    + "• Enables ReShade compute shaders on games that don't support them natively\n"
-                    + "• Can reduce CPU-bound stuttering in older titles\n\n"
-                    + "IMPORTANT WARNINGS:\n"
-                    + "• Anti-cheat games may ban players using DXVK\n"
-                    + "• Game overlays (Steam, NVIDIA, RTSS) may conflict or stop working\n"
-                    + "• Exclusive fullscreen is blocked — use borderless windowed\n"
-                    + "• First launch will be slow due to shader compilation (improves on subsequent runs)\n"
-                    + "• Some games may crash or have graphical glitches with DXVK\n\n"
-                    + "Do you want to continue?",
+                Text = Loc.T("⚠ ADVANCED FEATURE — USE AT YOUR OWN RISK\n\nDXVK is an unofficial DirectX-to-Vulkan translation layer.\nNo support will be provided if a game is not compatible.\n\nWHO SHOULD USE THIS:\n• Primarily benefits older DX8/DX9 games (e.g. FFXIV, Morrowind)\n• Enables ReShade compute shaders on games that don't support them natively\n• Can reduce CPU-bound stuttering in older titles\n\nIMPORTANT WARNINGS:\n• Anti-cheat games may ban players using DXVK\n• Game overlays (Steam, NVIDIA, RTSS) may conflict or stop working\n• Exclusive fullscreen is blocked — use borderless windowed\n• First launch will be slow due to shader compilation (improves on subsequent runs)\n• Some games may crash or have graphical glitches with DXVK\n\nDo you want to continue?"),
                 TextWrapping = Microsoft.UI.Xaml.TextWrapping.Wrap,
                 Foreground = UIFactory.Brush(ResourceKeys.TextPrimaryBrush),
                 FontSize = 13,
@@ -60,10 +48,10 @@ public partial class MainViewModel
 
             var warningDialog = new ContentDialog
             {
-                Title = "⚠ DXVK Warning",
+                Title = Loc.T("⚠ DXVK Warning"),
                 Content = contentPanel,
-                PrimaryButtonText = "Continue",
-                CloseButtonText = "Cancel",
+                PrimaryButtonText = Loc.T("Continue"),
+                CloseButtonText = Loc.T("Cancel"),
                 XamlRoot = xamlRoot,
                 RequestedTheme = Microsoft.UI.Xaml.ElementTheme.Dark,
             };
