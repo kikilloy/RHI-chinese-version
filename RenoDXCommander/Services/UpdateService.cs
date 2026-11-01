@@ -22,11 +22,11 @@ public class UpdateService : IUpdateService
     // GitHub API endpoint for the latest release (new per-version tags like "RHI 1.6.7").
     // This is the primary check — uses /releases/latest to find the newest release.
     private const string LatestReleaseApiUrl =
-        "https://api.github.com/repos/RankFTW/RHI/releases/latest";
+        "https://api.github.com/repos/kikilloy/RHI-chinese-version/releases/latest";
 
     // Fallback: legacy tag-based endpoints for older releases.
     private const string ReleaseApiUrl =
-        "https://api.github.com/repos/RankFTW/RHI/releases/tags/RHI";
+        "https://api.github.com/repos/kikilloy/RHI-chinese-version/releases/tags/RHI";
     private const string LegacyReleaseApiUrl =
         "https://api.github.com/repos/RankFTW/RenoDXChecker/releases/tags/RDXC";
 

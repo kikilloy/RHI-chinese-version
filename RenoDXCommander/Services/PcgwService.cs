@@ -175,7 +175,7 @@ public class PcgwService : IPcgwService
         "RHI", "pcgw_central_cache.json");
 
     private const string CentralDataUrl =
-        "https://raw.githubusercontent.com/RankFTW/RHI/main/database/pcgw_data.json";
+        "https://raw.githubusercontent.com/kikilloy/RHI-chinese-version/main/database/pcgw_data.json";
 
     private static readonly JsonSerializerOptions s_writeOptions = new() { WriteIndented = true };
     private static readonly JsonSerializerOptions s_readOptions  = new()

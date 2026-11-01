@@ -18,7 +18,7 @@ public sealed record MirrorProbeResult(string Prefix, bool Ok, long ElapsedMs, s
 public static class MirrorProbe
 {
     /// <summary>Small file in the RHI repo — cheap for the mirror and for us.</summary>
-    public const string ProbeUrl = "https://raw.githubusercontent.com/RankFTW/RHI/main/motd.md";
+    public const string ProbeUrl = "https://raw.githubusercontent.com/kikilloy/RHI-chinese-version/main/motd.md";
 
     private static readonly TimeSpan ProbeTimeout = TimeSpan.FromSeconds(15);
 

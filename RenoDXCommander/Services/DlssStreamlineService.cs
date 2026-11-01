@@ -55,7 +55,7 @@ public partial class DlssStreamlineService : IDlssStreamlineService
     // ── Manifest URL ──────────────────────────────────────────────────────────
 
     private const string DlssManifestUrl =
-        "https://raw.githubusercontent.com/RankFTW/RHI/main/dlss_manifest.json";
+        "https://raw.githubusercontent.com/kikilloy/RHI-chinese-version/main/dlss_manifest.json";
 
     private static readonly string ManifestCachePath = Path.Combine(BaseStagingDir, "dlss_manifest.json");
 

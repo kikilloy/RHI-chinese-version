@@ -9,7 +9,7 @@ namespace RenoDXCommander.Services;
 /// </summary>
 public static class MotdService
 {
-    private const string MotdUrl = "https://raw.githubusercontent.com/RankFTW/RHI/main/motd.md";
+    private const string MotdUrl = "https://raw.githubusercontent.com/kikilloy/RHI-chinese-version/main/motd.md";
     private static readonly string HashPath = Path.Combine(
         Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
         "RHI", "motd_hash.txt");
