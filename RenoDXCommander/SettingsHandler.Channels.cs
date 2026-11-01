@@ -1,9 +1,10 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using RenoDXCommander.Models;
 using RenoDXCommander.Services;
 using RenoDXCommander.ViewModels;
+using RenoDXCommander.Localization;
 
 namespace RenoDXCommander;
 
@@ -74,11 +75,11 @@ public partial class SettingsHandler
 
             var dialog = new ContentDialog
             {
-                Title = "DXVK Variant Changed",
-                Content = $"DXVK variant changed to {variantLabel}."
+                Title = Loc.T("DXVK Variant Changed"),
+                Content = Loc.T("DXVK variant changed to {0}.", variantLabel)
                     + (gamesWithDxvk.Count > 0
-                        ? $"\n\nSwitching {gamesWithDxvk.Count} game(s) to the {variantLabel} build."
-                        : "\n\nNo games currently have DXVK installed."),
+                        ? Loc.T("\n\nSwitching {0} game(s) to the {1} build.", gamesWithDxvk.Count, variantLabel)
+                        : Loc.T("\n\nNo games currently have DXVK installed.")),
                 CloseButtonText = "OK",
                 XamlRoot = _window.Content.XamlRoot,
                 RequestedTheme = ElementTheme.Dark,
@@ -235,12 +236,12 @@ public partial class SettingsHandler
 
             var dialog = new ContentDialog
             {
-                Title = "ReShade Build Channel Changed",
-                Content = $"ReShade build channel changed to {channelLabel}.\n\n"
+                Title = Loc.T("ReShade Build Channel Changed"),
+                Content = Loc.T("ReShade build channel changed to {0}.\n\n", channelLabel)
                     + (totalCount > 0
-                        ? $"Switching {totalCount} game(s) to the {channelLabel} build."
-                          + (vulkanCount > 0 ? $"\n{vulkanCount} Vulkan game(s) updated via global layer." : "")
-                        : "No games currently have ReShade installed."),
+                        ? Loc.T("Switching {0} game(s) to the {1} build.", totalCount, channelLabel)
+                          + (vulkanCount > 0 ? Loc.T("\n{0} Vulkan game(s) updated via global layer.", vulkanCount) : "")
+                        : Loc.T("No games currently have ReShade installed.")),
                 CloseButtonText = "OK",
                 XamlRoot = _window.Content.XamlRoot,
                 RequestedTheme = ElementTheme.Dark,

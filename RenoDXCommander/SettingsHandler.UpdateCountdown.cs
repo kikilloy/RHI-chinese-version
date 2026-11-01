@@ -1,4 +1,4 @@
-﻿// SettingsHandler.UpdateCountdown.cs -- "Next check in / Last checked" panel above the
+// SettingsHandler.UpdateCountdown.cs -- "Next check in / Last checked" panel above the
 // Check For Updates button (General › Updates). Built in C#; ticks once per second only while
 // the Settings page is open.
 
@@ -6,6 +6,7 @@ using Microsoft.UI.Dispatching;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using RenoDXCommander.Services;
+using RenoDXCommander.Localization;
 
 namespace RenoDXCommander;
 
@@ -74,7 +75,7 @@ public partial class SettingsHandler
                 Child = grid,
             };
             ToolTipService.SetToolTip(panel,
-                "On: every 4 hours RHI refreshes mod data and checks all components and RHI itself for updates. " +
+                Loc.T("On: every 4 hours RHI refreshes mod data and checks all components and RHI itself for updates. ") +
                 "Minimal: every 4 hours RHI refreshes mod data, DLSS versions and checks RHI itself; component checks only run when you check now, Refresh or Update All.");
 
             // Above the "RHI checks every 4 hours" note when it sits right before the button
@@ -150,9 +151,9 @@ public partial class SettingsHandler
             // Minimal mode: the 4-hour run refreshes data (manifests, mod lists, DLSS versions, RHI's own
             // version) but skips component update checks, and LastUpdateCheckUtc only moves on a full check.
             bool minimal = string.Equals(ViewModel.Settings.BackgroundUpdateChecks, "Minimal", StringComparison.OrdinalIgnoreCase);
-            _nextCheckLabel.Text = minimal ? "Next data refresh in" : "Next check in";
+            _nextCheckLabel.Text = minimal ? Loc.T("Next data refresh in") : Loc.T("Next check in");
             _nextCheckValue.Text = FormatNextUpdateCheck(ViewModel.NextUpdateCheckUtc, now);
-            _lastCheckLabel.Text = minimal ? "Last full check" : "Last checked";
+            _lastCheckLabel.Text = minimal ? Loc.T("Last full check") : Loc.T("Last checked");
             _lastCheckValue.Text = FormatLastUpdateCheck(ViewModel.Settings.LastUpdateCheckUtc, now);
         }
         catch (Exception ex) { CrashReporter.Log($"[SettingsHandler.UpdateCountdownText] {ex.Message}"); }
@@ -161,9 +162,9 @@ public partial class SettingsHandler
     /// <summary>"2h 41m 20s"; "After startup" before the periodic timer has started.</summary>
     internal static string FormatNextUpdateCheck(DateTime? nextUtc, DateTime nowUtc)
     {
-        if (nextUtc == null) return "After startup";
+        if (nextUtc == null) return Loc.T("After startup");
         var remaining = nextUtc.Value - nowUtc;
-        if (remaining <= TimeSpan.Zero) return "Any moment";
+        if (remaining <= TimeSpan.Zero) return Loc.T("Any moment");
         // Round up so the display reaches 0s exactly when the check is due
         var secs = (long)Math.Ceiling(remaining.TotalSeconds);
         return $"{secs / 3600}h {secs % 3600 / 60:00}m {secs % 60:00}s";
@@ -178,7 +179,7 @@ public partial class SettingsHandler
             return "Not yet";
         var lastUtc = last.Kind == DateTimeKind.Local ? last.ToUniversalTime() : last;
         var ago = nowUtc - lastUtc;
-        if (ago < TimeSpan.FromMinutes(1)) return "Just now"; // includes clock skew (future timestamps)
+        if (ago < TimeSpan.FromMinutes(1)) return Loc.T("Just now"); // includes clock skew (future timestamps)
         if (ago < TimeSpan.FromHours(1)) return $"{(int)ago.TotalMinutes}m ago";
         if (ago < TimeSpan.FromDays(1)) return $"{(int)ago.TotalHours}h {ago.Minutes:00}m ago";
         return $"{(int)ago.TotalDays}d {ago.Hours}h ago";

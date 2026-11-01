@@ -1,9 +1,10 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using RenoDXCommander.Models;
 using RenoDXCommander.Services;
 using RenoDXCommander.ViewModels;
+using RenoDXCommander.Localization;
 
 namespace RenoDXCommander;
 
@@ -26,8 +27,8 @@ public partial class SettingsHandler
     /// Accessible from the Apply handler (Task 6.3).
     /// </summary>
     internal string _currentHotkeyString = "36,0,0,0";
-    internal string _currentUlHotkeyString = "F12";
-    internal string _currentOsHotkeyString = "Insert";
+    internal string _currentUlHotkeyString = Loc.T("F12");
+    internal string _currentOsHotkeyString = Loc.T("Insert");
     internal string _currentScreenshotHotkeyString = "44,0,0,0";
 
     public SettingsHandler(MainWindow window)
@@ -56,7 +57,7 @@ public partial class SettingsHandler
             // Sync toggle state with ViewModel
             // (without triggering the change handler, which confirms and redeploys shaders)
             SyncShaderModeCombo();
-            _window.AboutVersionText.Text = $"v{CrashReporter.AppVersion}  ·  Simplified PC Gaming by RankFTW";
+            _window.AboutVersionText.Text = Loc.T("v{0}  ·  Simplified PC Gaming by RankFTW", CrashReporter.AppVersion);
             // Show installed Windows App Runtime version
             // Populate addon watch folder textbox
             _window.AddonWatchFolderBox.Text = ViewModel.Settings.AddonWatchFolder;
@@ -169,7 +170,7 @@ public partial class SettingsHandler
             _window.AutoUpdateComponentsCombo.SelectedIndex = ViewModel.Settings.AutoUpdateComponents ? 1 : 0;
 
             // Initialize background update checks combo
-            _window.BackgroundUpdateChecksCombo.SelectedIndex = ViewModel.Settings.BackgroundUpdateChecks == "Minimal" ? 1 : 0;
+            _window.BackgroundUpdateChecksCombo.SelectedIndex = ViewModel.Settings.BackgroundUpdateChecks == Loc.T("Minimal") ? 1 : 0;
 
             // Initialize HDR auto-toggle combo
             _window.HdrAutoToggleCombo.SelectedIndex = ViewModel.Settings.HdrAutoToggle ? 1 : 0;
@@ -185,7 +186,7 @@ public partial class SettingsHandler
                 // Populate resolution combo with supported modes
                 var resolutions = ResolutionToggleService.GetSupportedResolutions();
                 _window.ResolutionTargetCombo.ItemsSource = resolutions;
-                _window.ResolutionTargetCombo.DisplayMemberPath = "Label";
+                _window.ResolutionTargetCombo.DisplayMemberPath = Loc.T("Label");
 
                 var savedKey = ViewModel.Settings.ResolutionTarget;
                 if (!string.IsNullOrEmpty(savedKey))
@@ -203,7 +204,7 @@ public partial class SettingsHandler
                 if (nvDisplays.Count > 0)
                 {
                     _window.ColorDisplayCombo.ItemsSource    = nvDisplays;
-                    _window.ColorDisplayCombo.DisplayMemberPath = "Name";
+                    _window.ColorDisplayCombo.DisplayMemberPath = Loc.T("Name");
                     _window.ColorDisplayCombo.SelectedIndex  = 0; // triggers SelectionChanged → reads current values
                 }
                 else
@@ -279,7 +280,7 @@ public partial class SettingsHandler
                 var inner = new Microsoft.UI.Xaml.Controls.StackPanel { Spacing = 12 };
                 inner.Children.Add(new Microsoft.UI.Xaml.Controls.TextBlock
                 {
-                    Text       = "Freeze Diagnostics",
+                    Text       = Loc.T("Freeze Diagnostics"),
                     FontSize   = 14,
                     FontWeight = Microsoft.UI.Text.FontWeights.SemiBold,
                     Foreground = UIFactory.Brush(ResourceKeys.TextPrimaryBrush),
@@ -300,15 +301,15 @@ public partial class SettingsHandler
                 var btnRowBot = new Microsoft.UI.Xaml.Controls.StackPanel { Orientation = Microsoft.UI.Xaml.Controls.Orientation.Horizontal, Spacing = 8 };
                 btnRow.Children.Add(btnRowTop);
                 btnRow.Children.Add(btnRowBot);
-                var sleepBtn = new Microsoft.UI.Xaml.Controls.Button { Content = "Test IDLE (30s sleep)", FontSize = 11 };
+                var sleepBtn = new Microsoft.UI.Xaml.Controls.Button { Content = Loc.T("Test IDLE (30s sleep)"), FontSize = 11 };
                 sleepBtn.Click += (s, e) => { _window.ViewModel.IsTestFreezeActive = true; System.Threading.Thread.Sleep(30000); _window.ViewModel.IsTestFreezeActive = false; };
-                var spinBtn  = new Microsoft.UI.Xaml.Controls.Button { Content = "Test PEGGED (10s spin)", FontSize = 11 };
+                var spinBtn  = new Microsoft.UI.Xaml.Controls.Button { Content = Loc.T("Test PEGGED (10s spin)"), FontSize = 11 };
                 spinBtn.Click  += (s, e) => { _window.ViewModel.IsTestFreezeActive = true; var end = DateTime.UtcNow.AddSeconds(10); while (DateTime.UtcNow < end) { } _window.ViewModel.IsTestFreezeActive = false; };
 
                 // Native Block: WaitForSingleObject on an unsignaled event — pure native wait, WaitForSingleObject on an unsignaled event — pure native wait,
                 // no managed frames above the wait. Expected top: ntdll!NtWaitForSingleObject,
                 // then KERNELBASE!WaitForSingleObjectEx, then the managed-to-native boundary.
-                var nativeBlockBtn = new Microsoft.UI.Xaml.Controls.Button { Content = "Test Native Block (30s)", FontSize = 11 };
+                var nativeBlockBtn = new Microsoft.UI.Xaml.Controls.Button { Content = Loc.T("Test Native Block (30s)"), FontSize = 11 };
                 nativeBlockBtn.Click += (s, e) =>
                 {
                     var hEvent = NativeInterop.CreateEventW(IntPtr.Zero, true, false, null); // unsignaled manual-reset
@@ -323,7 +324,7 @@ public partial class SettingsHandler
                 // Idle Baseline: triggers the native stack capture on a healthy UI thread.
                 // Fires CaptureNativeUiThreadStack from a background task immediately.
                 // Output shows what the idle message pump looks like — the reference for real freezes.
-                var idleBaselineBtn = new Microsoft.UI.Xaml.Controls.Button { Content = "Capture Idle Baseline", FontSize = 11 };
+                var idleBaselineBtn = new Microsoft.UI.Xaml.Controls.Button { Content = Loc.T("Capture Idle Baseline"), FontSize = 11 };
                 idleBaselineBtn.Click += (s, e) =>
                 {
                     _ = System.Threading.Tasks.Task.Run(() =>
@@ -341,7 +342,7 @@ public partial class SettingsHandler
                 // Dispatcher Exception: throws inside a TryEnqueue callback.
                 // Checks whether app.UnhandledException fires, e.Handled = true takes effect,
                 // and whether the dispatcher keeps running afterwards (timer + probes should continue).
-                var dispExBtn = new Microsoft.UI.Xaml.Controls.Button { Content = "Test Dispatcher Exception", FontSize = 11 };
+                var dispExBtn = new Microsoft.UI.Xaml.Controls.Button { Content = Loc.T("Test Dispatcher Exception"), FontSize = 11 };
                 dispExBtn.Click += (s, e) =>
                 {
                     CrashReporter.LogSync("[FreezeDiag] Test Dispatcher Exception: about to throw inside TryEnqueue(Normal)");
@@ -356,7 +357,7 @@ public partial class SettingsHandler
                 // Reproduces rapid-navigation freeze patterns and shows which game/build triggers it.
                 // Each selection is logged with a sequential counter and timestamp so the last logged
                 // entry before [Heartbeat] *** UI FROZEN *** pinpoints exactly which game killed the dispatcher.
-                var stressBtn = new Microsoft.UI.Xaml.Controls.Button { Content = "Stress Loop (30 passes)", FontSize = 11 };
+                var stressBtn = new Microsoft.UI.Xaml.Controls.Button { Content = Loc.T("Stress Loop (30 passes)"), FontSize = 11 };
                 stressBtn.Click += (s, e) =>
                 {
                     if (!stressBtn.IsEnabled) return;
@@ -395,7 +396,7 @@ public partial class SettingsHandler
                 // Bypasses freeze detection entirely — just tests that restart, unclean marker,
                 // and relaunch all work correctly.
                 var btnRowBot2 = new Microsoft.UI.Xaml.Controls.StackPanel { Orientation = Microsoft.UI.Xaml.Controls.Orientation.Horizontal, Spacing = 8 };
-                var fastRestartBtn = new Microsoft.UI.Xaml.Controls.Button { Content = "Test Fast Restart (5s)", FontSize = 11 };
+                var fastRestartBtn = new Microsoft.UI.Xaml.Controls.Button { Content = Loc.T("Test Fast Restart (5s)"), FontSize = 11 };
                 fastRestartBtn.Click += (s, e) =>
                 {
                     if (!fastRestartBtn.IsEnabled) return;
@@ -427,7 +428,7 @@ public partial class SettingsHandler
                 // Test Known Signature Freeze: blocks the dispatcher thread in a managed semaphore wait
                 // while the Win32 pump stays alive. This matches the real freeze signature:
                 // CPU=IDLE, pump responded, High probe times out → fast-path restart (~5s).
-                var knownSigBtn = new Microsoft.UI.Xaml.Controls.Button { Content = "Test Known Sig Freeze (10s)", FontSize = 11 };
+                var knownSigBtn = new Microsoft.UI.Xaml.Controls.Button { Content = Loc.T("Test Known Sig Freeze (10s)"), FontSize = 11 };
                 knownSigBtn.Click += (s, e) =>
                 {
                     if (!knownSigBtn.IsEnabled) return;
@@ -456,7 +457,7 @@ public partial class SettingsHandler
                 // EmptyWorkingSet stress: trims the process working set then immediately triggers
                 // a card rebuild — reproduces the idle/trim/wake/rebuild pattern seen in freezes 4 and 5.
                 var btnRowBot3 = new Microsoft.UI.Xaml.Controls.StackPanel { Orientation = Microsoft.UI.Xaml.Controls.Orientation.Horizontal, Spacing = 8, Margin = new Microsoft.UI.Xaml.Thickness(0, 4, 0, 0) };
-                var ewsBtn = new Microsoft.UI.Xaml.Controls.Button { Content = "EmptyWS + Rebuild (visible)", FontSize = 11 };
+                var ewsBtn = new Microsoft.UI.Xaml.Controls.Button { Content = Loc.T("EmptyWS + Rebuild (visible)"), FontSize = 11 };
                 ewsBtn.Click += (s, e) =>
                 {
                     CrashReporter.LogSync("[FreezeDiag] EmptyWorkingSet + Rebuild (visible): trimming then RequestCardRebuild");
@@ -466,7 +467,7 @@ public partial class SettingsHandler
                     if (card2 != null) _window.ViewModel.RequestCardRebuild?.Invoke(card2);
                     else CrashReporter.LogSync("[FreezeDiag] EmptyWorkingSet: no selected game");
                 };
-                var ewsMinBtn = new Microsoft.UI.Xaml.Controls.Button { Content = "EmptyWS + Rebuild (minimised)", FontSize = 11 };
+                var ewsMinBtn = new Microsoft.UI.Xaml.Controls.Button { Content = Loc.T("EmptyWS + Rebuild (minimised)"), FontSize = 11 };
                 ewsMinBtn.Click += (s, e) =>
                 {
                     CrashReporter.LogSync("[FreezeDiag] EmptyWorkingSet + Rebuild (minimised): hiding, trimming, rebuilding after 500ms");
@@ -573,7 +574,7 @@ public partial class SettingsHandler
 
         // Global ReBAR Enable
         var isAdminForReBar = VulkanLayerService.IsRunningAsAdmin();
-        _window.GlobalReBarEnableCombo.ItemsSource = new[] { "Auto (Default)", "Off", "On" };
+        _window.GlobalReBarEnableCombo.ItemsSource = new[] { Loc.T("Auto (Default)"), "Off", "On" };
         var globalReBarMode = snapshot.ReBarEnableMode ?? 1; // 0=Off, 1=Auto, 2=On
         _window.GlobalReBarEnableCombo.SelectedIndex = globalReBarMode == 0 ? 1 : globalReBarMode == 2 ? 2 : 0;
         _window.GlobalReBarEnableCombo.IsEnabled = isAdminForReBar;

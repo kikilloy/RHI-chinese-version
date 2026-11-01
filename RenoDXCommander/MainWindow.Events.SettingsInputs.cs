@@ -4,6 +4,7 @@
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using RenoDXCommander.Services;
+using RenoDXCommander.Localization;
 
 namespace RenoDXCommander;
 
@@ -101,8 +102,8 @@ public sealed partial class MainWindow
                 if (SettingsPanel.Visibility != Visibility.Visible) return;
                 var dialog = new ContentDialog
                 {
-                    Title = "Folder not found",
-                    Content = $"\"{typed}\" doesn't exist. The addon watch folder was not changed.",
+                    Title = Loc.T("Folder not found"),
+                    Content = Loc.T("\"{0}\" doesn't exist. The addon watch folder was not changed.", typed),
                     CloseButtonText = "OK",
                     XamlRoot = Content.XamlRoot,
                     RequestedTheme = ElementTheme.Dark,

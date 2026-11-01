@@ -113,6 +113,11 @@ If you use **Sign in with GitHub**, click **Sign out** in the same place, revoke
 **Tooltips**
 - Fixed out-of-date tooltips: Update All now lists every component it updates, the Neural Rendering "Deploy DLL" button no longer mentions the old addon picker route, and RTX 40 MFG no longer refers to the old `RTXMFG.dll` file name.
 
+**Simplified Chinese interface**
+- RHI now speaks Simplified Chinese. Settings has a new **Language** section: System default (follows Windows), English, or 简体中文. Picking one saves immediately and asks for a restart, because the language loads once at startup.
+- Translated so far: the main window (toolbar, menus, filters, search), the status bar and every Settings page, including the new Downloads and Language sections. Everything else is still in English — a language pack only replaces the text it actually contains, so an untranslated line simply stays English.
+- Settings that are not translated yet keep their English names on purpose: component and channel names (ReShade, Stable, DLSS…) are never translated, so they still match the logs you paste into a bug report.
+
 ### Manifest Updates
 - Added dgVoodoo2 v2.87.6, now the default version for new installs.
 

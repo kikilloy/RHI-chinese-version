@@ -179,6 +179,17 @@
   </ItemGroup>
 
 
+  <!-- Language packs, read from <exe>/Lang at runtime (Loc.Load -> AppPaths.LangDir).
+       CopyToOutputDirectory keeps plain `dotnet run` working; publish.bat also xcopies Lang\
+       into the release folder, because a pack missing there means the language silently
+       falls back to English. -->
+  <ItemGroup>
+    <None Remove="Lang\*.json" />
+    <Content Include="Lang\*.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
   <!-- ClrMD for freeze diagnostics — loaded dynamically at runtime via Assembly.LoadFrom.
        Not a PackageReference (that crashes WinAppSDK XAML compiler on publish).
        Copied to the output directory as a loose file alongside the EXE. -->

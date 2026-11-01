@@ -1,5 +1,6 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.UI.Xaml;
+using RenoDXCommander.Localization;
 using RenoDXCommander.Services;
 using RenoDXCommander.Services.Net;
 using RenoDXCommander.ViewModels;
@@ -72,6 +73,9 @@ public partial class App : Application
             client.DefaultVersionPolicy  = HttpVersionPolicy.RequestVersionOrLower;
             return client;
         });
+
+        // Language packs (English-as-key, ADR-0003). Applied in OnLaunched before the window exists.
+        services.AddSingleton<ILanguageService, LanguageService>();
 
         // Shared ETag cache for GitHub API conditional requests (304 Not Modified)
         services.AddSingleton<GitHubETagCache>();
@@ -290,6 +294,18 @@ public partial class App : Application
                     return;
                 }
             }
+        }
+
+        // Load the language pack before anything is built: every window, page and dialog resolves
+        // its text through Loc.T at construction time (English-as-key, ADR-0003). A failure here
+        // leaves the app on English rather than blocking startup.
+        try
+        {
+            Services.GetRequiredService<ILanguageService>().Apply();
+        }
+        catch (Exception ex)
+        {
+            CrashReporter.Log($"[App.OnLaunched] Language init failed — continuing in English: {ex.Message}");
         }
 
         CrashReporter.Log("[App.OnLaunched] Creating MainWindow");

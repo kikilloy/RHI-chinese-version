@@ -1,9 +1,10 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using RenoDXCommander.Models;
 using RenoDXCommander.Services;
 using RenoDXCommander.ViewModels;
+using RenoDXCommander.Localization;
 
 namespace RenoDXCommander;
 
@@ -14,20 +15,20 @@ public partial class SettingsHandler
     /// <summary>VRR cap presets matching the MFG dialog pattern.</summary>
     private static readonly (int Fps, string Label)[] _ulTargetFpsPresets =
     {
-        (59,  "59 FPS (60Hz VRR Cap)"),
-        (73,  "73 FPS (75Hz VRR Cap)"),
-        (97,  "97 FPS (100Hz VRR Cap)"),
-        (116, "116 FPS (120Hz VRR Cap)"),
-        (138, "138 FPS (144Hz VRR Cap)"),
-        (157, "157 FPS (165Hz VRR Cap)"),
-        (171, "171 FPS (180Hz VRR Cap)"),
-        (189, "189 FPS (200Hz VRR Cap)"),
-        (224, "224 FPS (240Hz VRR Cap)"),
-        (258, "258 FPS (280Hz VRR Cap)"),
-        (275, "275 FPS (300Hz VRR Cap)"),
-        (324, "324 FPS (360Hz VRR Cap)"),
-        (416, "416 FPS (480Hz VRR Cap)"),
-        (431, "431 FPS (500Hz VRR Cap)"),
+        (59,  Loc.T("59 FPS (60Hz VRR Cap)")),
+        (73,  Loc.T("73 FPS (75Hz VRR Cap)")),
+        (97,  Loc.T("97 FPS (100Hz VRR Cap)")),
+        (116, Loc.T("116 FPS (120Hz VRR Cap)")),
+        (138, Loc.T("138 FPS (144Hz VRR Cap)")),
+        (157, Loc.T("157 FPS (165Hz VRR Cap)")),
+        (171, Loc.T("171 FPS (180Hz VRR Cap)")),
+        (189, Loc.T("189 FPS (200Hz VRR Cap)")),
+        (224, Loc.T("224 FPS (240Hz VRR Cap)")),
+        (258, Loc.T("258 FPS (280Hz VRR Cap)")),
+        (275, Loc.T("275 FPS (300Hz VRR Cap)")),
+        (324, Loc.T("324 FPS (360Hz VRR Cap)")),
+        (416, Loc.T("416 FPS (480Hz VRR Cap)")),
+        (431, Loc.T("431 FPS (500Hz VRR Cap)")),
     };
     private static readonly HashSet<int> _ulTargetFpsPresetValues = new(_ulTargetFpsPresets.Select(p => p.Fps));
 
@@ -83,19 +84,19 @@ public partial class SettingsHandler
                 var panel = new StackPanel { Spacing = 8 };
                 panel.Children.Add(new TextBlock
                 {
-                    Text = "Enter a custom FPS value (20-1000):",
+                    Text = Loc.T("Enter a custom FPS value (20-1000):"),
                     FontSize = 12,
                 });
                 var inputBox = new TextBox
                 {
-                    PlaceholderText = "e.g. 165",
+                    PlaceholderText = Loc.T("e.g. 165"),
                     FontSize = 12,
                 };
                 panel.Children.Add(inputBox);
 
                 var dialog = new ContentDialog
                 {
-                    Title = "Custom Target FPS",
+                    Title = Loc.T("Custom Target FPS"),
                     Content = panel,
                     PrimaryButtonText = "Set",
                     CloseButtonText = "Cancel",
@@ -173,10 +174,10 @@ public partial class SettingsHandler
         var ulCheck = new CheckBox { Content = "ReLimiter", IsChecked = !settings.GlobalSkipUlUpdates, FontSize = 12, Foreground = UIFactory.Brush(ResourceKeys.TextSecondaryBrush), Margin = new Thickness(0, 4, 0, 4) };
         var dcCheck = new CheckBox { Content = "Display Commander", IsChecked = !settings.GlobalSkipDcUpdates, FontSize = 12, Foreground = UIFactory.Brush(ResourceKeys.TextSecondaryBrush), Margin = new Thickness(0, 4, 0, 4) };
         var osCheck = new CheckBox { Content = "OptiScaler", IsChecked = !settings.GlobalSkipOsUpdates, FontSize = 12, Foreground = UIFactory.Brush(ResourceKeys.TextSecondaryBrush), Margin = new Thickness(0, 4, 0, 4) };
-        var refCheck = new CheckBox { Content = "RE Framework", IsChecked = !settings.GlobalSkipRefUpdates, FontSize = 12, Foreground = UIFactory.Brush(ResourceKeys.TextSecondaryBrush), Margin = new Thickness(0, 4, 0, 4) };
+        var refCheck = new CheckBox { Content = Loc.T("RE Framework"), IsChecked = !settings.GlobalSkipRefUpdates, FontSize = 12, Foreground = UIFactory.Brush(ResourceKeys.TextSecondaryBrush), Margin = new Thickness(0, 4, 0, 4) };
 
         var checkPanel = new StackPanel { Spacing = 0 };
-        checkPanel.Children.Add(new TextBlock { Text = "Include components in Update All globally:", FontSize = 12, Foreground = UIFactory.Brush(ResourceKeys.TextPrimaryBrush), Margin = new Thickness(0, 0, 0, 8) });
+        checkPanel.Children.Add(new TextBlock { Text = Loc.T("Include components in Update All globally:"), FontSize = 12, Foreground = UIFactory.Brush(ResourceKeys.TextPrimaryBrush), Margin = new Thickness(0, 0, 0, 8) });
         checkPanel.Children.Add(rsCheck);
         checkPanel.Children.Add(rdxCheck);
         checkPanel.Children.Add(ulCheck);
@@ -186,7 +187,7 @@ public partial class SettingsHandler
 
         var dialog = new ContentDialog
         {
-            Title = "Global Update Inclusion",
+            Title = Loc.T("Global Update Inclusion"),
             Content = checkPanel,
             PrimaryButtonText = "Save",
             CloseButtonText = "Cancel",
@@ -321,7 +322,7 @@ public partial class SettingsHandler
 
             var dialog = new ContentDialog
             {
-                Title = "OptiScaler Hotkey",
+                Title = Loc.T("OptiScaler Hotkey"),
                 Content = $"Updated {updatedCount} OptiScaler.ini file{(updatedCount == 1 ? "" : "s")}.",
                 CloseButtonText = "OK",
                 XamlRoot = _window.Content.XamlRoot,

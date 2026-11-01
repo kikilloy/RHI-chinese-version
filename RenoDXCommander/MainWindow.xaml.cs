@@ -12,6 +12,7 @@ using RenoDXCommander.Models;
 using RenoDXCommander.ViewModels;
 using Windows.Storage.Pickers;
 using WinRT.Interop;
+using RenoDXCommander.Localization;
 
 namespace RenoDXCommander;
 
@@ -69,6 +70,10 @@ public sealed partial class MainWindow : Window
         _optiScalerService = App.Services.GetRequiredService<IOptiScalerService>();
         _addonPackService = viewModel.AddonPackServiceInstance;
         InitializeComponent();
+        // Translate the static XAML skeleton once (English-as-key, ADR-0003). Runs before any data
+        // is loaded, so only the skeleton is in the tree and a game name can never be matched.
+        // Dynamic UI calls Loc.T directly and is not affected.
+        RenoDXCommander.Localization.LocVisualTree.Apply(Content);
         // Hide immediately if starting minimized — must be before any Activate() call
         if (App._startMinimized)
             AppWindow.Hide();
@@ -430,24 +435,24 @@ public sealed partial class MainWindow : Window
         StopStatusBarTimer();
         _crashReporter.Log("[Shutdown] Sequence started");
         RunShutdownStep("dialogs", DialogService.Stop);
-        RunShutdownStep("background timers", ViewModel.StopBackgroundWork);
-        RunShutdownStep("panel scans", _detailPanelBuilder.StopBackgroundWork);
+        RunShutdownStep(Loc.T("background timers"), ViewModel.StopBackgroundWork);
+        RunShutdownStep(Loc.T("panel scans"), _detailPanelBuilder.StopBackgroundWork);
 
         // An auxiliary Window keeps WinUI alive even after the main Window closes.
-        RunShutdownStep("update log window", () => _updateLogWindow?.Close());
+        RunShutdownStep(Loc.T("update log window"), () => _updateLogWindow?.Close());
         ViewModel.PropertyChanged -= OnViewModelChanged;
         if (_detailPanelBuilder.CurrentDetailCard != null)
             _detailPanelBuilder.CurrentDetailCard.PropertyChanged -= _detailPanelBuilder.DetailCard_PropertyChanged;
-        RunShutdownStep("file watcher", _addonFileWatcher.Dispose);
-        RunShutdownStep("drag and drop", _windowStateManager.CleanupOleDragDrop);
+        RunShutdownStep(Loc.T("file watcher"), _addonFileWatcher.Dispose);
+        RunShutdownStep(Loc.T("drag and drop"), _windowStateManager.CleanupOleDragDrop);
         RunShutdownStep("tray", TrayIconService.Dispose);
         // Save first, then flush: SaveSettingsPublic schedules a debounced write.
         RunShutdownStep("settings", () => { ViewModel.SaveSettingsPublic(); ViewModel.FlushPendingSaves(); });
         // During initialization the card list can be empty/partial. Preserve the last good library.
         if (!ViewModel.IsLoading)
             RunShutdownStep("library", ViewModel.SaveLibraryPublic);
-        RunShutdownStep("window bounds", _windowStateManager.SaveWindowBounds);
-        RunShutdownStep("single instance", SingleInstanceService.Stop);
+        RunShutdownStep(Loc.T("window bounds"), _windowStateManager.SaveWindowBounds);
+        RunShutdownStep(Loc.T("single instance"), SingleInstanceService.Stop);
         _crashReporter.Log("[Shutdown] All steps complete — exiting");
         CrashReporter.Shutdown(); // flush async log channel (waits up to 2s for drain)
         Application.Current.Exit();
@@ -602,7 +607,7 @@ public sealed partial class MainWindow : Window
                 };
                 var pickerDialog = new ContentDialog
                 {
-                    Title = "🌙 Install Luma Addon",
+                    Title = Loc.T("🌙 Install Luma Addon"),
                     Content = new StackPanel
                     {
                         Spacing = 8,
@@ -612,7 +617,7 @@ public sealed partial class MainWindow : Window
                             combo,
                         }
                     },
-                    PrimaryButtonText = "Install",
+                    PrimaryButtonText = Loc.T("Install"),
                     CloseButtonText = "Cancel",
                     XamlRoot = Content.XamlRoot,
                     RequestedTheme = Microsoft.UI.Xaml.ElementTheme.Dark,

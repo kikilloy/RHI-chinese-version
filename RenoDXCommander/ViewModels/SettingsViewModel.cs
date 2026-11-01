@@ -1,5 +1,6 @@
 using System.Text.Json;
 using CommunityToolkit.Mvvm.ComponentModel;
+using RenoDXCommander.Localization;
 using RenoDXCommander.Models;
 using RenoDXCommander.Services;
 using RenoDXCommander.Services.Net;
@@ -131,6 +132,20 @@ public partial class SettingsViewModel : ObservableObject
         customPrefix: string.IsNullOrWhiteSpace(CustomMirrorPrefix) ? null : CustomMirrorPrefix.Trim(),
         useJsDelivrFallback: UseJsDelivrFallback,
         verifyDownloads: VerifyDownloads);
+
+    // ── Interface language ────────────────────────────────────────────────────
+    /// <summary>
+    /// UI language preference: <c>system</c> (follow the Windows UI language, default), <c>en</c>
+    /// or <c>zh-Hans</c>. Read straight from settings.json at startup by LanguageService, before the
+    /// ViewModels exist — so a change here only shows up after RHI restarts.
+    /// </summary>
+    [ObservableProperty] private string _language = LanguageService.PreferenceSystem;
+
+    /// <summary>True when the stored preference differs from the language currently loaded.</summary>
+    public bool LanguageChangePending =>
+        !string.Equals(Language, Loc.Language, StringComparison.OrdinalIgnoreCase)
+        && !(Language == LanguageService.PreferenceSystem
+             && string.Equals(Loc.Language, LanguageService.GetSystemLanguage(), StringComparison.OrdinalIgnoreCase));
 
     // ── Digital Vibrance ──────────────────────────────────────────────────────
     /// <summary>Per-display DVC values. Key = display index (string), Value = 0-100.</summary>
@@ -357,6 +372,8 @@ public partial class SettingsViewModel : ObservableObject
         if (s.TryGetValue("CustomMirrorPrefix", out var cmpVal)) CustomMirrorPrefix = cmpVal ?? "";
         if (s.TryGetValue("VerifyDownloads", out var vdVal)) VerifyDownloads = vdVal != "false"; // default true
         if (s.TryGetValue("UseJsDelivrFallback", out var jdfVal)) UseJsDelivrFallback = jdfVal == "true";
+        if (s.TryGetValue(LanguageService.SettingsKey, out var langVal))
+            Language = LanguageService.NormalizePreference(langVal);
         if (s.TryGetValue("PeakNits", out var pnVal) && int.TryParse(pnVal, out var pnInt)) PeakNits = pnInt;
         if (s.TryGetValue("PeakNitsEnabled", out var pneVal)) PeakNitsEnabled = pneVal != "false"; // default true
         if (s.TryGetValue("PeakNitsPresets", out var pnpVal))
@@ -571,6 +588,11 @@ public partial class SettingsViewModel : ObservableObject
         else s.Remove("CustomMirrorPrefix");
         s["VerifyDownloads"] = VerifyDownloads ? "true" : "false";
         s["UseJsDelivrFallback"] = UseJsDelivrFallback ? "true" : "false";
+        // "system" is the default — omit it so the file stays clean.
+        if (!string.Equals(Language, LanguageService.PreferenceSystem, StringComparison.OrdinalIgnoreCase))
+            s[LanguageService.SettingsKey] = Language;
+        else
+            s.Remove(LanguageService.SettingsKey);
         if (PeakNits > 0) s["PeakNits"] = PeakNits.ToString();
         s["PeakNitsEnabled"] = PeakNitsEnabled ? "true" : "false";
         if (PeakNitsPresets.Count < 3)

@@ -15,6 +15,12 @@ public static class AppPaths
     /// <summary>Path of a file shipped next to RHI.exe.</summary>
     public static string InExeDir(string fileName) => Path.Combine(ExeDir, fileName);
 
+    /// <summary>
+    /// Folder holding the JSON language packs (English-as-key, ADR-0003). One file per language:
+    /// <c>Lang/en.json</c> (baseline, used by the translation tooling) and <c>Lang/zh-Hans.json</c>.
+    /// </summary>
+    public static string LangDir => InExeDir("Lang");
+
     /// <summary>The 7z.exe shipped next to RHI.exe.</summary>
     public static string Bundled7Zip => InExeDir("7z.exe");
 

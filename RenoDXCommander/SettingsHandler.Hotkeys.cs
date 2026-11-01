@@ -1,9 +1,10 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using RenoDXCommander.Models;
 using RenoDXCommander.Services;
 using RenoDXCommander.ViewModels;
+using RenoDXCommander.Localization;
 
 namespace RenoDXCommander;
 
@@ -262,7 +263,7 @@ public partial class SettingsHandler
 
             var dialog = new ContentDialog
             {
-                Title = "ReLimiter Settings",
+                Title = Loc.T("ReLimiter Settings"),
                 Content = $"Updated {updatedCount} relimiter.ini file{(updatedCount == 1 ? "" : "s")}.",
                 CloseButtonText = "OK",
                 XamlRoot = _window.Content.XamlRoot,

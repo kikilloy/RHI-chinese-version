@@ -1,4 +1,4 @@
-﻿// SettingsHandler.Navigation.cs -- Settings page left column: "Find a setting" search box, section
+// SettingsHandler.Navigation.cs -- Settings page left column: "Find a setting" search box, section
 // jump list that highlights the section in view, last-section memory and the narrow-window layout.
 // Everything here is built in C# (XAML constraint: no new x:Name / controls in MainWindow.xaml).
 
@@ -10,6 +10,7 @@ using Microsoft.UI.Xaml.Documents;
 using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Xaml.Media;
 using RenoDXCommander.Services;
+using RenoDXCommander.Localization;
 
 namespace RenoDXCommander;
 
@@ -135,7 +136,7 @@ public partial class SettingsHandler
             // 2. Search box + label
             _settingsSearchBox = new TextBox
             {
-                PlaceholderText = "e.g. hotkey, HDR, ReBAR",
+                PlaceholderText = Loc.T("e.g. hotkey, HDR, ReBAR"),
                 FontSize = 13,
                 MinHeight = 34,
                 CornerRadius = new CornerRadius(8),
@@ -143,13 +144,13 @@ public partial class SettingsHandler
                 Background = UIFactory.Brush(ResourceKeys.SurfaceInputBrush),
                 BorderBrush = UIFactory.Brush(ResourceKeys.BorderDefaultBrush),
             };
-            Microsoft.UI.Xaml.Automation.AutomationProperties.SetName(_settingsSearchBox, "Find a setting");
+            Microsoft.UI.Xaml.Automation.AutomationProperties.SetName(_settingsSearchBox, Loc.T("Find a setting"));
             _settingsSearchBox.TextChanged += SettingsSearchBox_TextChanged;
             _settingsSearchBox.KeyDown += SettingsSearchBox_KeyDown;
             _searchPanel = new StackPanel { Spacing = 4 };
             _searchPanel.Children.Add(new TextBlock
             {
-                Text = "Find a setting",
+                Text = Loc.T("Find a setting"),
                 FontSize = 11,
                 Margin = new Thickness(4, 0, 4, 0),
                 Foreground = UIFactory.Brush(ResourceKeys.TextSecondaryBrush),
@@ -832,18 +833,18 @@ public partial class SettingsHandler
         var header = new StackPanel { Spacing = 2 };
         header.Children.Add(new TextBlock
         {
-            Text = "Search results",
+            Text = Loc.T("Search results"),
             FontSize = 18,
             FontWeight = Microsoft.UI.Text.FontWeights.Bold,
             Foreground = UIFactory.Brush(ResourceKeys.TextPrimaryBrush),
         });
         string countText = matches.Count switch
         {
-            0 => $"No settings match \"{q}\"",
-            1 => $"1 setting matches \"{q}\"",
-            _ => $"{matches.Count} settings match \"{q}\"",
+            0 => Loc.T("No settings match \"{0}\"", q),
+            1 => Loc.T("1 setting matches \"{0}\"", q),
+            _ => Loc.T("{0} settings match \"{1}\"", matches.Count, q),
         };
-        if (matches.Count > MaxSearchResults) countText += $". Showing the first {MaxSearchResults}; keep typing to narrow it down.";
+        if (matches.Count > MaxSearchResults) countText += Loc.T(". Showing the first {0}; keep typing to narrow it down.", MaxSearchResults);
         header.Children.Add(new TextBlock
         {
             Text = countText,
@@ -883,7 +884,7 @@ public partial class SettingsHandler
                 HorizontalAlignment = HorizontalAlignment.Stretch,
                 HorizontalContentAlignment = HorizontalAlignment.Left,
             };
-            ToolTipService.SetToolTip(row, "Go to this setting");
+            ToolTipService.SetToolTip(row, Loc.T("Go to this setting"));
             var captured = entry;
             row.Click += (_, _) =>
             {

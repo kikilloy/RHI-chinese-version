@@ -1,9 +1,10 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using RenoDXCommander.Models;
 using RenoDXCommander.Services;
 using RenoDXCommander.ViewModels;
+using RenoDXCommander.Localization;
 
 namespace RenoDXCommander;
 
@@ -49,8 +50,8 @@ public partial class SettingsHandler
             {
                 await DialogService.ShowSafeAsync(new ContentDialog
                 {
-                    Title = "Game Data Copied",
-                    Content = $"Data for {ViewModel.AllCards.Count} games has been gathered and copied to your clipboard. Paste directly into Discord to share.",
+                    Title = Loc.T("Game Data Copied"),
+                    Content = Loc.T("Data for {0} games has been gathered and copied to your clipboard. Paste directly into Discord to share.", ViewModel.AllCards.Count),
                     CloseButtonText = "OK",
                     XamlRoot = fe.XamlRoot,
                     RequestedTheme = Microsoft.UI.Xaml.ElementTheme.Dark,
@@ -118,11 +119,11 @@ public partial class SettingsHandler
                 allApis.Add(a.ToString().Replace("DirectX", "DX"));
             if (pcgwInfo != null)
             {
-                if (pcgwInfo.HasDirectX9)  allApis.Add("DX9");
-                if (pcgwInfo.HasDirectX10) allApis.Add("DX10");
-                if (pcgwInfo.HasDirectX11) allApis.Add("DX11");
-                if (pcgwInfo.HasDirectX12) allApis.Add("DX12");
-                if (pcgwInfo.HasVulkan)    allApis.Add("Vulkan");
+                if (pcgwInfo.HasDirectX9)  allApis.Add(Loc.T("DX9"));
+                if (pcgwInfo.HasDirectX10) allApis.Add(Loc.T("DX10"));
+                if (pcgwInfo.HasDirectX11) allApis.Add(Loc.T("DX11"));
+                if (pcgwInfo.HasDirectX12) allApis.Add(Loc.T("DX12"));
+                if (pcgwInfo.HasVulkan)    allApis.Add(Loc.T("Vulkan"));
                 if (pcgwInfo.HasOpenGL)    allApis.Add("OpenGL");
             }
 
@@ -214,8 +215,8 @@ public partial class SettingsHandler
             {
                 await DialogService.ShowSafeAsync(new ContentDialog
                 {
-                    Title = "Logs Copied",
-                    Content = "All session logs have been archived and copied to your clipboard. Paste directly into Discord to share.",
+                    Title = Loc.T("Logs Copied"),
+                    Content = Loc.T("All session logs have been archived and copied to your clipboard. Paste directly into Discord to share."),
                     CloseButtonText = "OK",
                     XamlRoot = fe.XamlRoot,
                 });
@@ -234,9 +235,9 @@ public partial class SettingsHandler
             // Show warning dialog
             var warningDialog = new ContentDialog
             {
-                Title = "⚠ Purge Staging Files",
-                Content = "This will delete cached DLSS, Streamline, and component staging files to free disk space.\n\nShaders, installed RenoDX addons, and version metadata are preserved.\n\nThese files will be re-downloaded automatically when needed.\n\nContinue?",
-                PrimaryButtonText = "Purge",
+                Title = Loc.T("⚠ Purge Staging Files"),
+                Content = Loc.T("This will delete cached DLSS, Streamline, and component staging files to free disk space.\n\nShaders, installed RenoDX addons, and version metadata are preserved.\n\nThese files will be re-downloaded automatically when needed.\n\nContinue?"),
+                PrimaryButtonText = Loc.T("Purge"),
                 CloseButtonText = "Cancel",
                 DefaultButton = ContentDialogButton.Close,
                 XamlRoot = _window.Content.XamlRoot,
@@ -350,15 +351,15 @@ public partial class SettingsHandler
                     >= 1_073_741_824 => $"{bytesFreed / 1_073_741_824.0:F1} GB",
                     >= 1_048_576 => $"{bytesFreed / 1_048_576.0:F1} MB",
                     >= 1024 => $"{bytesFreed / 1024.0:F1} KB",
-                    _ => $"{bytesFreed} bytes"
+                    _ => Loc.T("{0} bytes", bytesFreed)
                 };
 
                 CrashReporter.Log($"[SettingsHandler.PurgeCachedFiles_Click] Purged {filesDeleted} files, freed {sizeStr}");
 
                 var resultDialog = new ContentDialog
                 {
-                    Title = "✅ Cache Purged",
-                    Content = $"Deleted {filesDeleted} files, freed {sizeStr} of disk space.",
+                    Title = Loc.T("✅ Cache Purged"),
+                    Content = Loc.T("Deleted {0} files, freed {1} of disk space.", filesDeleted, sizeStr),
                     CloseButtonText = "OK",
                     XamlRoot = _window.Content.XamlRoot,
                     RequestedTheme = ElementTheme.Dark,
@@ -370,8 +371,8 @@ public partial class SettingsHandler
                 CrashReporter.Log($"[SettingsHandler.PurgeCachedFiles_Click] Failed: {ex.Message}");
                 var errDialog = new ContentDialog
                 {
-                    Title = "❌ Purge Failed",
-                    Content = $"An error occurred: {ex.Message}",
+                    Title = Loc.T("❌ Purge Failed"),
+                    Content = Loc.T("An error occurred: {0}", ex.Message),
                     CloseButtonText = "OK",
                     XamlRoot = _window.Content.XamlRoot,
                     RequestedTheme = ElementTheme.Dark,

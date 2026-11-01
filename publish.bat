@@ -44,5 +44,10 @@ copy /y "%SRC%\OptiScaler.nvidia.ini" "%OUT%\" >nul
 copy /y "%SRC%\OptiScaler.amd-dlss.ini" "%OUT%\" >nul
 copy /y "%SRC%\OptiScaler.amd-nodlss.ini" "%OUT%\" >nul
 
+:: Language packs — Loc.Load reads <exe>\Lang\<language>.json at startup.
+:: Missing this folder in the release means every user silently gets English.
+if not exist "%OUT%\Lang" mkdir "%OUT%\Lang"
+xcopy /s /y /i "%SRC%\Lang\*.json" "%OUT%\Lang\" >nul
+
 :: Deploy ClrMD for freeze diagnostics (must be loose alongside EXE, not bundled)
 copy /y "%USERPROFILE%\.nuget\packages\microsoft.diagnostics.runtime\3.1.512801\lib\net6.0\Microsoft.Diagnostics.Runtime.dll" "%OUT%\" >nul

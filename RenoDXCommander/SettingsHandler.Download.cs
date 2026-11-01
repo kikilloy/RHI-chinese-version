@@ -9,11 +9,13 @@ using Microsoft.UI.Xaml.Controls;
 using RenoDXCommander.Services;
 using RenoDXCommander.Services.Net;
 using RenoDXCommander.ViewModels;
+using RenoDXCommander.Localization;
 
 namespace RenoDXCommander;
 
 public partial class SettingsHandler
 {
+    // Section keys are internal identifiers (Tag="Section:Download"), never shown to the user.
     private const string DownloadSectionKey = "Download";
 
     private StackPanel? _downloadSection;
@@ -64,14 +66,14 @@ public partial class SettingsHandler
         var header = new StackPanel { Spacing = 3 };
         header.Children.Add(new TextBlock
         {
-            Text = "Downloads",
+            Text = Loc.T("Downloads"),
             FontSize = 18,
             FontWeight = FontWeights.Bold,
             Foreground = UIFactory.Brush(ResourceKeys.TextPrimaryBrush),
         });
         header.Children.Add(new TextBlock
         {
-            Text = "How RHI fetches components from GitHub. Use a mirror when downloads are slow or blocked.",
+            Text = Loc.T("How RHI fetches components from GitHub. Use a mirror when downloads are slow or blocked."),
             FontSize = 12,
             LineHeight = 17,
             TextWrapping = TextWrapping.Wrap,
@@ -87,7 +89,7 @@ public partial class SettingsHandler
         var content = new StackPanel { Spacing = 12 };
         content.Children.Add(new TextBlock
         {
-            Text = "Download source",
+            Text = Loc.T("Download source"),
             FontSize = 13,
             FontWeight = FontWeights.SemiBold,
             Foreground = UIFactory.Brush(ResourceKeys.TextPrimaryBrush),
@@ -101,8 +103,8 @@ public partial class SettingsHandler
             MinWidth = 210,
             HorizontalAlignment = HorizontalAlignment.Right,
         };
-        modeCombo.Items.Add("Direct (github.com)");
-        modeCombo.Items.Add("Accelerated (mirror)");
+        modeCombo.Items.Add(Loc.T("Direct (github.com)"));
+        modeCombo.Items.Add(Loc.T("Accelerated (mirror)"));
         modeCombo.SelectedIndex = settings.IsAcceleratedDownloads ? 1 : 0;
         modeCombo.SelectionChanged += (_, _) =>
         {
@@ -115,8 +117,8 @@ public partial class SettingsHandler
             UpdateDownloadStatus();
         };
         content.Children.Add(MakeSettingRow(
-            "Download source",
-            "Direct talks to GitHub itself. Accelerated tries a mirror first and falls back to the direct connection when it fails.",
+            Loc.T("Download source"),
+            Loc.T("Direct talks to GitHub itself. Accelerated tries a mirror first and falls back to the direct connection when it fails."),
             modeCombo));
 
         // 2. Custom prefix ---------------------------------------------------------------
@@ -132,7 +134,7 @@ public partial class SettingsHandler
             if (e.Key == Windows.System.VirtualKey.Enter) ApplyCustomMirrorPrefix(prefixBox);
         };
         content.Children.Add(MakeSettingRow(
-            "Custom mirror prefix",
+            Loc.T("Custom mirror prefix"),
             "Optional. Leave empty to use the mirror list published with the manifest. Must be an https:// address that accepts {prefix}{full-url}.",
             prefixBox));
 
@@ -154,8 +156,8 @@ public partial class SettingsHandler
             UpdateDownloadStatus();
         };
         content.Children.Add(MakeSettingRow(
-            "Verify downloads",
-            "Compares mirrored files with the hash GitHub publishes. Recommended: a mirror is a third party. Turning this off removes the protection against a tampered mirror.",
+            Loc.T("Verify downloads"),
+            Loc.T("Compares mirrored files with the hash GitHub publishes. Recommended: a mirror is a third party. Turning this off removes the protection against a tampered mirror."),
             verifyToggle));
 
         // 4. jsDelivr fallback -----------------------------------------------------------
@@ -176,14 +178,14 @@ public partial class SettingsHandler
             UpdateDownloadStatus();
         };
         content.Children.Add(MakeSettingRow(
-            "jsDelivr fallback",
-            "Last-resort CDN for raw files. Its edge cache holds files for up to 12 hours, so manifest and MOTD updates can arrive late. Leave off unless you need it.",
+            Loc.T("jsDelivr fallback"),
+            Loc.T("Last-resort CDN for raw files. Its edge cache holds files for up to 12 hours, so manifest and MOTD updates can arrive late. Leave off unless you need it."),
             jsDelivrToggle));
 
         // 5. Mirror speed test -----------------------------------------------------------
         var probeButton = new Button
         {
-            Content = "Test mirrors",
+            Content = Loc.T("Test mirrors"),
             FontSize = 12,
             Padding = new Thickness(12, 4, 12, 4),
             HorizontalAlignment = HorizontalAlignment.Right,
@@ -200,8 +202,8 @@ public partial class SettingsHandler
         probePanel.Children.Add(probeButton);
         probePanel.Children.Add(probeOutput);
         content.Children.Add(MakeSettingRow(
-            "Mirror speed",
-            "Downloads a small file through every mirror in the active list and reports the time.",
+            Loc.T("Mirror speed"),
+            Loc.T("Downloads a small file through every mirror in the active list and reports the time."),
             probePanel));
 
         // 6. Current state ---------------------------------------------------------------
@@ -265,15 +267,15 @@ public partial class SettingsHandler
 
         if (!settings.IsAcceleratedDownloads)
         {
-            text = "Direct only — GitHub is contacted for every download.";
+            text = Loc.T("Direct only — GitHub is contacted for every download.");
         }
         else
         {
             var prefixes = MirrorRuntime.EffectivePrefixes;
-            var origin = string.IsNullOrWhiteSpace(settings.CustomMirrorPrefix) ? "manifest/default list" : "custom prefix";
+            var origin = string.IsNullOrWhiteSpace(settings.CustomMirrorPrefix) ? Loc.T("manifest/default list") : Loc.T("custom prefix");
             text = settings.VerifyDownloads
-                ? $"Accelerated via {prefixes.Count} mirror(s) from the {origin} · integrity checks on."
-                : $"Accelerated via {prefixes.Count} mirror(s) from the {origin} · integrity checks OFF.  You will not be protected against a tampered mirror.";
+                ? Loc.T("Accelerated via {0} mirror(s) from the {1} · integrity checks on.", prefixes.Count, origin)
+                : Loc.T("Accelerated via {0} mirror(s) from the {1} · integrity checks OFF.  You will not be protected against a tampered mirror.", prefixes.Count, origin);
             warn = !settings.VerifyDownloads;
         }
 
@@ -283,7 +285,7 @@ public partial class SettingsHandler
         var skipReason = MirrorRuntime.IntegritySkipReason;
         if (settings.VerifyDownloads && !string.IsNullOrWhiteSpace(skipReason))
         {
-            text += $"\nLast mirrored download was NOT verified: {skipReason}";
+            text += Loc.T("\nLast mirrored download was NOT verified: {0}", skipReason);
             warn = true;
         }
 
@@ -304,19 +306,19 @@ public partial class SettingsHandler
             var results = await MirrorProbe.TestAsync(MirrorRuntime.EffectivePrefixes);
             if (results.Count == 0)
             {
-                output.Text = "No mirrors configured.";
+                output.Text = Loc.T("No mirrors configured.");
                 return;
             }
 
             var lines = results.Select(r => r.Ok
-                ? $"{r.Host}: {r.ElapsedMs} ms"
-                : $"{r.Host}: failed — {r.Error}");
+                ? Loc.T("{0}: {1} ms", r.Host, r.ElapsedMs)
+                : Loc.T("{0}: failed — {1}", r.Host, r.Error));
             output.Text = string.Join("\n", lines);
             CrashReporter.Log("[SettingsHandler.RunMirrorProbe] " + string.Join(" | ", lines));
         }
         catch (Exception ex)
         {
-            output.Text = $"Mirror test failed — {ex.Message}";
+            output.Text = Loc.T("Mirror test failed — {0}", ex.Message);
             CrashReporter.Log($"[SettingsHandler.RunMirrorProbe] {ex.Message}");
         }
         finally

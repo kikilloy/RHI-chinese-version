@@ -4,6 +4,7 @@
 
 using Microsoft.UI.Dispatching;
 using RenoDXCommander.Services;
+using RenoDXCommander.Localization;
 
 namespace RenoDXCommander;
 
@@ -81,14 +82,17 @@ public sealed partial class MainWindow
     {
         bool minimal = string.Equals(backgroundChecks, "Minimal", StringComparison.OrdinalIgnoreCase);
         var last = SettingsHandler.FormatLastUpdateCheck(lastUtcText, nowUtc);
-        var text = (minimal ? "Last full check: " : "Last checked: ") + (last == "Just now" ? "just now" : last == "Not yet" ? "not yet" : last);
+        // FormatLastUpdateCheck returns English, so compare against English: only the text that is
+        // shown gets translated.
+        var text = (minimal ? Loc.T("Last full check: ") : Loc.T("Last checked: "))
+            + (last == "Just now" ? Loc.T("just now") : last == "Not yet" ? Loc.T("not yet") : last);
         if (nextUtc != null)
         {
             var remaining = nextUtc.Value - nowUtc;
             var next = remaining <= TimeSpan.FromMinutes(1)
-                ? "under a minute"
+                ? Loc.T("under a minute")
                 : $"{(int)remaining.TotalHours}h {remaining.Minutes:00}m";
-            text += minimal ? $"  ·  Next data refresh in {next}" : $"  ·  Next check in {next}";
+            text += minimal ? Loc.T("  ·  Next data refresh in {0}", next) : Loc.T("  ·  Next check in {0}", next);
         }
         return text;
     }

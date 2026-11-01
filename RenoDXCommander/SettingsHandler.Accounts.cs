@@ -1,9 +1,10 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using RenoDXCommander.Models;
 using RenoDXCommander.Services;
 using RenoDXCommander.ViewModels;
+using RenoDXCommander.Localization;
 
 namespace RenoDXCommander;
 
@@ -25,8 +26,8 @@ public partial class SettingsHandler
 
         if (connected)
         {
-            var tier = isPremium ? "Premium" : "Free";
-            _window.NexusStatusText.Text = $"Connected as {username} ({tier})";
+            var tier = isPremium ? Loc.T("Premium") : Loc.T("Free");
+            _window.NexusStatusText.Text = Loc.T("Connected as {0} ({1})", username, tier);
             _window.NexusStatusText.Foreground = UIFactory.Brush(
                 isPremium ? ResourceKeys.AccentGreenBrush : ResourceKeys.TextSecondaryBrush);
             _window.NexusDisconnectRow.Visibility = Microsoft.UI.Xaml.Visibility.Visible;
@@ -34,10 +35,10 @@ public partial class SettingsHandler
         }
         else
         {
-            _window.NexusStatusText.Text = "Not connected";
+            _window.NexusStatusText.Text = Loc.T("Not connected");
             _window.NexusStatusText.Foreground = UIFactory.Brush(ResourceKeys.TextTertiaryBrush);
             _window.NexusDisconnectRow.Visibility = Microsoft.UI.Xaml.Visibility.Collapsed;
-            _window.NexusConnectBtn.Content = "Connect";
+            _window.NexusConnectBtn.Content = Loc.T("Connect");
         }
 
         // NXM handler status
@@ -45,7 +46,7 @@ public partial class SettingsHandler
         _window.NxmStatusText.Text = nxmRegistered ? "RHI is the active nxm:// handler" : "Not registered";
         _window.NxmStatusText.Foreground = UIFactory.Brush(
             nxmRegistered ? ResourceKeys.AccentGreenBrush : ResourceKeys.TextSecondaryBrush);
-        _window.NxmRegisterBtn.Content = nxmRegistered ? "Unregister" : "Register";
+        _window.NxmRegisterBtn.Content = nxmRegistered ? Loc.T("Unregister") : Loc.T("Register");
     }
 
     public async void NexusConnectBtn_Click(object sender, Microsoft.UI.Xaml.RoutedEventArgs e)
@@ -56,7 +57,7 @@ public partial class SettingsHandler
             var nexusSso = App.Services.GetRequiredService<NexusSsoService>();
 
             _window.NexusConnectBtn.IsEnabled = false;
-            _window.NexusStatusText.Text = "Opening browser for authorisation...";
+            _window.NexusStatusText.Text = Loc.T("Opening browser for authorisation...");
             _window.NexusStatusText.Foreground = UIFactory.Brush(ResourceKeys.TextTertiaryBrush);
 
             using var cts = new System.Threading.CancellationTokenSource(TimeSpan.FromSeconds(120));
@@ -69,7 +70,7 @@ public partial class SettingsHandler
                 catch (Exception ex) { CrashReporter.Log($"[SettingsHandler.NexusConnectBtn_Click] Failed to open browser — {ex.Message}"); }
 
                 _window.DispatcherQueue?.TryEnqueue(() =>
-                    _window.NexusStatusText.Text = "Waiting for authorisation in browser...");
+                    _window.NexusStatusText.Text = Loc.T("Waiting for authorisation in browser..."));
             };
 
             try
@@ -94,14 +95,14 @@ public partial class SettingsHandler
 
                     if (string.IsNullOrEmpty(receivedKey))
                     {
-                        _window.NexusStatusText.Text = "Authorisation timed out or was cancelled.";
+                        _window.NexusStatusText.Text = Loc.T("Authorisation timed out or was cancelled.");
                         _window.NexusStatusText.Foreground = UIFactory.Brush(ResourceKeys.AccentRedBrush);
                         return;
                     }
 
                     if (info == null)
                     {
-                        _window.NexusStatusText.Text = "Received key was invalid. Please try again.";
+                        _window.NexusStatusText.Text = Loc.T("Received key was invalid. Please try again.");
                         _window.NexusStatusText.Foreground = UIFactory.Brush(ResourceKeys.AccentRedBrush);
                         return;
                     }
@@ -150,9 +151,9 @@ public partial class SettingsHandler
                 {
                     var result = await DialogService.ShowSafeAsync(new ContentDialog
                     {
-                        Title = "NXM Protocol Handler",
+                        Title = Loc.T("NXM Protocol Handler"),
                         Content = "Another application (e.g. Vortex or MO2) is already registered as the nxm:// handler. Registering RHI will replace it. Continue?",
-                        PrimaryButtonText = "Register RHI",
+                        PrimaryButtonText = Loc.T("Register RHI"),
                         CloseButtonText = "Cancel",
                         XamlRoot = _window.Content.XamlRoot,
                         RequestedTheme = Microsoft.UI.Xaml.ElementTheme.Dark,
@@ -169,7 +170,7 @@ public partial class SettingsHandler
                 {
                     await DialogService.ShowSafeAsync(new ContentDialog
                     {
-                        Title = "NXM Registration Failed",
+                        Title = Loc.T("NXM Registration Failed"),
                         Content = $"Could not register the nxm:// handler: {ex.Message}",
                         CloseButtonText = "OK",
                         XamlRoot = _window.Content.XamlRoot,
@@ -211,7 +212,7 @@ public partial class SettingsHandler
         // Update the PAT status text to show file state
         if (hasPat)
         {
-            _window.GitHubPatStatusText.Text = "PAT file active — 5,000 req/hr (persists across restarts)";
+            _window.GitHubPatStatusText.Text = Loc.T("PAT file active — 5,000 req/hr (persists across restarts)");
             _window.GitHubPatStatusText.Foreground = UIFactory.Brush(ResourceKeys.AccentGreenBrush);
             _window.GitHubPatStatusText.Visibility = Microsoft.UI.Xaml.Visibility.Visible;
         }
@@ -223,7 +224,7 @@ public partial class SettingsHandler
 
         if (App._gitHubTokenExpiredOnStartup)
         {
-            _window.GitHubStatusText.Text       = "GitHub session expired — please re-connect to restore the 5,000 req/hr limit";
+            _window.GitHubStatusText.Text       = Loc.T("GitHub session expired — please re-connect to restore the 5,000 req/hr limit");
             _window.GitHubStatusText.Foreground = UIFactory.Brush(ResourceKeys.AccentAmberDimBrush);
             _window.GitHubConnectBtn.Content    = "Re-connect";
             _window.GitHubDisconnectRow.Visibility = Microsoft.UI.Xaml.Visibility.Collapsed;
@@ -231,16 +232,16 @@ public partial class SettingsHandler
         else if (connected)
         {
             var display = string.IsNullOrEmpty(username) ? "GitHub" : $"@{username}";
-            _window.GitHubStatusText.Text       = $"Connected as {display} · 5,000 req/hr";
+            _window.GitHubStatusText.Text       = Loc.T("Connected as {0} · 5,000 req/hr", display);
             _window.GitHubStatusText.Foreground = UIFactory.Brush(ResourceKeys.AccentGreenBrush);
             _window.GitHubConnectBtn.Content    = "Re-connect";
             _window.GitHubDisconnectRow.Visibility = Microsoft.UI.Xaml.Visibility.Visible;
         }
         else
         {
-            _window.GitHubStatusText.Text       = hasPat ? "Using PAT · 5,000 req/hr" : "Not connected · 60 req/hr";
+            _window.GitHubStatusText.Text       = hasPat ? Loc.T("Using PAT · 5,000 req/hr") : Loc.T("Not connected · 60 req/hr");
             _window.GitHubStatusText.Foreground = hasPat ? UIFactory.Brush(ResourceKeys.AccentGreenBrush) : UIFactory.Brush(ResourceKeys.TextTertiaryBrush);
-            _window.GitHubConnectBtn.Content    = "Sign in with GitHub instead";
+            _window.GitHubConnectBtn.Content    = Loc.T("Sign in with GitHub instead");
             _window.GitHubDisconnectRow.Visibility = Microsoft.UI.Xaml.Visibility.Collapsed;
         }
 
@@ -257,7 +258,7 @@ public partial class SettingsHandler
 
             _window.GitHubConnectBtn.IsEnabled = false;
             _window.GitHubConnectBtn.Content   = "Connecting...";
-            _window.GitHubStatusText.Text      = "Requesting device code...";
+            _window.GitHubStatusText.Text      = Loc.T("Requesting device code...");
             _window.GitHubStatusText.Foreground = UIFactory.Brush(ResourceKeys.TextTertiaryBrush);
             _window.GitHubDeviceCodePanel.Visibility = Microsoft.UI.Xaml.Visibility.Collapsed;
 
@@ -270,10 +271,10 @@ public partial class SettingsHandler
             {
                 _window.DispatcherQueue?.TryEnqueue(() =>
                 {
-                    _window.GitHubStatusText.Text      = "Failed to start authorisation. Check your connection and try again.";
+                    _window.GitHubStatusText.Text      = Loc.T("Failed to start authorisation. Check your connection and try again.");
                     _window.GitHubStatusText.Foreground = UIFactory.Brush(ResourceKeys.AccentRedBrush);
                     _window.GitHubConnectBtn.IsEnabled  = true;
-                    _window.GitHubConnectBtn.Content    = "Sign in with GitHub instead";
+                    _window.GitHubConnectBtn.Content    = Loc.T("Sign in with GitHub instead");
                 });
                 return;
             }
@@ -285,7 +286,7 @@ public partial class SettingsHandler
                 _window.GitHubVerificationLink.NavigateUri = new Uri(deviceCode.VerificationUri);
                 _window.GitHubVerificationLink.Content     = deviceCode.VerificationUri;
                 _window.GitHubDeviceCodePanel.Visibility   = Microsoft.UI.Xaml.Visibility.Visible;
-                _window.GitHubStatusText.Text       = "Enter the code above at the link — waiting for authorisation...";
+                _window.GitHubStatusText.Text       = Loc.T("Enter the code above at the link — waiting for authorisation...");
                 _window.GitHubStatusText.Foreground = UIFactory.Brush(ResourceKeys.TextTertiaryBrush);
             });
 
@@ -303,7 +304,7 @@ public partial class SettingsHandler
             {
                 _window.DispatcherQueue?.TryEnqueue(() =>
                 {
-                    _window.GitHubStatusText.Text       = "Authorisation timed out or was cancelled.";
+                    _window.GitHubStatusText.Text       = Loc.T("Authorisation timed out or was cancelled.");
                     _window.GitHubStatusText.Foreground = UIFactory.Brush(ResourceKeys.AccentRedBrush);
                     _window.GitHubDeviceCodePanel.Visibility = Microsoft.UI.Xaml.Visibility.Collapsed;
                     _window.GitHubConnectBtn.IsEnabled  = true;
@@ -360,7 +361,7 @@ public partial class SettingsHandler
             var pat = _window.GitHubPatBox.Text?.Trim() ?? "";
             if (string.IsNullOrEmpty(pat))
             {
-                _window.GitHubPatStatusText.Text = "Please enter a token first.";
+                _window.GitHubPatStatusText.Text = Loc.T("Please enter a token first.");
                 _window.GitHubPatStatusText.Foreground = UIFactory.Brush(ResourceKeys.AccentRedBrush);
                 _window.GitHubPatStatusText.Visibility = Microsoft.UI.Xaml.Visibility.Visible;
                 return;
@@ -370,7 +371,7 @@ public partial class SettingsHandler
             if (!pat.StartsWith("ghp_", StringComparison.OrdinalIgnoreCase) &&
                 !pat.StartsWith("github_pat_", StringComparison.OrdinalIgnoreCase))
             {
-                _window.GitHubPatStatusText.Text = "Token should start with ghp_ or github_pat_";
+                _window.GitHubPatStatusText.Text = Loc.T("Token should start with ghp_ or github_pat_");
                 _window.GitHubPatStatusText.Foreground = UIFactory.Brush(ResourceKeys.AccentAmberDimBrush);
                 _window.GitHubPatStatusText.Visibility = Microsoft.UI.Xaml.Visibility.Visible;
             }
@@ -386,7 +387,7 @@ public partial class SettingsHandler
                 var http = App.Services.GetRequiredService<HttpClient>();
                 using var cts = new System.Threading.CancellationTokenSource(TimeSpan.FromSeconds(5));
                 var req = new System.Net.Http.HttpRequestMessage(System.Net.Http.HttpMethod.Get, "https://api.github.com/user");
-                req.Headers.TryAddWithoutValidation("Authorization", $"Bearer {pat}");
+                req.Headers.TryAddWithoutValidation(Loc.T("Authorization"), Loc.T("Bearer {0}", pat));
                 req.Headers.TryAddWithoutValidation("User-Agent", "RHI");
                 using var resp = await http.SendAsync(req, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cts.Token);
                 valid = resp.IsSuccessStatusCode;
@@ -405,7 +406,7 @@ public partial class SettingsHandler
 
             if (!valid)
             {
-                _window.GitHubPatStatusText.Text = "Token validation failed — check the token and try again.";
+                _window.GitHubPatStatusText.Text = Loc.T("Token validation failed — check the token and try again.");
                 _window.GitHubPatStatusText.Foreground = UIFactory.Brush(ResourceKeys.AccentRedBrush);
                 _window.GitHubPatStatusText.Visibility = Microsoft.UI.Xaml.Visibility.Visible;
                 return;
@@ -422,7 +423,7 @@ public partial class SettingsHandler
             }
             catch (Exception ex)
             {
-                _window.GitHubPatStatusText.Text = $"Failed to save: {ex.Message}";
+                _window.GitHubPatStatusText.Text = Loc.T("Failed to save: {0}", ex.Message);
                 _window.GitHubPatStatusText.Foreground = UIFactory.Brush(ResourceKeys.AccentRedBrush);
                 _window.GitHubPatStatusText.Visibility = Microsoft.UI.Xaml.Visibility.Visible;
                 return;
@@ -436,8 +437,8 @@ public partial class SettingsHandler
 
             _window.GitHubPatBox.Text = "";
             _window.GitHubPatStatusText.Text = username != null
-                ? $"PAT saved — authenticated as @{username}"
-                : "PAT saved and applied.";
+                ? Loc.T("PAT saved — authenticated as @{0}", username)
+                : Loc.T("PAT saved and applied.");
             _window.GitHubPatStatusText.Foreground = UIFactory.Brush(ResourceKeys.AccentGreenBrush);
             _window.GitHubPatStatusText.Visibility = Microsoft.UI.Xaml.Visibility.Visible;
 
@@ -461,7 +462,7 @@ public partial class SettingsHandler
         }
         catch (Exception ex)
         {
-            _window.GitHubPatStatusText.Text = $"Failed to clear: {ex.Message}";
+            _window.GitHubPatStatusText.Text = Loc.T("Failed to clear: {0}", ex.Message);
             _window.GitHubPatStatusText.Foreground = UIFactory.Brush(ResourceKeys.AccentRedBrush);
             _window.GitHubPatStatusText.Visibility = Microsoft.UI.Xaml.Visibility.Visible;
             return;
@@ -474,7 +475,7 @@ public partial class SettingsHandler
         GitHubAuthService.ApplyTokenToHttpClient(http, string.IsNullOrEmpty(oauthToken) ? null : oauthToken);
 
         _window.GitHubPatBox.Text = "";
-        _window.GitHubPatStatusText.Text = "PAT cleared.";
+        _window.GitHubPatStatusText.Text = Loc.T("PAT cleared.");
         _window.GitHubPatStatusText.Foreground = UIFactory.Brush(ResourceKeys.TextTertiaryBrush);
         _window.GitHubPatStatusText.Visibility = Microsoft.UI.Xaml.Visibility.Visible;
 

@@ -1,9 +1,10 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using RenoDXCommander.Models;
 using RenoDXCommander.Services;
 using RenoDXCommander.ViewModels;
+using RenoDXCommander.Localization;
 
 namespace RenoDXCommander;
 
@@ -54,11 +55,11 @@ public partial class SettingsHandler
                 // Check if it's due to admin rights
                 if (!VulkanLayerService.IsRunningAsAdmin())
                 {
-                    _window.DldsrCurrentStateText.Text = "Admin required to read DLDSR state";
+                    _window.DldsrCurrentStateText.Text = Loc.T("Admin required to read DLDSR state");
                 }
                 else
                 {
-                    _window.DldsrCurrentStateText.Text = "No DLDSR-capable monitors detected";
+                    _window.DldsrCurrentStateText.Text = Loc.T("No DLDSR-capable monitors detected");
                 }
                 return;
             }
@@ -77,7 +78,7 @@ public partial class SettingsHandler
             foreach (var s in states)
             {
                 var factorPart = string.IsNullOrEmpty(s.EnabledFactors) ? "Off" : s.EnabledFactors;
-                var matchPart = string.IsNullOrEmpty(s.MatchesCapture) ? "" : $" (matches: {s.MatchesCapture})";
+                var matchPart = string.IsNullOrEmpty(s.MatchesCapture) ? "" : Loc.T(" (matches: {0})", s.MatchesCapture);
                 // Use friendly monitor name if available, otherwise fall back to shortened key
                 string displayName;
                 if (friendlyNames.TryGetValue(s.MonitorId, out var fn))
@@ -92,14 +93,14 @@ public partial class SettingsHandler
                     if (shortId.Length > 12) shortId = shortId.Substring(0, 12) + "...";
                     displayName = shortId;
                 }
-                lines.Add($"{displayName}: {factorPart}, {s.Smoothness}% smooth{matchPart}");
+                lines.Add(Loc.T("{0}: {1}, {2}% smooth{3}", displayName, factorPart, s.Smoothness, matchPart));
             }
 
             _window.DldsrCurrentStateText.Text = string.Join("\n", lines);
         }
         catch (Exception ex)
         {
-            _window.DldsrCurrentStateText.Text = $"Error: {ex.Message}";
+            _window.DldsrCurrentStateText.Text = Loc.T("Error: {0}", ex.Message);
             CrashReporter.Log($"[SettingsHandler.RefreshDldsrCurrentState] {ex.Message}");
         }
     }
@@ -158,9 +159,9 @@ public partial class SettingsHandler
             // Changing this redeploys shaders to every game straight away, so confirm first.
             var confirm = new ContentDialog
             {
-                Title = "Change shader management?",
-                Content = "RHI will update the shader files in all your ReShade games straight away to match this setting.",
-                PrimaryButtonText = "Change",
+                Title = Loc.T("Change shader management?"),
+                Content = Loc.T("RHI will update the shader files in all your ReShade games straight away to match this setting."),
+                PrimaryButtonText = Loc.T("Change"),
                 CloseButtonText = "Cancel",
                 DefaultButton = ContentDialogButton.Close,
                 XamlRoot = combo.XamlRoot ?? _window.Content.XamlRoot,
@@ -251,11 +252,11 @@ public partial class SettingsHandler
 
             // Show confirmation dialog
             var appliedSettings = string.IsNullOrEmpty(screenshotPath)
-                ? "ReShade hotkeys and effect list style"
-                : "Screenshot path, ReShade hotkeys, and effect list style";
+                ? Loc.T("ReShade hotkeys and effect list style")
+                : Loc.T("Screenshot path, ReShade hotkeys, and effect list style");
             var dialog = new ContentDialog
             {
-                Title = "Keys and screenshots",
+                Title = Loc.T("Keys and screenshots"),
                 Content = $"{appliedSettings} applied to {updatedCount} game{(updatedCount == 1 ? "" : "s")}.",
                 CloseButtonText = "OK",
                 XamlRoot = _window.Content.XamlRoot,
@@ -314,8 +315,8 @@ public partial class SettingsHandler
             {
                 var emptyDialog = new ContentDialog
                 {
-                    Title = "Peak Nits",
-                    Content = "Peak nits is not configured or is disabled.",
+                    Title = Loc.T("Peak Nits"),
+                    Content = Loc.T("Peak nits is not configured or is disabled."),
                     CloseButtonText = "OK",
                     XamlRoot = _window.Content.XamlRoot,
                     RequestedTheme = ElementTheme.Dark,
@@ -360,7 +361,7 @@ public partial class SettingsHandler
 
             var dialog = new ContentDialog
             {
-                Title = "Peak Nits",
+                Title = Loc.T("Peak Nits"),
                 Content = $"Applied peak nits ({peakNits}) to {updatedCount} reshade.ini file{(updatedCount == 1 ? "" : "s")}.",
                 CloseButtonText = "OK",
                 XamlRoot = _window.Content.XamlRoot,
@@ -384,6 +385,7 @@ public partial class SettingsHandler
         System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo(logsDir) { UseShellExecute = true });
     }
 
+    // Windows scheduled-task name: a machine identifier, never translated.
     private const string AdminTaskName = "RHI Admin Mode";
     private bool _adminComboInit = true;
 
@@ -420,8 +422,8 @@ public partial class SettingsHandler
             {
                 await DialogService.ShowSafeAsync(new ContentDialog
                 {
-                    Title = "Admin Mode",
-                    Content = "UAC is disabled on this system — RHI always runs as administrator.",
+                    Title = Loc.T("Admin Mode"),
+                    Content = Loc.T("UAC is disabled on this system — RHI always runs as administrator."),
                     CloseButtonText = "OK",
                     XamlRoot = _window.Content.XamlRoot,
                     RequestedTheme = ElementTheme.Dark,
@@ -443,10 +445,10 @@ public partial class SettingsHandler
                 // Show restart notice
                 await DialogService.ShowSafeAsync(new ContentDialog
                 {
-                    Title = "Admin Mode",
+                    Title = Loc.T("Admin Mode"),
                     Content = enable
-                        ? "Admin Mode enabled. Restart RHI for it to take effect."
-                        : "Admin Mode disabled. RHI will launch normally on next start.",
+                        ? Loc.T("Admin Mode enabled. Restart RHI for it to take effect.")
+                        : Loc.T("Admin Mode disabled. RHI will launch normally on next start."),
                     CloseButtonText = "OK",
                     XamlRoot = _window.Content.XamlRoot,
                     RequestedTheme = ElementTheme.Dark,

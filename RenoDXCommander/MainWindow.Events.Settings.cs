@@ -9,6 +9,7 @@ using Microsoft.UI.Xaml.Media;
 using RenoDXCommander.Models;
 using RenoDXCommander.Services;
 using RenoDXCommander.ViewModels;
+using RenoDXCommander.Localization;
 
 namespace RenoDXCommander;
 
@@ -28,8 +29,8 @@ public sealed partial class MainWindow
             {
                 var dlg = new ContentDialog
                 {
-                    Title = "RHI is up to date",
-                    Content = $"You're running v{Services.CrashReporter.AppVersion} — no updates available.",
+                    Title = Loc.T("RHI is up to date"),
+                    Content = Loc.T("You're running v{0} — no updates available.", Services.CrashReporter.AppVersion),
                     CloseButtonText = "OK",
                     XamlRoot = Content.XamlRoot,
                     RequestedTheme = ElementTheme.Dark,
@@ -261,7 +262,7 @@ public sealed partial class MainWindow
         {
             DlssDefaultsSummaryPanel.Children.Add(new TextBlock
             {
-                Text = "No defaults configured yet.",
+                Text = Loc.T("No defaults configured yet."),
                 FontSize = 11,
                 Foreground = UIFactory.Brush(ResourceKeys.TextTertiaryBrush),
             });
@@ -280,7 +281,7 @@ public sealed partial class MainWindow
 
         var srCol = new StackPanel { Spacing = 2 };
         srCol.Children.Add(new TextBlock { Text = "DLSS", FontSize = 10, FontWeight = Microsoft.UI.Text.FontWeights.SemiBold, Foreground = UIFactory.Brush(ResourceKeys.TextSecondaryBrush) });
-        if (s.DefaultSrDriverOverride) srCol.Children.Add(MakeSummaryText("NVIDIA Override"));
+        if (s.DefaultSrDriverOverride) srCol.Children.Add(MakeSummaryText(Loc.T("NVIDIA Override")));
         else if (!string.IsNullOrEmpty(s.DefaultDlssVersion)) srCol.Children.Add(MakeSummaryText(s.DefaultDlssVersion));
         if (s.DefaultSrPreset != 0) srCol.Children.Add(MakeSummaryText($"Preset {DlssPresetService.SrPresets.FirstOrDefault(p => p.Value == s.DefaultSrPreset).Name ?? "?"}"));
         if (s.DefaultSrRenderScale != 0) srCol.Children.Add(MakeSummaryText($"{s.DefaultSrRenderScale}%"));
@@ -443,10 +444,10 @@ public sealed partial class MainWindow
             var textBox = new TextBox { PlaceholderText = "20-1000", FontSize = 13 };
             var dialog = new ContentDialog
             {
-                Title = "Custom FPS Limit",
+                Title = Loc.T("Custom FPS Limit"),
                 Content = textBox,
-                PrimaryButtonText = "Set",
-                CloseButtonText = "Cancel",
+                PrimaryButtonText = Loc.T("Set"),
+                CloseButtonText = Loc.T("Cancel"),
                 XamlRoot = this.Content.XamlRoot,
                 RequestedTheme = Microsoft.UI.Xaml.ElementTheme.Dark,
             };
@@ -463,7 +464,7 @@ public sealed partial class MainWindow
                 // Add the custom value to the combo and select it
                 _shaderCacheComboInit = true;
                 var items = DlssPresetService.FpsLimiterPresets.Select(o => o.Name).ToList();
-                items.Add($"{fps} FPS (Custom)");
+                items.Add(Loc.T("{0} FPS (Custom)", fps));
                 combo.ItemsSource = items.ToArray();
                 combo.SelectedIndex = items.Count - 1;
                 _shaderCacheComboInit = false;
@@ -538,7 +539,7 @@ public sealed partial class MainWindow
             var textBox = new TextBox { PlaceholderText = "20-1000", FontSize = 13 };
             var dialog = new ContentDialog
             {
-                Title = "Custom DMFG Target FPS",
+                Title = Loc.T("Custom DMFG Target FPS"),
                 Content = textBox,
                 PrimaryButtonText = "Set",
                 CloseButtonText = "Cancel",
@@ -651,9 +652,9 @@ public sealed partial class MainWindow
 
             var confirm = new ContentDialog
             {
-                Title = "Create missing profiles?",
-                Content = "RHI will create an NVIDIA driver profile for every game in your library that doesn't have one. Hidden games are skipped and existing profiles are not changed.",
-                PrimaryButtonText = "Create",
+                Title = Loc.T("Create missing profiles?"),
+                Content = Loc.T("RHI will create an NVIDIA driver profile for every game in your library that doesn't have one. Hidden games are skipped and existing profiles are not changed."),
+                PrimaryButtonText = Loc.T("Create"),
                 CloseButtonText = "Cancel",
                 DefaultButton = ContentDialogButton.Close,
                 XamlRoot = Content.XamlRoot,
@@ -680,12 +681,12 @@ public sealed partial class MainWindow
             });
 
             var content = created.Count > 0
-                ? $"Created {created.Count} profile(s):\n\n• " + string.Join("\n• ", created)
-                : "All games already have NVIDIA profiles.";
+                ? Loc.T("Created {0} profile(s):\n\n• ", created.Count) + string.Join("\n• ", created)
+                : Loc.T("All games already have NVIDIA profiles.");
 
             var dialog = new ContentDialog
             {
-                Title = "Create Missing Profiles",
+                Title = Loc.T("Create Missing Profiles"),
                 Content = new ScrollViewer
                 {
                     Content = new TextBlock { Text = content, TextWrapping = TextWrapping.Wrap, FontSize = 12 },
@@ -721,8 +722,8 @@ public sealed partial class MainWindow
             {
                 await DialogService.ShowSafeAsync(new ContentDialog
                 {
-                    Title = "Export",
-                    Content = "No custom profile settings found to export.",
+                    Title = Loc.T("Export"),
+                    Content = Loc.T("No custom profile settings found to export."),
                     CloseButtonText = "OK",
                     XamlRoot = Content.XamlRoot,
                     RequestedTheme = ElementTheme.Dark,
@@ -739,8 +740,8 @@ public sealed partial class MainWindow
 
             await DialogService.ShowSafeAsync(new ContentDialog
             {
-                Title = "Export Complete",
-                Content = $"Exported {data.Count} profile(s) to:\n{path}",
+                Title = Loc.T("Export Complete"),
+                Content = Loc.T("Exported {0} profile(s) to:\n{1}", data.Count, path),
                 CloseButtonText = "OK",
                 XamlRoot = Content.XamlRoot,
                 RequestedTheme = ElementTheme.Dark,
@@ -751,8 +752,8 @@ public sealed partial class MainWindow
             CrashReporter.Log($"[ExportNvidiaProfiles_Click] Error: {ex.GetType().Name}: {ex.Message}");
             await DialogService.ShowSafeAsync(new ContentDialog
             {
-                Title = "Export Failed",
-                Content = $"An error occurred during export:\n{ex.Message}",
+                Title = Loc.T("Export Failed"),
+                Content = Loc.T("An error occurred during export:\n{0}", ex.Message),
                 CloseButtonText = "OK",
                 XamlRoot = Content.XamlRoot,
                 RequestedTheme = ElementTheme.Dark,
@@ -772,8 +773,8 @@ public sealed partial class MainWindow
             {
                 await DialogService.ShowSafeAsync(new ContentDialog
                 {
-                    Title = "Import",
-                    Content = $"No backup file found at:\n{path}\n\nBackup profiles first.",
+                    Title = Loc.T("Import"),
+                    Content = Loc.T("No backup file found at:\n{0}\n\nBackup profiles first.", path),
                     CloseButtonText = "OK",
                     XamlRoot = Content.XamlRoot,
                     RequestedTheme = ElementTheme.Dark,
@@ -787,20 +788,20 @@ public sealed partial class MainWindow
 
             // Confirm before proceeding — importing overwrites driver profile settings irreversibly
             bool isAdmin = VulkanLayerService.IsRunningAsAdmin();
-            var warningText = "This will overwrite your current NVIDIA driver profile settings with the saved backup. This cannot be undone.";
+            var warningText = Loc.T("This will overwrite your current NVIDIA driver profile settings with the saved backup. This cannot be undone.");
             if (!isAdmin)
-                warningText += "\n\nYou are not running as admin. Settings that require elevated privileges (e.g. ReBAR) will not be restored. Run RHI as admin to import all settings.";
+                warningText += Loc.T("\n\nYou are not running as admin. Settings that require elevated privileges (e.g. ReBAR) will not be restored. Run RHI as admin to import all settings.");
 
             var confirmResult = await DialogService.ShowSafeAsync(new ContentDialog
             {
-                Title = "Restore Profiles",
+                Title = Loc.T("Restore Profiles"),
                 Content = new TextBlock
                 {
                     Text = warningText,
                     TextWrapping = TextWrapping.Wrap,
                     FontSize = 12,
                 },
-                PrimaryButtonText = "Import",
+                PrimaryButtonText = Loc.T("Import"),
                 CloseButtonText = "Cancel",
                 XamlRoot = Content.XamlRoot,
                 RequestedTheme = ElementTheme.Dark,
@@ -810,7 +811,7 @@ public sealed partial class MainWindow
             // Show progress dialog
             var progressText = new TextBlock
             {
-                Text = "Importing profiles...",
+                Text = Loc.T("Importing profiles..."),
                 FontSize = 12,
                 Foreground = UIFactory.Brush(ResourceKeys.TextSecondaryBrush),
                 TextWrapping = TextWrapping.Wrap,
@@ -840,8 +841,8 @@ public sealed partial class MainWindow
 
             await DialogService.ShowSafeAsync(new ContentDialog
             {
-                Title = "Import Complete",
-                Content = $"Imported {count} profile(s) from backup.",
+                Title = Loc.T("Import Complete"),
+                Content = Loc.T("Imported {0} profile(s) from backup.", count),
                 CloseButtonText = "OK",
                 XamlRoot = Content.XamlRoot,
                 RequestedTheme = ElementTheme.Dark,
@@ -862,8 +863,8 @@ public sealed partial class MainWindow
             {
                 await DialogService.ShowSafeAsync(new ContentDialog
                 {
-                    Title = "Digital Vibrance",
-                    Content = "No NVIDIA displays detected. Digital Vibrance requires an NVIDIA GPU with compatible drivers.",
+                    Title = Loc.T("Digital Vibrance"),
+                    Content = Loc.T("No NVIDIA displays detected. Digital Vibrance requires an NVIDIA GPU with compatible drivers."),
                     CloseButtonText = "OK",
                     XamlRoot = Content.XamlRoot,
                     RequestedTheme = ElementTheme.Dark,
@@ -886,7 +887,7 @@ public sealed partial class MainWindow
 
             var displayLabel = new TextBlock
             {
-                Text = "Monitor",
+                Text = Loc.T("Monitor"),
                 FontSize = 11,
                 Foreground = UIFactory.Brush(ResourceKeys.InlineDescriptionBrush),
             };
@@ -946,7 +947,7 @@ public sealed partial class MainWindow
             // Buttons row
             var saveBtn = new Button
             {
-                Content = "Save",
+                Content = Loc.T("Save"),
                 Background = UIFactory.Brush(ResourceKeys.AccentBlueBgBrush),
                 Foreground = UIFactory.Brush(ResourceKeys.AccentBlueBrush),
                 BorderBrush = UIFactory.Brush(ResourceKeys.AccentBlueBorderBrush),
@@ -957,7 +958,7 @@ public sealed partial class MainWindow
             };
             var resetBtn = new Button
             {
-                Content = "Reset to 50",
+                Content = Loc.T("Reset to 50"),
                 CornerRadius = new CornerRadius(6),
                 Padding = new Thickness(16, 6, 16, 6),
                 FontSize = 12,
@@ -1019,9 +1020,9 @@ public sealed partial class MainWindow
 
             var dialog = new ContentDialog
             {
-                Title = "Digital Vibrance",
+                Title = Loc.T("Digital Vibrance"),
                 Content = panel,
-                CloseButtonText = "Close",
+                CloseButtonText = Loc.T("Close"),
                 XamlRoot = Content.XamlRoot,
                 RequestedTheme = ElementTheme.Dark,
             };
@@ -1040,14 +1041,14 @@ public sealed partial class MainWindow
         {
             var confirmDialog = new ContentDialog
             {
-                Title = "Reset all game profiles?",
+                Title = Loc.T("Reset all game profiles?"),
                 Content = new TextBlock
                 {
-                    Text = "This will remove ALL per-game NVIDIA driver profile overrides (DLSS/Streamline versions, presets, render scales, ReBAR, VSync, Smooth Motion, Low Latency, Power Mode — everything) AND reset global settings (Shader Cache, G-Sync, Refresh Rate, ReBAR) to defaults.\n\nAll profiles will return to NVIDIA factory defaults. This cannot be undone.",
+                    Text = Loc.T("This will remove ALL per-game NVIDIA driver profile overrides (DLSS/Streamline versions, presets, render scales, ReBAR, VSync, Smooth Motion, Low Latency, Power Mode — everything) AND reset global settings (Shader Cache, G-Sync, Refresh Rate, ReBAR) to defaults.\n\nAll profiles will return to NVIDIA factory defaults. This cannot be undone."),
                     TextWrapping = Microsoft.UI.Xaml.TextWrapping.Wrap,
                     FontSize = 13,
                 },
-                PrimaryButtonText = "Reset All",
+                PrimaryButtonText = Loc.T("Reset All"),
                 CloseButtonText = "Cancel",
                 DefaultButton = ContentDialogButton.Close,
                 XamlRoot = Content.XamlRoot,
@@ -1102,7 +1103,7 @@ public sealed partial class MainWindow
 
                     // Reset global profile
                     DispatcherQueue?.TryEnqueue(() =>
-                        progressText.Text = "Resetting global settings...");
+                        progressText.Text = Loc.T("Resetting global settings..."));
                     presetSvc.ResetGlobalProfile();
                 });
 
@@ -1124,8 +1125,8 @@ public sealed partial class MainWindow
 
                 await DialogService.ShowSafeAsync(new ContentDialog
                 {
-                    Title = "Profiles Reset",
-                    Content = $"Reset {resetCount} game profile(s) and global settings to factory defaults.",
+                    Title = Loc.T("Profiles Reset"),
+                    Content = Loc.T("Reset {0} game profile(s) and global settings to factory defaults.", resetCount),
                     CloseButtonText = "OK",
                     XamlRoot = Content.XamlRoot,
                     RequestedTheme = ElementTheme.Dark,
@@ -1136,8 +1137,8 @@ public sealed partial class MainWindow
                 CrashReporter.Log($"[ResetAllNvidiaProfiles_Click] Error: {ex.GetType().Name}: {ex.Message}");
                 await DialogService.ShowSafeAsync(new ContentDialog
                 {
-                    Title = "Reset Failed",
-                    Content = $"Error: {ex.Message}",
+                    Title = Loc.T("Reset Failed"),
+                    Content = Loc.T("Error: {0}", ex.Message),
                     CloseButtonText = "OK",
                     XamlRoot = Content.XamlRoot,
                     RequestedTheme = ElementTheme.Dark,
@@ -1156,9 +1157,9 @@ public sealed partial class MainWindow
         {
             var confirmDialog = new ContentDialog
             {
-                Title = "Clear NVIDIA Shader Cache",
-                Content = "This will permanently delete the NVIDIA DXCache and GLCache folders. This cannot be undone.\n\nAll games will need to rebuild their shader caches on next launch, which may cause brief stuttering or longer load times the first time. This can fix shader corruption, persistent stuttering, or graphical issues after driver updates.",
-                PrimaryButtonText = "Clear",
+                Title = Loc.T("Clear NVIDIA Shader Cache"),
+                Content = Loc.T("This will permanently delete the NVIDIA DXCache and GLCache folders. This cannot be undone.\n\nAll games will need to rebuild their shader caches on next launch, which may cause brief stuttering or longer load times the first time. This can fix shader corruption, persistent stuttering, or graphical issues after driver updates."),
+                PrimaryButtonText = Loc.T("Clear"),
                 CloseButtonText = "Cancel",
                 DefaultButton = ContentDialogButton.Close,
                 XamlRoot = Content.XamlRoot,
@@ -1200,12 +1201,12 @@ public sealed partial class MainWindow
             }
 
             var message = filesFailed > 0
-                ? $"Shader cache folders cleared. {filesDeleted} files deleted, {filesFailed} files skipped (in use by running games). Shaders will recompile on next game launch."
-                : $"Shader cache folders cleared. {filesDeleted} files deleted. Shaders will recompile on next game launch.";
+                ? Loc.T("Shader cache folders cleared. {0} files deleted, {1} files skipped (in use by running games). Shaders will recompile on next game launch.", filesDeleted, filesFailed)
+                : Loc.T("Shader cache folders cleared. {0} files deleted. Shaders will recompile on next game launch.", filesDeleted);
 
             await DialogService.ShowSafeAsync(new ContentDialog
             {
-                Title = "Shader Cache Cleared",
+                Title = Loc.T("Shader Cache Cleared"),
                 Content = message,
                 CloseButtonText = "OK",
                 XamlRoot = Content.XamlRoot,
@@ -1233,7 +1234,7 @@ public sealed partial class MainWindow
                 // Writing to HKLM requires admin — use a reg.exe process with elevation
                 var regValue = value.ToString();
                 var psi = new System.Diagnostics.ProcessStartInfo("reg.exe",
-                    $"add \"HKLM\\SOFTWARE\\NVIDIA Corporation\\Global\\NGXCore\" /v ShowDlssIndicator /t REG_DWORD /d {regValue} /f")
+                    Loc.T("add \"HKLM\\SOFTWARE\\NVIDIA Corporation\\Global\\NGXCore\" /v ShowDlssIndicator /t REG_DWORD /d {0} /f", regValue))
                 {
                     UseShellExecute = true,
                     Verb = "runas",
@@ -1298,7 +1299,7 @@ public sealed partial class MainWindow
     private void BackgroundUpdateChecksCombo_SelectionChanged(object sender, SelectionChangedEventArgs e)
     {
         if (sender is not ComboBox combo || combo.SelectedIndex < 0) return;
-        ViewModel.Settings.BackgroundUpdateChecks = combo.SelectedIndex == 1 ? "Minimal" : "On";
+        ViewModel.Settings.BackgroundUpdateChecks = combo.SelectedIndex == 1 ? Loc.T("Minimal") : "On";
         ViewModel.SaveSettingsPublic();
     }
 
@@ -1335,7 +1336,7 @@ public sealed partial class MainWindow
 
             panel.Children.Add(new TextBlock
             {
-                Text = "Leave all unchecked to enable HDR on the primary display only.",
+                Text = Loc.T("Leave all unchecked to enable HDR on the primary display only."),
                 FontSize = 11,
                 Foreground = UIFactory.Brush(ResourceKeys.InlineDescriptionBrush),
                 Margin = new Thickness(0, 4, 0, 0),
@@ -1343,7 +1344,7 @@ public sealed partial class MainWindow
 
             var dialog = new ContentDialog
             {
-                Title = "Select HDR Monitors",
+                Title = Loc.T("Select HDR Monitors"),
                 Content = panel,
                 PrimaryButtonText = "Save",
                 CloseButtonText = "Cancel",
@@ -1452,7 +1453,7 @@ public sealed partial class MainWindow
             if (enabled)
             {
                 var exePath = Environment.ProcessPath ?? System.Reflection.Assembly.GetExecutingAssembly().Location;
-                key.SetValue(valueName, $"\"{exePath}\" --minimized");
+                key.SetValue(valueName, Loc.T("\"{0}\" --minimized", exePath));
                 CrashReporter.Log("[StartWithWindows] Registry Run key added");
             }
             else
@@ -1521,8 +1522,8 @@ public sealed partial class MainWindow
         var colorData = NvColorService.GetColorData(display.DisplayId);
         if (colorData != null)
         {
-            string[] depthItems = { "8 bpc", "10 bpc", "12 bpc" };
-            string[] rangeItems = { "Full", "Limited" };
+            string[] depthItems = { Loc.T("8 bpc"), Loc.T("10 bpc"), Loc.T("12 bpc") };
+            string[] rangeItems = { Loc.T("Full"), Loc.T("Limited") };
             var depthLabel = NvColorService.BpcToLabel(colorData.Bpc);
             var rangeLabel = NvColorService.DynamicRangeToLabel(colorData.DynamicRange);
             int di = Array.IndexOf(depthItems, depthLabel);
@@ -1540,9 +1541,9 @@ public sealed partial class MainWindow
             if (ColorDisplayCombo.SelectedItem is not NvColorService.NvDisplay display) return;
 
             var depthLabel = (ColorDepthCombo.SelectedItem as ComboBoxItem)?.Content as string
-                          ?? ColorDepthCombo.SelectedItem as string ?? "10 bpc";
+                          ?? ColorDepthCombo.SelectedItem as string ?? Loc.T("10 bpc");
             var rangeLabel = (ColorRangeCombo.SelectedItem as ComboBoxItem)?.Content as string
-                          ?? ColorRangeCombo.SelectedItem as string ?? "Full";
+                          ?? ColorRangeCombo.SelectedItem as string ?? Loc.T("Full");
 
             byte bpc = NvColorService.LabelToBpc(depthLabel);
             byte dr  = NvColorService.LabelToDynamicRange(rangeLabel);
@@ -1551,10 +1552,10 @@ public sealed partial class MainWindow
 
             var dialog = new ContentDialog
             {
-                Title   = "Output Colour Settings",
+                Title   = Loc.T("Output Colour Settings"),
                 Content = ok
-                    ? $"Applied to {display.Name}: {depthLabel}, {rangeLabel}."
-                    : $"Failed to apply colour settings to {display.Name}. Check that RHI is running as administrator.",
+                    ? Loc.T("Applied to {0}: {1}, {2}.", display.Name, depthLabel, rangeLabel)
+                    : Loc.T("Failed to apply colour settings to {0}. Check that RHI is running as administrator.", display.Name),
                 CloseButtonText = "OK",
                 XamlRoot        = Content.XamlRoot,
                 RequestedTheme  = ElementTheme.Dark,
@@ -1592,7 +1593,7 @@ public sealed partial class MainWindow
 
             panel.Children.Add(new TextBlock
             {
-                Text = "Leave all unchecked to change resolution on the primary display only.",
+                Text = Loc.T("Leave all unchecked to change resolution on the primary display only."),
                 FontSize = 11,
                 Foreground = UIFactory.Brush(ResourceKeys.InlineDescriptionBrush),
                 Margin = new Thickness(0, 4, 0, 0),
@@ -1600,7 +1601,7 @@ public sealed partial class MainWindow
 
             var dialog = new ContentDialog
             {
-                Title = "Select Resolution Monitors",
+                Title = Loc.T("Select Resolution Monitors"),
                 Content = panel,
                 PrimaryButtonText = "Save",
                 CloseButtonText = "Cancel",
@@ -1651,7 +1652,7 @@ public sealed partial class MainWindow
         ViewModel.SaveSettingsPublic();
 
         bool resActive = string.Equals(newValue, "On", StringComparison.OrdinalIgnoreCase);
-        DetailResToggleText.Text = "RES";
+        DetailResToggleText.Text = Loc.T("RES");
         DetailResToggleBtn.Background = resActive
             ? UIFactory.Brush(ResourceKeys.AccentPurpleBgBrush)
             : UIFactory.Brush(ResourceKeys.SurfaceOverlayBrush);
@@ -1676,7 +1677,7 @@ public sealed partial class MainWindow
 
             content.Children.Add(new TextBlock
             {
-                Text = "How DLDSR Control Works",
+                Text = Loc.T("How DLDSR Control Works"),
                 FontSize = 14,
                 FontWeight = Microsoft.UI.Text.FontWeights.SemiBold,
                 Foreground = UIFactory.Brush(ResourceKeys.TextPrimaryBrush),
@@ -1684,9 +1685,9 @@ public sealed partial class MainWindow
 
             content.Children.Add(new TextBlock
             {
-                Text = "DLDSR (Deep Learning Dynamic Super Resolution) renders games at higher resolutions and downscales with AI for sharper image quality. This feature lets you switch DLDSR presets without opening NVIDIA Control Panel.\n\n" +
-                       "DLDSR uses a Lanczos algorithm — less jaggies, more stable, but can look slightly painterly. Standard DSR uses a Gaussian filter — more natural but with more aliasing. DLDSR is generally sharper than DSR at equivalent settings.\n\n" +
-                       "Recommended factors: DLDSR 2.25x offers the best balance of quality and performance. DSR 4.00x uses significantly more VRAM. DLDSR 1.78x is the most VRAM-friendly option.",
+                Text = Loc.T("DLDSR (Deep Learning Dynamic Super Resolution) renders games at higher resolutions and downscales with AI for sharper image quality. This feature lets you switch DLDSR presets without opening NVIDIA Control Panel.\n\n") +
+                       Loc.T("DLDSR uses a Lanczos algorithm — less jaggies, more stable, but can look slightly painterly. Standard DSR uses a Gaussian filter — more natural but with more aliasing. DLDSR is generally sharper than DSR at equivalent settings.\n\n") +
+                       Loc.T("Recommended factors: DLDSR 2.25x offers the best balance of quality and performance. DSR 4.00x uses significantly more VRAM. DLDSR 1.78x is the most VRAM-friendly option."),
                 FontSize = 12,
                 TextWrapping = TextWrapping.Wrap,
                 Foreground = UIFactory.Brush(ResourceKeys.TextSecondaryBrush),
@@ -1694,7 +1695,7 @@ public sealed partial class MainWindow
 
             content.Children.Add(new TextBlock
             {
-                Text = "Initial Setup (One Time)",
+                Text = Loc.T("Initial Setup (One Time)"),
                 FontSize = 13,
                 FontWeight = Microsoft.UI.Text.FontWeights.SemiBold,
                 Foreground = UIFactory.Brush(ResourceKeys.AccentTealBrush),
@@ -1703,11 +1704,11 @@ public sealed partial class MainWindow
 
             content.Children.Add(new TextBlock
             {
-                Text = "1. Open NVIDIA Control Panel → Manage 3D Settings → Global Settings\n" +
-                       "2. Find \"DSR - Factors\" and enable the DLDSR factors you want (e.g. 1.78x DL, 2.25x DL)\n" +
-                       "3. Click Apply and wait for the ~15 second display blackout\n" +
-                       "4. Come back here and click \"Capture Current\" to save this state\n" +
-                       "5. Repeat steps 2-4 for each DLDSR configuration you want to save (e.g. \"Off\", \"2.25x only\", \"1.78x + 2.25x\")",
+                Text = Loc.T("1. Open NVIDIA Control Panel → Manage 3D Settings → Global Settings\n") +
+                       Loc.T("2. Find \"DSR - Factors\" and enable the DLDSR factors you want (e.g. 1.78x DL, 2.25x DL)\n") +
+                       Loc.T("3. Click Apply and wait for the ~15 second display blackout\n") +
+                       Loc.T("4. Come back here and click \"Capture Current\" to save this state\n") +
+                       Loc.T("5. Repeat steps 2-4 for each DLDSR configuration you want to save (e.g. \"Off\", \"2.25x only\", \"1.78x + 2.25x\")"),
                 FontSize = 12,
                 TextWrapping = TextWrapping.Wrap,
                 Foreground = UIFactory.Brush(ResourceKeys.TextSecondaryBrush),
@@ -1715,7 +1716,7 @@ public sealed partial class MainWindow
 
             content.Children.Add(new TextBlock
             {
-                Text = "Daily Use",
+                Text = Loc.T("Daily Use"),
                 FontSize = 13,
                 FontWeight = Microsoft.UI.Text.FontWeights.SemiBold,
                 Foreground = UIFactory.Brush(ResourceKeys.AccentTealBrush),
@@ -1724,7 +1725,7 @@ public sealed partial class MainWindow
 
             content.Children.Add(new TextBlock
             {
-                Text = "Select a saved state from the dropdown and click Apply. RHI writes the registry values directly and triggers a display reset (~15 seconds of blackout while the driver reinitializes).",
+                Text = Loc.T("Select a saved state from the dropdown and click Apply. RHI writes the registry values directly and triggers a display reset (~15 seconds of blackout while the driver reinitializes)."),
                 FontSize = 12,
                 TextWrapping = TextWrapping.Wrap,
                 Foreground = UIFactory.Brush(ResourceKeys.TextSecondaryBrush),
@@ -1732,7 +1733,7 @@ public sealed partial class MainWindow
 
             content.Children.Add(new TextBlock
             {
-                Text = "DSR Smoothness",
+                Text = Loc.T("DSR Smoothness"),
                 FontSize = 13,
                 FontWeight = Microsoft.UI.Text.FontWeights.SemiBold,
                 Foreground = UIFactory.Brush(ResourceKeys.AccentTealBrush),
@@ -1742,15 +1743,15 @@ public sealed partial class MainWindow
             content.Children.Add(new TextBlock
             {
                 Text = "Controls the sharpening/smoothing applied during downscale. 100 = no sharpening (pure Lanczos downscale). Lower values add sharpening — the image gets progressively sharper as you reduce it.\n\n" +
-                       "Recommended DLDSR smoothness values (from r/MotionClarity):\n" +
-                       "  • 100 — No sharpening\n" +
-                       "  • 80 — Sharp without artifacts\n" +
-                       "  • 75 — Clear\n" +
-                       "  • 65 — Clearer\n" +
-                       "  • 55-65 — Similar clarity to DSR 4.00x at 0% (recommended range)\n" +
-                       "  • 45 — As sharp as DSR 4.00x everywhere\n\n" +
-                       "Note: DLDSR uses a Lanczos algorithm — it is naturally much sharper than standard DSR (Gaussian), so it requires higher smoothness values for a comparable look.\n\n" +
-                       "Changing smoothness causes the same ~15 second display blackout as applying a full state. Tip: set smoothness first, then click Apply — both will apply together in a single restart.",
+                       Loc.T("Recommended DLDSR smoothness values (from r/MotionClarity):\n") +
+                       Loc.T("  • 100 — No sharpening\n") +
+                       Loc.T("  • 80 — Sharp without artifacts\n") +
+                       Loc.T("  • 75 — Clear\n") +
+                       Loc.T("  • 65 — Clearer\n") +
+                       Loc.T("  • 55-65 — Similar clarity to DSR 4.00x at 0% (recommended range)\n") +
+                       Loc.T("  • 45 — As sharp as DSR 4.00x everywhere\n\n") +
+                       Loc.T("Note: DLDSR uses a Lanczos algorithm — it is naturally much sharper than standard DSR (Gaussian), so it requires higher smoothness values for a comparable look.\n\n") +
+                       Loc.T("Changing smoothness causes the same ~15 second display blackout as applying a full state. Tip: set smoothness first, then click Apply — both will apply together in a single restart."),
                 FontSize = 12,
                 TextWrapping = TextWrapping.Wrap,
                 Foreground = UIFactory.Brush(ResourceKeys.TextSecondaryBrush),
@@ -1766,9 +1767,9 @@ public sealed partial class MainWindow
 
             var dialog = new ContentDialog
             {
-                Title = "DLDSR Control",
+                Title = Loc.T("DLDSR Control"),
                 Content = scrollViewer,
-                CloseButtonText = "Got it",
+                CloseButtonText = Loc.T("Got it"),
                 XamlRoot = Content.XamlRoot,
             };
             await DialogService.ShowSafeAsync(dialog);
@@ -1788,9 +1789,9 @@ public sealed partial class MainWindow
 
             var confirm = new ContentDialog
             {
-                Title = "Apply DLDSR state?",
-                Content = $"Your screen will go black for about 15 seconds while the driver applies '{selectedLabel}'.",
-                PrimaryButtonText = "Apply",
+                Title = Loc.T("Apply DLDSR state?"),
+                Content = Loc.T("Your screen will go black for about 15 seconds while the driver applies '{0}'.", selectedLabel),
+                PrimaryButtonText = Loc.T("Apply"),
                 CloseButtonText = "Cancel",
                 DefaultButton = ContentDialogButton.Close,
                 XamlRoot = Content.XamlRoot,
@@ -1830,8 +1831,8 @@ public sealed partial class MainWindow
                     _crashReporter.Log($"[DLDSR] Failed to apply state '{selectedLabel}'");
                     var dlg = new ContentDialog
                     {
-                        Title = "DLDSR Apply Failed",
-                        Content = "Failed to apply DLDSR state. Check logs for details.",
+                        Title = Loc.T("DLDSR Apply Failed"),
+                        Content = Loc.T("Failed to apply DLDSR state. Check logs for details."),
                         CloseButtonText = "OK",
                         XamlRoot = Content.XamlRoot,
                     };
@@ -1843,7 +1844,7 @@ public sealed partial class MainWindow
                 _crashReporter.Log($"[DLDSR] Exception applying state — {ex.Message}");
                 var dlg = new ContentDialog
                 {
-                    Title = "DLDSR Apply Failed",
+                    Title = Loc.T("DLDSR Apply Failed"),
                     Content = ex.Message,
                     CloseButtonText = "OK",
                     XamlRoot = Content.XamlRoot,
@@ -1869,13 +1870,13 @@ public sealed partial class MainWindow
             // Show input dialog to get a label for the capture
             var inputBox = new TextBox
             {
-                PlaceholderText = "e.g. DLDSR 2.25x + 1.78x",
+                PlaceholderText = Loc.T("e.g. DLDSR 2.25x + 1.78x"),
                 FontSize = 12,
                 Width = 300,
             };
             var dialog = new ContentDialog
             {
-                Title = "Capture DLDSR State",
+                Title = Loc.T("Capture DLDSR State"),
                 Content = new StackPanel
                 {
                     Spacing = 8,
@@ -1883,7 +1884,7 @@ public sealed partial class MainWindow
                     {
                         new TextBlock
                         {
-                            Text = "Enter a label for this DLDSR configuration.\nFirst enable the DLDSR factors you want in NVIDIA Control Panel, then capture here.",
+                            Text = Loc.T("Enter a label for this DLDSR configuration.\nFirst enable the DLDSR factors you want in NVIDIA Control Panel, then capture here."),
                             FontSize = 12,
                             TextWrapping = TextWrapping.Wrap,
                             Foreground = UIFactory.Brush(ResourceKeys.TextSecondaryBrush),
@@ -1891,7 +1892,7 @@ public sealed partial class MainWindow
                         inputBox,
                     },
                 },
-                PrimaryButtonText = "Capture",
+                PrimaryButtonText = Loc.T("Capture"),
                 CloseButtonText = "Cancel",
                 XamlRoot = Content.XamlRoot,
             };
@@ -1904,8 +1905,8 @@ public sealed partial class MainWindow
             {
                 var errDlg = new ContentDialog
                 {
-                    Title = "Invalid Label",
-                    Content = "Please enter a label for the capture.",
+                    Title = Loc.T("Invalid Label"),
+                    Content = Loc.T("Please enter a label for the capture."),
                     CloseButtonText = "OK",
                     XamlRoot = Content.XamlRoot,
                 };
@@ -1926,7 +1927,7 @@ public sealed partial class MainWindow
                 _crashReporter.Log($"[DLDSR] Failed to capture state — {ex.Message}");
                 var errDlg = new ContentDialog
                 {
-                    Title = "DLDSR Capture Failed",
+                    Title = Loc.T("DLDSR Capture Failed"),
                     Content = ex.Message,
                     CloseButtonText = "OK",
                     XamlRoot = Content.XamlRoot,
@@ -1949,9 +1950,9 @@ public sealed partial class MainWindow
 
             var confirm = new ContentDialog
             {
-                Title = "Delete DLDSR Capture",
-                Content = $"Delete the capture '{selectedLabel}'?",
-                PrimaryButtonText = "Delete",
+                Title = Loc.T("Delete DLDSR Capture"),
+                Content = Loc.T("Delete the capture '{0}'?", selectedLabel),
+                PrimaryButtonText = Loc.T("Delete"),
                 CloseButtonText = "Cancel",
                 DefaultButton = ContentDialogButton.Close,
                 XamlRoot = Content.XamlRoot,
@@ -2010,8 +2011,8 @@ public sealed partial class MainWindow
                     _crashReporter.Log($"[DLDSR] Failed to set smoothness to {smoothness}%");
                     var dlg = new ContentDialog
                     {
-                        Title = "Smoothness Apply Failed",
-                        Content = "Failed to set DSR smoothness. Check logs for details.",
+                        Title = Loc.T("Smoothness Apply Failed"),
+                        Content = Loc.T("Failed to set DSR smoothness. Check logs for details."),
                         CloseButtonText = "OK",
                         XamlRoot = Content.XamlRoot,
                     };
@@ -2023,7 +2024,7 @@ public sealed partial class MainWindow
                 _crashReporter.Log($"[DLDSR] Exception setting smoothness — {ex.Message}");
                 var dlg = new ContentDialog
                 {
-                    Title = "Smoothness Apply Failed",
+                    Title = Loc.T("Smoothness Apply Failed"),
                     Content = ex.Message,
                     CloseButtonText = "OK",
                     XamlRoot = Content.XamlRoot,
@@ -2139,7 +2140,7 @@ public sealed partial class MainWindow
             var enablePanel = new StackPanel { Orientation = Orientation.Horizontal, Spacing = 10 };
             enablePanel.Children.Add(new TextBlock
             {
-                Text = "Auto-apply peak nits on deploy",
+                Text = Loc.T("Auto-apply peak nits on deploy"),
                 FontSize = 12,
                 Foreground = UIFactory.Brush(ResourceKeys.TextSecondaryBrush),
                 VerticalAlignment = VerticalAlignment.Center,
@@ -2154,7 +2155,7 @@ public sealed partial class MainWindow
             // Preset checkboxes
             content.Children.Add(new TextBlock
             {
-                Text = "Apply to presets:",
+                Text = Loc.T("Apply to presets:"),
                 FontSize = 12,
                 Foreground = UIFactory.Brush(ResourceKeys.TextSecondaryBrush),
                 Margin = new Thickness(0, 4, 0, 0),
@@ -2169,7 +2170,7 @@ public sealed partial class MainWindow
 
             content.Children.Add(new TextBlock
             {
-                Text = "Unchecked presets keep their existing per-preset values.",
+                Text = Loc.T("Unchecked presets keep their existing per-preset values."),
                 FontSize = 11,
                 Foreground = UIFactory.Brush(ResourceKeys.InlineDescriptionBrush),
                 TextWrapping = TextWrapping.Wrap,
@@ -2177,7 +2178,7 @@ public sealed partial class MainWindow
 
             var dialog = new ContentDialog
             {
-                Title = "Peak Nits Settings",
+                Title = Loc.T("Peak Nits Settings"),
                 Content = content,
                 PrimaryButtonText = "Save",
                 CloseButtonText = "Cancel",
@@ -2214,7 +2215,7 @@ public sealed partial class MainWindow
 
     private void AboutButton_Click(object sender, RoutedEventArgs e)
     {
-        AboutVersionText.Text = $"v{CrashReporter.AppVersion}  ·  Simplified PC Gaming by RankFTW";
+        AboutVersionText.Text = Loc.T("v{0}  ·  Simplified PC Gaming by RankFTW", CrashReporter.AppVersion);
         // Show installed Windows App Runtime version — scan WindowsApps for the installed runtime folder
         try
         {
@@ -2377,9 +2378,9 @@ public sealed partial class MainWindow
             var totalCount = newWikiMods.Count + newUltraPlusMods.Count + newLumaMods.Count;
             var dialog = new ContentDialog
             {
-                Title = "New Mods Available",
+                Title = Loc.T("New Mods Available"),
                 Content = contentPanel,
-                PrimaryButtonText = "Dismiss",
+                PrimaryButtonText = Loc.T("Dismiss"),
                 CloseButtonText = "Close",
                 XamlRoot = Content.XamlRoot,
                 RequestedTheme = ElementTheme.Dark,
@@ -2421,7 +2422,7 @@ public sealed partial class MainWindow
             // ── Search box ────────────────────────────────────────────────────────
             var searchBox = new TextBox
             {
-                PlaceholderText = "Search games, or type RenoDX, Luma or Ultra+ to filter…",
+                PlaceholderText = Loc.T("Search games, or type RenoDX, Luma or Ultra+ to filter…"),
                 FontSize        = 13,
                 Margin          = new Thickness(0, 0, 0, 10),
             };
@@ -2447,7 +2448,7 @@ public sealed partial class MainWindow
                 Grid.SetColumn(tb, col);
                 headerGrid.Children.Add(tb);
             }
-            AddHeader("Game",   0);
+            AddHeader(Loc.T("Game"),   0);
             AddHeader("RenoDX", 1);
             AddHeader("Luma",   2);
             AddHeader("Ultra+", 3);
@@ -2471,7 +2472,7 @@ public sealed partial class MainWindow
             {
                 var tick = new TextBlock
                 {
-                    Text                = status == "Done" ? "✓" : status == "WIP" ? "🔨" : "✗",
+                    Text                = status == Loc.T("Done") ? "✓" : status == Loc.T("WIP") ? "🔨" : "✗",
                     FontSize            = 13,
                     Foreground          = status == "Done" ? UIFactory.GetBrush(doneColor)
                                         : status == "WIP"  ? UIFactory.GetBrush("#D4A856")
@@ -2494,7 +2495,7 @@ public sealed partial class MainWindow
                         HorizontalAlignment = HorizontalAlignment.Center,
                         VerticalAlignment   = VerticalAlignment.Center,
                     };
-                    ToolTipService.SetToolTip(link, $"Open {modName} page");
+                    ToolTipService.SetToolTip(link, Loc.T("Open {0} page", modName));
                     cell = link;
                 }
                 Grid.SetColumn(cell, col);
@@ -2600,7 +2601,7 @@ public sealed partial class MainWindow
 
             var dlg = new ContentDialog
             {
-                Title           = "Available Mods",
+                Title           = Loc.T("Available Mods"),
                 Content         = content,
                 CloseButtonText = "Close",
                 XamlRoot        = Content.XamlRoot,

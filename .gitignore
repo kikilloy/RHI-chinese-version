@@ -43,3 +43,8 @@ OptiScaler-DLSSNR-v*/
 # Claude Code personal settings (shared .claude/settings.json is committed)
 .claude/settings.local.json
 __pycache__/
+
+# i18n tooling scratch
+tools/i18n/*.log
+tools/i18n/*.log.err
+tools/i18n/*.tmp
