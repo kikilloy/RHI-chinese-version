@@ -10,6 +10,7 @@ using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media;
 using RenoDXCommander.Controls;
 using RenoDXCommander.Services;
+using RenoDXCommander.Localization;
 
 namespace RenoDXCommander;
 
@@ -43,7 +44,7 @@ internal sealed class CogDialog
     private readonly TextBlock _status;
     private bool _hasContent;
     private string? _primaryText;
-    private string _closeText = "Close";
+    private string _closeText = Loc.T("Close");
 
     /// <summary>The scrolling body. Prefer the Add* helpers; add directly only for one-off content.</summary>
     public StackPanel Body { get; }
@@ -349,10 +350,11 @@ internal sealed class CogDialog
     /// Apply / Cancel instead of Close. Only for dialogs where applying on every change would be
     /// too expensive (sliders that write to the driver).
     /// </summary>
-    public void UseApplyButton(string applyText = "Apply", string cancelText = "Cancel")
+    public void UseApplyButton(string? applyText = null, string? cancelText = null)
     {
-        _primaryText = applyText;
-        _closeText = cancelText;
+        // Defaults cannot be Loc.T(...) — default arguments must be compile-time constants.
+        _primaryText = applyText ?? Loc.T("Apply");
+        _closeText = cancelText ?? Loc.T("Cancel");
     }
 
     /// <summary>Creates the ContentDialog. <paramref name="footer"/> (optional) stays pinned below the scrolling body.</summary>

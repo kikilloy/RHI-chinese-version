@@ -4,6 +4,7 @@ using Microsoft.UI.Xaml.Media;
 using RenoDXCommander.Models;
 using RenoDXCommander.Services;
 using System.IO;
+using RenoDXCommander.Localization;
 
 namespace RenoDXCommander;
 
@@ -45,14 +46,14 @@ public static class AddonPopupHelper
         {
             var emptyDlg = new ContentDialog
             {
-                Title = "Select Addons",
+                Title = Loc.T("Select Addons"),
                 Content = new TextBlock
                 {
-                    Text = "No addons available.",
+                    Text = Loc.T("No addons available."),
                     FontSize = 13,
                     Foreground = Brush(ResourceKeys.TextPrimaryBrush),
                 },
-                CloseButtonText = "Close",
+                CloseButtonText = Loc.T("Close"),
                 XamlRoot = xamlRoot,
                 Background = Brush(ResourceKeys.SurfaceOverlayBrush),
                 MinWidth = 750,
@@ -73,7 +74,7 @@ public static class AddonPopupHelper
             "RHI", "Custom", "Addons");
         var folderLink = new HyperlinkButton
         {
-            Content = "Place custom .addon64/.addon32 files here",
+            Content = Loc.T("Place custom .addon64/.addon32 files here"),
             FontSize = 11,
             Foreground = Brush(ResourceKeys.AccentBlueBrush),
             Padding = new Thickness(0),
@@ -154,7 +155,7 @@ public static class AddonPopupHelper
             {
                 textPanel.Children.Add(new HyperlinkButton
                 {
-                    Content = "How to use",
+                    Content = Loc.T("How to use"),
                     NavigateUri = new Uri(entry.RepositoryUrl),
                     FontSize = 11,
                     Foreground = Brush(ResourceKeys.AccentBlueBrush),
@@ -196,8 +197,8 @@ public static class AddonPopupHelper
             var toggle = new ToggleSwitch
             {
                 IsOn = isSelected,
-                OnContent = "On",
-                OffContent = "Off",
+                OnContent = Loc.T("On"),
+                OffContent = Loc.T("Off"),
                 VerticalAlignment = VerticalAlignment.Center,
                 IsEnabled = !peerIsSelected,
                 Opacity = peerIsSelected ? 0.35 : 1.0,
@@ -307,7 +308,7 @@ public static class AddonPopupHelper
         {
             panel.Children.Add(new TextBlock
             {
-                Text = "Custom Addons",
+                Text = Loc.T("Custom Addons"),
                 FontSize = 12,
                 FontWeight = Microsoft.UI.Text.FontWeights.SemiBold,
                 Foreground = Brush(ResourceKeys.TextPrimaryBrush),
@@ -356,8 +357,8 @@ public static class AddonPopupHelper
                 var toggle = new ToggleSwitch
                 {
                     IsOn = isSelected,
-                    OnContent = "On",
-                    OffContent = "Off",
+                    OnContent = Loc.T("On"),
+                    OffContent = Loc.T("Off"),
                     VerticalAlignment = VerticalAlignment.Center,
                 };
                 toggle.Toggled += (s, ev) => { if (suppressToggle) return; };
@@ -392,10 +393,10 @@ public static class AddonPopupHelper
 
         var dlg = new ContentDialog
         {
-            Title = "Select Addons",
+            Title = Loc.T("Select Addons"),
             Content = scrollViewer,
-            PrimaryButtonText = "Deploy",
-            CloseButtonText = "Cancel",
+            PrimaryButtonText = Loc.T("Deploy"),
+            CloseButtonText = Loc.T("Cancel"),
             XamlRoot = xamlRoot,
             Background = Brush(ResourceKeys.SurfaceOverlayBrush),
             MinWidth = 750,

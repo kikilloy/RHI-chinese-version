@@ -165,7 +165,7 @@ public partial class DialogService
             // Download failed — update dialog to show error with a Close button
             progressText.Text = Loc.T("❌ Download failed. Please try again later or download manually from GitHub.");
             progressBar.Value = 0;
-            downloadDlg.CloseButtonText = "Close";
+            downloadDlg.CloseButtonText = Loc.T("Close");
             await progressSession.Completion;
             return;
         }
@@ -265,7 +265,7 @@ public partial class DialogService
         {
             Title              = Loc.T("📋 Patch Notes — What's New"),
             Content            = scrollViewer,
-            CloseButtonText    = "Close",
+            CloseButtonText    = Loc.T("Close"),
             XamlRoot           = _window.Content.XamlRoot,
             Background         = Brush(ResourceKeys.SurfaceToolbarBrush),
             RequestedTheme     = ElementTheme.Dark,
@@ -326,7 +326,7 @@ public partial class DialogService
                 },
                 MaxHeight = 400,
             },
-            CloseButtonText = "OK",
+            CloseButtonText = Loc.T("OK"),
             XamlRoot = _window.Content.XamlRoot,
             RequestedTheme = ElementTheme.Dark,
         };
